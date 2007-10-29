@@ -1,0 +1,6 @@
+(jde-project-file-version "1.0")
+
+(jde-set-variables
+ ;; Path to source files for automatic loading
+ '(jde-global-classpath (quote ("/home/amuller/.m2/repository/commons-cli/commons-cli/1.0/commons-cli-1.0.jar:/home/amuller/.m2/repository/oro/oro/2.0.8/oro-2.0.8.jar:/home/amuller/.m2/repository/commons-logging/commons-logging/1.0/commons-logging-1.0.jar:/home/amuller/.m2/repository/antlr/antlr/2.7.6/antlr-2.7.6.jar:/home/amuller/.m2/repository/gsoc/obsearch/0.8/obsearch-0.8.jar:/home/amuller/.m2/repository/berkeleydb/je/3.2.23/je-3.2.23.jar:/home/amuller/.m2/repository/xpp3/xpp3_min/1.1.3.4.O/xpp3_min-1.1.3.4.O.jar:/home/amuller/.m2/repository/commons-lang/commons-lang/1.0/commons-lang-1.0.jar:/home/amuller/.m2/repository/commons-net/commons-net/1.4.1/commons-net-1.4.1.jar:/home/amuller/.m2/repository/junit/junit/4.2/junit-4.2.jar:/home/amuller/.m2/repository/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar:/home/amuller/.m2/repository/trove/trove/2.0.1/trove-2.0.1.jar:/home/amuller/.m2/repository/jxta/jxta/2.5rc2/jxta-2.5rc2.jar:/home/amuller/.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar:/home/amuller/.m2/repository/com/thoughtworks/xstream/xstream/1.2.2/xstream-1.2.2.jar:/home/amuller/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar:/home/amuller/furia-chan/target/classes:/home/amuller/furia-chan/target/test-classes:/usr/share/java/jde.jar")))
+)
