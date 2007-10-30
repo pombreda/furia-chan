@@ -1,0 +1,51 @@
+;; Object index/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "index/"
+  :tables (list 
+   (semanticdb-table "IndexSmokeTUtil.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [1 33]) ("java.io.BufferedReader" include nil nil [35 65]) ("java.io.File" include nil nil [66 86]) ("java.io.FileReader" include nil nil [87 113]) ("java.io.IOException" include nil nil [114 141]) ("java.util.Iterator" include nil nil [142 168]) ("java.util.LinkedList" include nil nil [169 197]) ("java.util.List" include nil nil [198 220]) ("java.util.Properties" include nil nil [221 249]) ("org.ajmm.obsearch.ParallelIndex" include nil nil [384 423]) ("org.ajmm.obsearch.TUtils" include nil nil [424 456]) ("org.ajmm.obsearch.SynchronizableIndex" include nil nil [457 502]) ("org.ajmm.obsearch.TimeStampResult" include nil nil [503 544]) ("org.ajmm.obsearch.example.OBSlice" include nil nil [545 586]) ("org.ajmm.obsearch.index.pivotselection.DummyPivotSelector" include nil nil [587 652]) ("org.ajmm.obsearch.index.utils.Directory" include nil nil [653 700]) ("org.ajmm.obsearch.result.OBPriorityQueueShort" include nil nil [701 754]) ("org.ajmm.obsearch.result.OBResultShort" include nil nil [755 801]) ("org.apache.log4j.Logger" include nil nil [802 833]) ("IndexSmokeTUtil" type (:typemodifiers ("public") :members (("testProperties" variable (:type "Properties") (reparse-symbol class_member_declaration) [1960 1986]) ("logger" variable (:typemodifiers ("private" "static" "transient" "final") :type "Logger") (reparse-symbol class_member_declaration) [2023 2123]) ("IndexSmokeTUtil" function (:constructor-flag t :throws ("IOException") :typemodifiers ("public")) (reparse-symbol class_member_declaration) [2289 2393]) ("initIndex" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [2576 5208]) ("tIndex" function (:throws ("Exception") :typemodifiers ("protected") :type "void") (reparse-symbol class_member_declaration) [5653 12119]) ("isIn" function (:typemodifiers ("public" "static") :arguments (("x" variable (:type "int") (reparse-symbol formal_parameters) [12324 12329]) ("j" variable (:type "int[]") (reparse-symbol formal_parameters) [12331 12338])) :type "boolean") (reparse-symbol class_member_declaration) [12297 12474]) ("shouldProcessSlice" function (:throws ("Exception") :typemodifiers ("public" "static") :arguments (("x" variable (:type "OBSlice") (reparse-symbol formal_parameters) [12751 12760])) :type "boolean") (reparse-symbol class_member_declaration) [12710 12818]) ("parseLine" function (:typemodifiers ("public" "static") :arguments (("line" variable (:type "String") (reparse-symbol formal_parameters) [13082 13093])) :type "String") (reparse-symbol class_member_declaration) [13051 13591]) ("searchSequential" function (:throws ("Exception") :typemodifiers ("public") :arguments (("max" variable (:type "int") (reparse-symbol formal_parameters) [14071 14078]) ("o" variable (:type "OBSlice") (reparse-symbol formal_parameters) [14080 14089]) ("range" variable (:type "short") (reparse-symbol formal_parameters) [14186 14197])) :type "void") (reparse-symbol class_member_declaration) [14042 14469])) :type "class") nil [1876 14472]))
+    :file "IndexSmokeTUtil.java"
+    :pointmax 14473
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TestExtentedPyramidIndex.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [12 44]) ("java.io.File" include nil nil [46 66]) ("org.ajmm.obsearch.TUtils" include nil nil [67 99]) ("org.ajmm.obsearch.example.OBSlice" include nil nil [100 141]) ("org.ajmm.obsearch.index.utils.Directory" include nil nil [142 189]) ("org.apache.log4j.Logger" include nil nil [190 221]) ("junit.framework.TestCase" include nil nil [222 254]) ("TestExtentedPyramidIndex" type (:typemodifiers ("public") :superclasses "TestCase" :members (("logger" variable (:typemodifiers ("private" "static" "transient" "final") :type "Logger") (reparse-symbol class_member_declaration) [1292 1401]) ("testPyramid" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1513 2014])) :type "class") nil [1191 2017]))
+    :file "TestExtentedPyramidIndex.java"
+    :pointmax 2018
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TestParallelIndex.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [1 33]) ("junit.framework.TestCase" include nil nil [35 67]) ("org.junit.Test" include nil nil [69 91]) ("TestParallelIndex" type (:typemodifiers ("public") :superclasses "TestCase" :members (("testParallelIndexPPTree" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1223 1886])) :type "class") nil [1006 1889]))
+    :file "TestParallelIndex.java"
+    :pointmax 1890
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TestPPTree.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [1 33]) ("java.io.File" include nil nil [35 55]) ("junit.framework.TestCase" include nil nil [57 89]) ("org.ajmm.obsearch.TUtils" include nil nil [91 123]) ("org.ajmm.obsearch.example.OBSlice" include nil nil [124 165]) ("org.ajmm.obsearch.index.utils.Directory" include nil nil [166 213]) ("org.apache.log4j.Logger" include nil nil [214 245]) ("TestPPTree" type (:typemodifiers ("public") :superclasses "TestCase" :members (("logger" variable (:typemodifiers ("private" "static" "transient" "final") :type "Logger") (reparse-symbol class_member_declaration) [1221 1316]) ("testPPTree" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1421 1917])) :type "class") nil [1134 1920]))
+    :file "TestPPTree.java"
+    :pointmax 1921
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TestSpaceTreeLeaf.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [1 33]) ("org.ajmm.obsearch.index.pptree.SpaceTreeLeaf" include nil nil [70 122]) ("org.junit.Before" include nil nil [123 147]) ("org.junit.Test" include nil nil [148 170]) ("TestSpaceTreeLeaf" type (:typemodifiers ("public") :members (("leaf" variable (:typemodifiers ("private") :type "SpaceTreeLeaf") (reparse-symbol class_member_declaration) [1156 1183]) ("setUp" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1289 1456]) ("testIntersects" function (:typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1533 1669]) ("testNotIntersects" function (:typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1745 1885])) :type "class") nil [1069 1888]))
+    :file "TestSpaceTreeLeaf.java"
+    :pointmax 1889
+    :unmatched-syntax 'nil
+    )
+   (semanticdb-table "TestSynchronizableIndex.java"
+    :major-mode 'jde-mode
+    :tags '(("org.ajmm.obsearch.index" package nil nil [1 33]) ("java.io.File" include nil nil [35 55]) ("junit.framework.TestCase" include nil nil [57 89]) ("org.ajmm.obsearch.TUtils" include nil nil [91 123]) ("org.ajmm.obsearch.example.OBSlice" include nil nil [124 165]) ("org.ajmm.obsearch.index.utils.Directory" include nil nil [166 213]) ("org.junit.Before" include nil nil [214 238]) ("TestSynchronizableIndex" type (:typemodifiers ("public") :superclasses "TestCase" :members (("testSyncTree" function (:throws ("Exception") :typemodifiers ("public") :type "void") (reparse-symbol class_member_declaration) [1351 1979])) :type "class") nil [1132 1982]))
+    :file "TestSynchronizableIndex.java"
+    :pointmax 1983
+    :unmatched-syntax 'nil
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )
