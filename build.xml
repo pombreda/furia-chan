@@ -7,12 +7,22 @@
 
 	<target name="testDataPrepareInit">
 		<property name="my.test.data.url" value="http://obsearch.googlecode.com/files/"/>		
+		<property name="tagsFile" value="TAGS"/>
 		<condition property="testDataReady">
     <and>
       <available file="${out}/${my.test.data.db}"/>
       <available file="${out}/${my.test.data.query}"/>
     </and>
   </condition>
+
+	<!-- generate etags file -->
+		<echo>Generating tags here: ${tagsFile}</echo>
+      <apply executable="etags"  parallel="true">
+				<arg value="-o"/> 
+				<arg value="${tagsFile}"/>  
+				<srcfile/>
+				<fileset dir="src" includes="**/*.java"/>
+      </apply>
 	</target>
 	
 	<target name="testDataPrepare" depends="testDataPrepareInit" unless="testDataReady">

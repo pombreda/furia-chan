@@ -4,9 +4,10 @@
   :tables (list 
    (semanticdb-table "IRIndex.java"
     :major-mode 'jde-mode
-    :tags '(("org.kit.furia" package nil nil [1 23]) ("org.ajmm.obsearch.OB" include nil nil [24 52]) ("java.util.List" include nil nil [53 75]) ("org.ajmm.obsearch.Index" include nil nil [76 107]))
+    :tags '(("org.kit.furia" package nil nil [1 23]) ("org.ajmm.obsearch.OB" include nil nil [25 53]) ("java.util.List" include nil nil [54 76]) ("org.ajmm.obsearch.Index" include nil nil [77 108]))
     :file "IRIndex.java"
-    :pointmax 1540
+    :pointmax 1492
+    :unmatched-syntax 'nil
     )
    )
   :file "semantic.cache"
