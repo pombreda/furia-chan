@@ -25,11 +25,10 @@ import org.ajmm.obsearch.Index;
 
 /**
  * This interface holds documents composed of OB objects
- * (http://obsearch.berlios.de/). 
- * An IRIndex takes advantage of the
- * distribution of these objects, to match groups of objects. If each object is
- * a word (natural language) then, what we do here is what any information
- * retrieval does when you "click" on "find similar pages".
+ * (http://obsearch.berlios.de/). An IRIndex takes advantage of the distribution
+ * of these objects, to match groups of objects. If each object is a word
+ * (natural language) then, what we do here is what any information retrieval
+ * does when you "click" on "find similar pages".
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
