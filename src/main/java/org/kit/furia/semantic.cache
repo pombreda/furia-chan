@@ -1,0 +1,15 @@
+;; Object furia/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "furia/"
+  :tables (list 
+   (semanticdb-table "IRIndex.java"
+    :major-mode 'jde-mode
+    :tags '(("org.kit.furia" package nil nil [1 23]) ("org.ajmm.obsearch.OB" include nil nil [24 52]) ("java.util.List" include nil nil [53 75]) ("org.ajmm.obsearch.Index" include nil nil [76 107]))
+    :file "IRIndex.java"
+    :pointmax 1540
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )
