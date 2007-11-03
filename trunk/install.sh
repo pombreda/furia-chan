@@ -35,5 +35,19 @@ rm -fdr temp
 cd ..
 
 
+# install lucene
+
+wget http://ftp.kddilabs.jp/infosystems/apache/lucene/java/lucene-2.2.0.tar.gz
+
+tar -xzf lucene-2.2.0.tar.gz
+
+cd lucene-2.2.0
+
+mvn install:install-file -Dfile=lucene-core-2.2.0.jar -DgroupId=apache -DartifactId=lucene -Dversion=2.2.0 -Dpackaging=jar -DpomFile=pom.xml
+
+cd ..
+
+rm -fdr lucene-2.2.0
+rm lucene-2.2.0.tar.gz
 
 
