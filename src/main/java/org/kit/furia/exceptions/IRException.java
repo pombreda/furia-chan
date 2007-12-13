@@ -1,8 +1,7 @@
-package org.kit.furia;
+package org.kit.furia.exceptions;
 
 /*
- OBSearch: a distributed similarity search engine
- This project is to similarity search what 'bit-torrent' is to downloads.
+ Furia-chan: An Open Source software license violation detector.    
  Copyright (C) 2007 Kyushu Institute of Technology
 
  This program is free software: you can redistribute it and/or modify
@@ -20,27 +19,27 @@ package org.kit.furia;
  */
 
 /**
- * Class: Result
+ * IRException is an exception wrapper. It holds exceptions thrown by the underlying Information Retrieval
+ * system implementation.
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
-class Result {
-
+public class IRException
+        extends Exception {
     /**
-     * The name of the document of the result
+     * Internal exception
      */
-    private String documentName;
-
-    /**
-     * The score for the given document
-     */
-    private float score;
-
-    public String getDocumentName() {
-        return documentName;
+    private Exception e;
+    
+    public IRException(Exception e){
+        this.e = e;
     }
-
-    public float getScore() {
-        return score;
+    
+    public String toString(){
+        if(e != null){
+        return e.toString();
+        }else{
+            return "N/A";
+        }
     }
 }
