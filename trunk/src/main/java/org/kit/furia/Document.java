@@ -8,8 +8,7 @@ import org.ajmm.obsearch.OB;
 import org.kit.furia.misc.IntegerHolder;
 
 /*
- OBSearch: a distributed similarity search engine
- This project is to similarity search what 'bit-torrent' is to downloads.
+ Furia-chan: An Open Source software license violation detector. 
  Copyright (C) 2007 Kyushu Institute of Technology
 
  This program is free software: you can redistribute it and/or modify
@@ -48,6 +47,11 @@ public class Document < O extends OB > {
      * The identification string of this document
      */
     private String id;
+    
+    /**
+     * The size of the multi-set of the words of this document.
+     */
+    private int wordCountMultiSet;
 
 
     public String getId() {
@@ -64,10 +68,18 @@ public class Document < O extends OB > {
     }
     
     /**
-     * @return The number of words contained in this documnet.
+     * @return The size of the set of words contained in this document.
      */
     public int size(){
         return data.size();
+    }
+    
+    /**
+     * 
+     * @return The size of the multi-set of words contained in this document.
+     */
+    public int multiSetSize(){
+        return wordCountMultiSet;
     }
 
     /**
@@ -83,6 +95,7 @@ public class Document < O extends OB > {
     public Document(String id, int initialCapacity) {
         data = new HashMap < O, DocumentElement < O > >(initialCapacity);
         this.id = id;
+        wordCountMultiSet = 0;
     }
 
     /**
@@ -100,6 +113,7 @@ public class Document < O extends OB > {
         }
         // increment the number of words in the document.
         r.inc();
+        wordCountMultiSet++;
     }
 
     /**

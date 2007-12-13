@@ -11,12 +11,12 @@ import org.ajmm.obsearch.exception.OBException;
 import org.ajmm.obsearch.exception.OutOfRangeException;
 import org.ajmm.obsearch.exception.UndefinedPivotsException;
 import org.apache.lucene.index.CorruptIndexException;
+import org.kit.furia.exceptions.IRException;
 
 import com.sleepycat.je.DatabaseException;
 
 /*
- OBSearch: a distributed similarity search engine
- This project is to similarity search what 'bit-torrent' is to downloads.
+ Furia-chan: An Open Source software license violation detector.
  Copyright (C) 2007 Kyushu Institute of Technology
 
  This program is free software: you can redistribute it and/or modify
@@ -34,13 +34,16 @@ import com.sleepycat.je.DatabaseException;
  */
 
 /**
- * AbstractIRIndex holds the basic functionality for an Information Retrieval
- * system that works on OB objects (please see obsearch.berlios.de). By using a
+ * IRIndex holds the basic functionality for an Information Retrieval system
+ * that works on OB objects (please see obsearch.berlios.de). By using a
  * distance function d, we transform the queries in terms of the closest
  * elements that are in the database, and once this transformation is performed,
  * we utilize an information retrieval system to perform the matching. Because
  * our documents are multi-sets, the distribution of OB objects inside a
- * document is taken into account.
+ * document is taken into account. So, instead of matching a huge syntax tree of
+ * for example, music, we cut a song into pieces, match the pieces and then the
+ * overall finger-print of the multi-set of OB objects is matched.
+ * 
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
@@ -50,29 +53,21 @@ public interface IRIndex < O extends OB > {
      * Inserts a new document into the database.
      * @param document
      *                The document to be inserted.
-     * @throws DatabaseException
-     *                 If something goes wrong with the DB
-     * @throws OBException
-     *                 User generated exception
-     * @throws IllegalAccessException
-     *                 If there is a problem when instantiating objects O
-     * @throws InstantiationException
-     *                 If there is a problem when instantiating objects O
-     * @throws CorruptIndexException
-     *                 If the IR index is corrupted.
-     * @throws IOException
-     *                 If there is a problem while writing into the IRIndex.
+     * @throws IRException
+     *                 If something goes wrong with the IR engine or with
+     *                 OBSearch.
      */
-    void insert(Document < O > document) throws DatabaseException, OBException,
-            IllegalAccessException, InstantiationException,
-            CorruptIndexException, IOException;
+    void insert(Document < O > document) throws IRException;
 
     /**
-     * Deletes the given string document from the database.
-     * @param documentName
-     *                The document id that will be deleted.
+     * Deletes the given string document from the database. If more than one
+     * documents have the same name, all the documents will be erased.
+     * @return The number of documents deleted.
+     * @throws IRException
+     *                 If something goes wrong with the IR engine or with
+     *                 OBSearch.
      */
-    void delete(String documentName);
+    int delete(String documentName) throws IRException;
 
     /**
      * Returns the underlying OBSearch index.
@@ -85,42 +80,18 @@ public interface IRIndex < O extends OB > {
      * deleted. The index might deteriorate at some point so every once in a
      * while it is a good idea to rebuild the index. Additionally, it will
      * Optimize the IR index.
-     * @throws IOException
-     *                 if the index serialization process fails
-     * @throws AlreadyFrozenException
-     *                 If the index was already frozen and the user attempted to
-     *                 freeze it again
-     * @throws DatabaseException
-     *                 If something goes wrong with the DB
-     * @throws OBException
-     *                 User generated exception
-     * @throws IllegalAccessException
-     *                 If there is a problem when instantiating objects O
-     * @throws InstantiationException
-     *                 If there is a problem when instantiating objects O
-     * @throws UndefinedPivotsException
-     *                 If the pivots of the index have not been selected before
-     *                 calling this method.
-     * @throws OutOfRangeException
-     *                 If the distance of any object to any other object exceeds
-     *                 the range defined by the user.
-     * @throws IllegalIdException
-     *                 This exception is left as a Debug flag. If you receive
-     *                 this exception please report the problem to:
-     *                 http://code.google.com/p/obsearch/issues/list
+     * @throws IRException
+     *                 If something goes wrong with the IR engine or with
+     *                 OBSearch.
      */
-    void freeze() throws IOException, AlreadyFrozenException,
-            IllegalIdException, IllegalAccessException, InstantiationException,
-            DatabaseException, OutOfRangeException, OBException,
-            UndefinedPivotsException;
+    void freeze() throws IRException;
 
     /**
-     * Closes the databases. You *should* close the databases
-     * after using an IRIndex.
-     * @throws DatabaseException
-     *                 If something goes wrong with the OBSearch
-     * @throws IOException
-     *                 If something goes wrong with the IR engine.
+     * Closes the databases. You *should* close the databases after using an
+     * IRIndex.
+     * @throws IRException
+     *                 If something goes wrong with the IR engine or with
+     *                 OBSearch.
      */
-    void close() throws DatabaseException, IOException;
+    void close() throws IRException;
 }
