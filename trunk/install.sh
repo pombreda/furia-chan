@@ -51,3 +51,17 @@ rm -fdr lucene-2.2.0
 rm lucene-2.2.0.tar.gz
 
 
+# install soot
+
+
+wget http://www.sable.mcgill.ca/software/sootclasses-2.2.4.jar
+mvn install:install-file -Dfile=sootclasses-2.2.4.jar -DgroupId=sable -DartifactId=soot -Dversion=2.2.4 -Dpackaging=jar -DpomFile=pom.xml
+rm sootclasses-2.2.4.jar
+
+wget http://www.sable.mcgill.ca/software/jasminclasses-2.2.4.jar
+mvn install:install-file -Dfile=jasminclasses-2.2.4.jar -DgroupId=sable -DartifactId=soot-jasmin -Dversion=2.2.4 -Dpackaging=jar -DpomFile=pom.xml
+rm jasminclasses-2.2.4.jar
+
+wget http://www.sable.mcgill.ca/software/polyglotclasses-1.3.4.jar
+mvn install:install-file -Dfile=polyglotclasses-1.3.4.jar -DgroupId=sable -DartifactId=soot-polyglot -Dversion=1.3.4 -Dpackaging=jar -DpomFile=pom.xml
+rm polyglotclasses-1.3.4.jar

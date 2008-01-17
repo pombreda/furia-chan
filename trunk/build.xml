@@ -6,12 +6,11 @@
 	</target>
 
 	<target name="testDataPrepareInit">
-		<property name="my.test.data.url" value="http://obsearch.googlecode.com/files/"/>		
+		<property name="my.test.data.url" value="http://furia-chan.googlecode.com/files/"/>		
 		<property name="tagsFile" value="TAGS"/>
 		<condition property="testDataReady">
     <and>
       <available file="${out}/${my.test.data.db}"/>
-      <available file="${out}/${my.test.data.query}"/>
     </and>
   </condition>
 
@@ -29,10 +28,10 @@
 		
 		<!-- remove -small to get a bigger dataset -->
 		<mkdir dir="${out}"/>
-		<get src="${my.test.data.url}${my.test.data.db}.bz2" dest="${out}/${my.test.data.db}.bz2" usetimestamp="true" />
-		<get src="${my.test.data.url}${my.test.data.query}.bz2" dest="${out}/${my.test.data.query}.bz2" usetimestamp="true" />
-		<bunzip2 src="${out}/${my.test.data.db}.bz2"/>
-		<bunzip2 src="${out}/${my.test.data.query}.bz2"/>
+<!--		<get src="${my.test.data.url}${my.test.data.db}.bz2" dest="${out}/${my.test.data.db}.bz2" usetimestamp="true" />-->
+
+
+		<untar src="${out}/${my.test.data.db}.tar.bz2" dest="${out}" compression="bzip2"/>
 	</target>
 
 	
