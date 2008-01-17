@@ -24,7 +24,7 @@ package org.kit.furia.misc;
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
-public class IntegerHolder implements Comparable {
+public class IntegerHolder implements Comparable<IntegerHolder> {
 
     /**
      * Integer value to be stored.
@@ -90,14 +90,11 @@ public class IntegerHolder implements Comparable {
     /**
      * Compares this IntegerHolder to another IntegerHolder.
      */
-    public int compareTo(Object o) {
-        if (!(o instanceof IntegerHolder)) {
-            throw new ClassCastException();
-        }
+    public int compareTo(IntegerHolder o) {
         IntegerHolder i = (IntegerHolder) o;
         int res = 0;
         if (value < i.value) {
-            res = -1; // we invert it :)
+            res = -1; 
         } else if (value > i.value) {
             res = 1;
         }

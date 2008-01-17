@@ -6,9 +6,9 @@
   <packaging>jar</packaging>
 	<!-- Since Furia is a program that we know already that will never
        be complete, we just increment the version integer 
-			 <program version>+<test database version>+<lowest precision obtained>n<top n used>
+			 <program version>+<test database version>+<lowest precision obtained>n<top n used>       0+0+96n10
 	-->
-  <version>0+0+96n10</version>
+  <version>0</version>
   <name>furia-chan</name>
 	<inceptionYear>2007</inceptionYear>
 	<description>  
@@ -19,8 +19,7 @@
 	<properties>
 		<!-- additional unit test files to be downloaded -->
 
-		<my.test.data.db>slices-small</my.test.data.db>
-		<my.test.data.query>slices-query</my.test.data.query>
+		<my.test.data.db>SmallDataSetJava</my.test.data.db>
 		<my.test.data.dir>${user.home}/temp/</my.test.data.dir>
 		
   </properties>
@@ -92,6 +91,28 @@
 			<groupId>gsoc</groupId>
 			<artifactId>obsearch</artifactId>
 			<version>0.9</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>sable</groupId>
+			<artifactId>soot</artifactId>
+			<version>2.2.4</version>
+			<scope>compile</scope>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>sable</groupId>
+			<artifactId>soot-jasmin</artifactId>
+			<version>2.2.4</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>sable</groupId>
+			<artifactId>soot-polyglot</artifactId>
+			<version>1.3.4</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -342,7 +363,6 @@ Would be cool to use this.
 									<property name="home" value="${user.home}"/>
 									<property name="out" value="${my.test.data.dir}"/>
 									<property name="my.test.data.db" value="${my.test.data.db}"/>
-									<property name="my.test.data.query" value="${my.test.data.query}"/>
 								</ant>
               </tasks>
             </configuration>
@@ -403,7 +423,7 @@ Would be cool to use this.
         <artifactId>maven-antlr-plugin</artifactId>
         <configuration>
 					<sourceDirectory>${basedir}/src/main/antlr/</sourceDirectory>
-            <grammars>Slice.g</grammars>
+            <grammars>Fragment.g</grammars>
         </configuration>
 				<executions>
           <execution>
@@ -418,7 +438,8 @@ Would be cool to use this.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-					<forkMode>pertest</forkMode>
+					<useSystemClassLoader>true</useSystemClassLoader>
+					<forkMode>once</forkMode>
 					<argLine>-enableassertions</argLine>
           <argLine>-Xmx1200M</argLine>
         </configuration>

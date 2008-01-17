@@ -40,7 +40,7 @@ public interface IRIndexShort < O extends OBShort > extends IRIndex < O > {
      * @param document
      *                A multi-set of objects OBShort.
      * @param k
-     *                k for the nearest neighbor search
+     *                k for the nearest neighbor search. All the k-elements will be used to create the IR query.
      * @param r
      *                range for the nearest neighbor search
      * @param n
