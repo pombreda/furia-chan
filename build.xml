@@ -28,8 +28,15 @@
 		
 		<!-- remove -small to get a bigger dataset -->
 		<mkdir dir="${out}"/>
-<!--		<get src="${my.test.data.url}${my.test.data.db}.bz2" dest="${out}/${my.test.data.db}.bz2" usetimestamp="true" />-->
+		<get src="${my.test.data.url}${my.test.data.db}_00" dest="${out}/${my.test.data.db}_00" usetimestamp="true" />
+    <get src="${my.test.data.url}${my.test.data.db}_01" dest="${out}/${my.test.data.db}_01" usetimestamp="true" />
+    <get src="${my.test.data.url}${my.test.data.db}_02" dest="${out}/${my.test.data.db}_02" usetimestamp="true" />
 
+    <concat destfile="${out}/${my.test.data.db}.tar.bz2" binary="yes">
+     <fileset file="${out}/${my.test.data.db}_00" />
+     <fileset file="${out}/${my.test.data.db}_01" />
+		 <fileset file="${out}/${my.test.data.db}_02" />
+   </concat>
 
 		<untar src="${out}/${my.test.data.db}.tar.bz2" dest="${out}" compression="bzip2"/>
 	</target>
