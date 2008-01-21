@@ -39,8 +39,7 @@ import org.apache.log4j.PropertyConfigurator;
  * maximum number of expansions to allow. (To prevent huge Fragments) [3] The
  * output directory in which the fragments will be stored in a "fragments" file.
  * If the filename {@value org.kit.furia.io.AbstractFuriaInput.fragmentFileName}
- * is found in the output directory, this directory is silently skipped.[4] The
- * log configuration file that will be used.
+ * is found in the output directory, this directory is silently skipped.
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */

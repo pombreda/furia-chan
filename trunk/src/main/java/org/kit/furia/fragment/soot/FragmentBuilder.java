@@ -35,15 +35,31 @@ import soot.jimple.internal.JimpleLocal;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Iterator;
+/*
+    Furia-chan: An Open Source software license violation detector.    
+    Copyright (C) 2008 Kyushu Institute of Technology
 
-/**
- * Hay dos cosas que se pueden hacer: 1) micro slices: cuando encuentro un phi,
- * termino el slice, borro el phi, y creo n nuevos slices con los n elementos
- * del phi 2) exp slices: cuando encuentro un phi, creo n nuevos slices con los
- * n elementos del phi borrando el phi la cosa es crear un nuevo slice por
- * branch, muchos nuevos slices seran creados eso si...
- * @author amuller
- */
+  	This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/** 
+	*  FragmentBuilder builds new fragments out of a soot method. At first, it creates
+  *  a graph representation of the method, and from there the fragmentation can
+  * be executed
+	*  
+  *  @author      Arnoldo Jose Muller Molina    
+  */
 public class FragmentBuilder {
 
     private static final Logger logger = Logger

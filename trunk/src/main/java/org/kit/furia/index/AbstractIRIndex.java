@@ -168,7 +168,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         Query q = createQuery(sorted);
         // now we just perform the search and return the results.
         Hits hits = searcher.search(q);
-        Iterator < Hit > it = hits.iterator();
+        Iterator < Hit > it =  hits.iterator();
         List < ResultCandidate > res = new LinkedList<ResultCandidate>();
         int i = 0;
         while (it.hasNext() && i < n) {

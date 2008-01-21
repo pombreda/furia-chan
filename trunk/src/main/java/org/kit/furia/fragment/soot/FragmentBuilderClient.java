@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ajmm.obsearch.asserts.OBAsserts;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.kit.furia.FuriaProperties;
+import org.kit.furia.misc.FuriaProperties;
 
 /*
  Furia-chan: An Open Source software license violation detector.    

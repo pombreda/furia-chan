@@ -78,8 +78,8 @@ public interface IRIndex < O extends OB > {
     /**
      * Freezes the index. From this point data can be inserted, searched and
      * deleted. The index might deteriorate at some point so every once in a
-     * while it is a good idea to rebuild the index. Additionally, it will
-     * Optimize the IR index.
+     * while it is a good idea to rebuild the index. This method will also 
+     * 
      * @throws IRException
      *                 If something goes wrong with the IR engine or with
      *                 OBSearch.

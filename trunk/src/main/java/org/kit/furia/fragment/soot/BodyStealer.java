@@ -11,17 +11,30 @@ import java.util.Map;
 import java.util.Vector;
 
 import soot.*;
+/*
+    Furia-chan: An Open Source software license violation detector.    
+    Copyright (C) 2008 Kyushu Institute of Technology
 
-/**
- * @author Created by Arnoldo Jose Muller Molina (ID: Costa Rica:110820160)
- * arnoldoMuller@gmail.com
- */
-/**
- * 
- * Since Soot seems to like BodyTransformers and I have found particularly 
- * hard to get a Body out of a method in the library, so this "Transformation"
- * steals a body out of the transformation pipe 
- */
+  	This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/** 
+	*  BodyStealer 
+	*  
+  *  @author      Arnoldo Jose Muller Molina    
+	* This class steals bodies from the transformation pipe, and recovers them
+  * so that we can generate fragments later.
+  */
 public class BodyStealer extends BodyTransformer {
     
     private String signature;
