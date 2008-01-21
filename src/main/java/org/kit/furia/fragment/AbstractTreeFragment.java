@@ -38,7 +38,7 @@ public class AbstractTreeFragment implements OB {
     /**
      * The root node of the tree.
      */
-    protected FragmentAST tree;
+    protected MTDFragmentAST tree;
 
     private int hashCode;
 
@@ -73,15 +73,15 @@ public class AbstractTreeFragment implements OB {
         this.hashCode = tree.toFuriaChanTree().hashCode();
     }
 
-    protected final FragmentAST parseTree(String x)
+    protected final MTDFragmentAST parseTree(String x)
             throws FragmentParseException {
         try {
             FragmentLexer lexer = new FragmentLexer(new StringReader(x));
             FragmentParser parser = new FragmentParser(lexer);
-            parser.setASTNodeClass("org.kit.furia.fragment.FragmentAST");
+            parser.setASTNodeClass("org.kit.furia.fragment.MTDFragmentAST");
             parser.fragment();
-            FragmentAST t = (FragmentAST) parser.getAST();
-            t.updateDecendantInformation();
+            MTDFragmentAST t = (MTDFragmentAST) parser.getAST();
+            t.update();
             return t;
         } catch (Exception e) {
             throw new FragmentParseException(x, e);
@@ -102,7 +102,7 @@ public class AbstractTreeFragment implements OB {
      * @return A String representation of the tree.
      */
     public final String toString() {
-        String res = ":)";
+        String res = ":(";
         try {
             res = tree.toFuriaChanTree() + "|" + tree.getSize() + "|";
         } catch (Exception e) {
@@ -142,10 +142,6 @@ public class AbstractTreeFragment implements OB {
      * @return true if this == obj
      */
     public final boolean equals(final Object obj) {
-        if (!(obj instanceof FragmentMullerShinoharaCascon2006)) {
-            assert false;
-            return false;
-        }
         FragmentMullerShinoharaCascon2006 o = (FragmentMullerShinoharaCascon2006) obj;
         return tree.equalsTree(o.tree);
     }

@@ -22,12 +22,6 @@
  * See the 'credits' file distributed with Soot for the complete list of
  * contributors.  (Soot is distributed at http://www.sable.mcgill.ca/soot)
  */
-
-
-
-
-
-
 package org.kit.furia.fragment.soot.representation.internal;
 
 import org.kit.furia.fragment.soot.representation.Frimp;

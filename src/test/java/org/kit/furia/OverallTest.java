@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kit.furia.fragment.soot.FragmentBuilderClient;
+import org.kit.furia.misc.FuriaProperties;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -69,6 +70,10 @@ public class OverallTest {
        fragmentDataSet("JPackageClass");
        fragmentDataSet("JPackageClassObfuscatedSandMarkNoClassEnc");
        fragmentDataSet("JPackageClassObfuscatedZelix");
+       
+       // now we perform matches with IRIndex and the results
+       // should be within the top 10.
+       
     }
     
     /**

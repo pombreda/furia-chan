@@ -32,13 +32,10 @@ import antlr.collections.AST;
  * @since 0
  */
 
-public final class FragmentAST
+public  class FragmentAST
         extends BaseAST {
 
-    /**
-     * Serial version of the class.
-     */
-    private static final long serialVersionUID = -7669115912647058933L;
+    
 
     /**
      * Number of children this node has.
@@ -221,87 +218,11 @@ public final class FragmentAST
         return ts;
     }
 
-    /**
-     * Little speed up to the normal equalsTree method. Returns tree if this and
-     * t are equal
-     * @param t
-     *                Another tree to compare.
-     * @return True if both trees are equal.
-     * @see antlr.BaseAST#equalsTree(antlr.collections.AST)
-     */
-    /*
-     * public final boolean equalsTree(final SliceAST t) { if (t.decendants !=
-     * this.decendants) { // little speed up! ;) return false; } else { return
-     * super.equalsTree(t); } }
-     */
+   
 
-    /**
-     * Is t an exact structural and equals() match of this tree. The 'this'
-     * reference is considered the start of a sibling list.
-     */
-    public final boolean equalsList(AST t) {
-        AST sibling;
+    
 
-        // the empty tree is not a match of any non-null tree.
-        if (t == null) {
-            return false;
-        }
-
-        // Otherwise, start walking sibling lists. First mismatch, return false.
-        for (sibling = this; sibling != null && t != null; sibling = sibling
-                .getNextSibling(), t = t.getNextSibling()) {
-            // as a quick optimization, check roots first.
-            if (!sibling.equals(t)) {
-                return false;
-            }
-            // if roots match, do full list match test on children.
-            if (sibling.getFirstChild() != null) {
-                if (!sibling.getFirstChild().equalsList(t.getFirstChild())) {
-                    return false;
-                }
-            }
-            // sibling has no kids, make sure t doesn't either
-            else if (t.getFirstChild() != null) {
-                return false;
-            }
-        }
-        if (sibling == null && t == null) {
-            return true;
-        }
-        // one sibling list has more than the other
-        return false;
-    }
-
-    public final boolean equalsTree(AST t) {
-        // check roots first.
-        if (!this.equals(t))
-            return false;
-        // if roots match, do full list match test on children.
-        if (this.getFirstChild() != null) {
-            if (!this.getFirstChild().equalsList(t.getFirstChild()))
-                return false;
-        }
-        // sibling has no kids, make sure t doesn't either
-        else if (t.getFirstChild() != null) {
-            return false;
-        }
-        return true;
-    }
-
-    public final boolean equals(AST t) {
-        FragmentAST j = (FragmentAST) t;
-        return t != null && this.text.equals(t.getText())
-                && this.getSize() == j.getSize();
-    }
-
-    /*
-     * public final boolean equalsTree(SliceAST t) { // check roots first. if
-     * (!this.text.equals(t.text)) return false; // if roots match, do full list
-     * match test on children. if (this.getFirstChild() != null) { if
-     * (!this.getFirstChild().equalsList(t.getFirstChild())) return false; } //
-     * sibling has no kids, make sure t doesn't either else if
-     * (t.getFirstChild() != null) { return false; } return true; }
-     */
+   
 
     /** Get the first child of this node; null if not children */
     public final AST getFirstChild() {
@@ -313,22 +234,7 @@ public final class FragmentAST
         return right;
     }
 
-    /*
-     * public final boolean equalsList(AST t) { AST sibling; // the empty tree
-     * is not a match of any non-null tree. if (t == null) { return false; } //
-     * Otherwise, start walking sibling lists. First mismatch, return false. for
-     * (sibling = this; sibling != null && t != null; sibling =
-     * sibling.getNextSibling(), t = t.getNextSibling()) { // as a quick
-     * optimization, check roots first. if (!
-     * ((SliceAST)sibling).text.equals(((SliceAST)t).text)) { return false; } //
-     * if roots match, do full list match test on children. if
-     * (sibling.getFirstChild() != null) { if
-     * (!sibling.getFirstChild().equalsList(t.getFirstChild())) { return false; } } //
-     * sibling has no kids, make sure t doesn't either else if
-     * (t.getFirstChild() != null) { return false; } } if (sibling == null && t ==
-     * null) { return true; } // one sibling list has more than the other return
-     * false; }
-     */
+    
     /**
      * @return A list of the nodes in depth first order
      */

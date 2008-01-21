@@ -3,7 +3,7 @@
 # run this script when after an update install.sh has changed
 
 
-OBVERSION=0.9
+OBVERSION=0.9.1a
 
 mkdir target
 cd target
