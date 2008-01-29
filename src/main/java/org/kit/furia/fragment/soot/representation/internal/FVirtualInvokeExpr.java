@@ -128,7 +128,7 @@ public class FVirtualInvokeExpr extends AbstractVirtualInvokeExpr
         for(int i = 0; i < argBoxes.length; i++)
         {
             
-            buffer.append(", ");
+            buffer.append(",");
 
             buffer.append(Frimp.toQ(argBoxes[i].getValue()));
         }

@@ -9,6 +9,8 @@ import java.util.Properties;
 import org.ajmm.obsearch.index.utils.Directory;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
+
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kit.furia.fragment.soot.FragmentBuilderClient;
@@ -50,6 +52,7 @@ public class OverallTest {
     }
 
 
+    FuriaChanEngine engine = null;
     @Test
     public void testAll() throws IOException, Exception{
         
@@ -65,15 +68,39 @@ public class OverallTest {
         // delete the output directory before starting a new test.
         String output = FuriaProperties.getProperty("test.db.output");
         File outputDir = new File(output);
-       Directory.deleteDirectory(outputDir);
+      /* Directory.deleteDirectory(outputDir); TODO: uncomment this block
        assertTrue(outputDir.mkdirs());
        fragmentDataSet("JPackageClass");
        fragmentDataSet("JPackageClassObfuscatedSandMarkNoClassEnc");
-       fragmentDataSet("JPackageClassObfuscatedZelix");
+       fragmentDataSet("JPackageClassObfuscatedZelix");*/
        
        // now we perform matches with IRIndex and the results
        // should be within the top 10.
        
+       // first we create the database:
+       File furiaChanDBDir = new File(outputDir, "FuriaChanDB");
+       /*Directory.deleteDirectory(furiaChanDBDir);
+        engine = new FuriaChanEngine(furiaChanDBDir);      
+       
+       engine.insert(new File(outputDir, "JPackageClass"));
+       engine.freeze();
+       engine.close();*/
+       // got to reopen everything or lucene won't have anything refreshed.
+       engine = new FuriaChanEngine(furiaChanDBDir);   
+       engine.setValidationMode(true);
+       engine.setN((short)10);
+       engine.setR((short) 10);
+       // performs the search. Makes sure all the items were found in the specified range
+       //assertEquals(engine.search(new File(outputDir, "JPackageClass")), 1f);       
+       //assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedZelix")), 1f);
+       assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedSandMarkNoClassEnc")), 1f);
+    }
+    
+    @After
+    public void closeEngine() throws Exception{
+        if(engine != null){
+            engine.close(); // close the engine so that everything will be refreshed.
+        }
     }
     
     /**
@@ -88,8 +115,8 @@ public class OverallTest {
         File outputFile = new File(output);
         Directory.deleteDirectory(outputFile);
         FragmentBuilderClient c = new FragmentBuilderClient(true,
-                new File(input), Runtime.getRuntime().availableProcessors(), 1000, outputFile, true);
-        // fragments were created. 
+                new File(input), Runtime.getRuntime().availableProcessors(), outputFile, true);
+        // fragments were created.         
     }
 
 }

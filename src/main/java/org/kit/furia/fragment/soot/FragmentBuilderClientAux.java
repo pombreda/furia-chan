@@ -12,6 +12,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.kit.furia.FuriaChanConstants;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -41,7 +42,7 @@ import org.apache.log4j.PropertyConfigurator;
  * If the filename {@value org.kit.furia.io.AbstractFuriaInput.fragmentFileName}
  * is found in the output directory, this directory is silently skipped.
  * @author Arnoldo Jose Muller Molina
- * @since 0
+ * TODO: remove the fragments file if there is an error.
  */
 
 public class FragmentBuilderClientAux {
@@ -52,8 +53,7 @@ public class FragmentBuilderClientAux {
        
         //try {
             File dir = new File(args[0]);
-            int maximumNumberOfExpansions = Integer.parseInt(args[1]);
-            File output = new File(args[2]);
+            File output = new File(args[1]);
             if (!dir.exists()) {
                 String msg = "Input directory does not exist: " + dir;
                 System.err.println(msg);
@@ -80,9 +80,10 @@ public class FragmentBuilderClientAux {
                 System.exit(0);
             }
 
+            
              FragmentExtractor
                     .extractMethodsFromDirectory(dir.toString(),
-                            maximumNumberOfExpansions, 1, output.toString(), fragmentsFile.toString());
+                            FuriaChanConstants.MAX_NODES_PER_FRAGMENT, FuriaChanConstants.MIN_NODES_PER_FRAGMENT, output.toString(), fragmentsFile.toString());
             /*Iterator < FragmentBuilder > it = result.iterator();
             FileWriter outputFile = new FileWriter(fragmentsFile);
             while (it.hasNext()) {

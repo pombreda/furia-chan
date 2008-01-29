@@ -51,7 +51,7 @@ public FNewArrayExpr(Type type, Value size)
     
     public String toQ() throws Exception
     {        
-        String res = FuriaConstructDefinitions.FURIA_fnewArray + "(" + Frimp.toQ(super.getBaseType()) + ", " + Frimp.toQ(super.getSize()) + ")";
+        String res = FuriaConstructDefinitions.FURIA_fnewArray + "(" + Frimp.toQ(super.getBaseType()) + "," + Frimp.toQ(super.getSize()) + ")";
         return res;
     }
     

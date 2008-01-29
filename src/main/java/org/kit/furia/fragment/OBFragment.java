@@ -40,7 +40,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
  * respectively to trees T1 and T2, the intersection of j and m and all their
  * complete subtrees can be calculated in linear time. This requires to have a
  * value of multiplicity in each node of T1 and T2.
- * So the expected running time is around O(T1) (T1 the smallest tree)
+ * So the expected running time is around O(|T1|) (where |T1| the size of the smallest tree)
  * @author Arnoldo Jose Muller Molina
  */
 
@@ -53,6 +53,10 @@ public final class OBFragment implements OBShort {
     private int maxId;
 
     private MTDFragmentAST tree;
+    
+    public OBFragment(){
+        
+    }
 
     public OBFragment(String x) throws OBException {
         updateTree(x);
@@ -70,7 +74,7 @@ public final class OBFragment implements OBShort {
         decorate(tree, new IntegerHolder(0));
     }
 
-    protected final MTDFragmentAST parseTree(String x)
+    public static final  MTDFragmentAST parseTree(String x)
             throws FragmentParseException {
         try {
             FragmentLexer lexer = new FragmentLexer(new StringReader(x));
@@ -179,7 +183,7 @@ public final class OBFragment implements OBShort {
     public final short mtd(OBFragment other) {
 
         int res =  (ds(other) + dn(other) ) / 2;
-        assert res == distance(this.tree, other.tree);
+        //assert res == distance(this.tree, other.tree);
         return (short)res;
     }
 

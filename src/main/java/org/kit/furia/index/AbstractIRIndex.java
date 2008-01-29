@@ -149,13 +149,18 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      * elements to the original query
      * @param normalizedQuery
      *                A map that contains OB_id -> freq
-     * @param n Return the top n results only.
-     * @param intersectionQuerySize Size of the common elements.
-     * @param originalQuerySize The size of the multi-set of the  query.
+     * @param n
+     *                Return the top n results only.
+     * @param intersectionQuerySize
+     *                Size of the common elements.
+     * @param originalQuerySize
+     *                The size of the multi-set of the query.
      * @return The top n candidates.
      */
     protected List < ResultCandidate > processQueryResults(
-            Map < Integer, Integer > normalizedQuery, short n, int intersectionQuerySize, int originalQuerySize) throws IOException {
+            Map < Integer, Integer > normalizedQuery, short n,
+            int intersectionQuerySize, int originalQuerySize)
+            throws IOException {
         // at this stage we have created a map that holds all the matched
         // elements,
         // the initial document that is in terms of the original objects
@@ -164,21 +169,46 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         // we now generate a priority queue with the terms, in order to sort
         // them and put the most
         // relevant at the beginning of the query.
-        PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
-        Query q = createQuery(sorted);
-        // now we just perform the search and return the results.
-        Hits hits = searcher.search(q);
-        Iterator < Hit > it =  hits.iterator();
-        List < ResultCandidate > res = new LinkedList<ResultCandidate>();
+
+        List < ResultCandidate > res = new LinkedList < ResultCandidate >();
+        if (normalizedQuery.size() > 0) {
+            PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
+            Query q = createQuery(sorted);
+            // now we just perform the search and return the results.
+            Hits hits = searcher.search(q);
+            Iterator < Hit > it = hits.iterator();
+
+            int i = 0;
+            while (it.hasNext() && i < n) {
+                Hit h = it.next();
+                String docName = h.getDocument().getField(
+                        FieldName.DOC_NAME.toString()).stringValue();
+                TupleInput in = new TupleInput(h.getDocument().getField(
+                        FieldName.MULTI_SET_SIZE.toString()).binaryValue());
+                // size of the doc in the DB.
+                int docSize = in.readInt();
+
+                res.add(new ResultCandidate(docName, h.getScore(),
+                        ((float) (intersectionQuerySize) / (float) (docSize))));
+                i++;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Repeats times times the given string, separates everything with a space
+     * @param x
+     * @param times
+     * @return
+     */
+    private StringBuilder repeat(int x, int times) {
         int i = 0;
-        while (it.hasNext() && i < n) {
-            Hit h = it.next();
-            String docName = h.getDocument().getField(FieldName.DOC_NAME.toString()).stringValue();
-            TupleInput in = new TupleInput(h.getDocument().getField(FieldName.MULTI_SET_SIZE.toString()).binaryValue());
-            // size of the doc in the DB.
-            int docSize = in.readInt();
-            
-            res.add(new ResultCandidate(docName, h.getScore(),  ((float)(intersectionQuerySize * 2f) / (float)( originalQuerySize + docSize))));
+        assert times > 0;
+        StringBuilder res = new StringBuilder();
+        while (i < times) {
+            res.append(x);
+            res.append(" ");
             i++;
         }
         return res;
@@ -186,29 +216,38 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
 
     public void insert(Document < O > document) throws IRException {
         // OBSearch index that we use for "stemming".
+        assert document.size() != 0;
         try {
             Index < O > index = getIndex();
             Iterator < Document < O >.DocumentElement < O > > it = document
                     .iterator();
 
             StringBuilder contents = new StringBuilder();
+            int i = 0;
+            long prevTime = System.currentTimeMillis();
             while (it.hasNext()) {
                 Document < O >.DocumentElement < O > elem = it.next();
                 Result res = index.insert(elem.getObject());
                 assert res.getStatus() == Result.Status.OK
                         || res.getStatus() == Result.Status.EXISTS;
-                contents.append(res.getId());
-                contents.append(" ");
-            }
+                contents.append(repeat(res.getId(), elem.getCount()));
 
+                // TODO: put the multi-set not the set
+                i++;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Added " + i + " fragments into OB. msec: "
+                        + (System.currentTimeMillis() - prevTime));
+            }
             // now we just have to create the fields
             Field contentsField = new Field(FieldName.WORDS.toString(),
                     contents.toString(), Field.Store.NO, Field.Index.TOKENIZED);
             Field docName = new Field(FieldName.DOC_NAME.toString(), document
-                    .getId(), Field.Store.YES, Field.Index.UN_TOKENIZED);
+                    .getName(), Field.Store.YES, Field.Index.UN_TOKENIZED);
             TupleOutput out = new TupleOutput();
             out.writeInt(document.multiSetSize());
-            Field multiSetSize = new Field(FieldName.MULTI_SET_SIZE.toString(), out.getBufferBytes(), Field.Store.YES);
+            Field multiSetSize = new Field(FieldName.MULTI_SET_SIZE.toString(),
+                    out.getBufferBytes(), Field.Store.YES);
 
             org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
             doc.add(contentsField);
@@ -222,11 +261,13 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
 
     public void freeze() throws IRException {
         try {
-            logger.debug("Freezing index");
+            logger.debug("Freezing index, OB objects: "
+                    + this.getIndex().databaseSize());
             getIndex().freeze();
             logger.debug("Optimizing Lucene");
             indexWriter.optimize();
         } catch (Exception e) {
+            logger.fatal("Error in freeze: ", e);
             throw new IRException(e);
         }
     }
@@ -234,8 +275,8 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     public void close() throws IRException {
         try {
             getIndex().close();
-            indexWriter.optimize();
             indexWriter.close();
+            indexReader.close();
         } catch (Exception e) {
             throw new IRException(e);
         }
@@ -247,7 +288,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      */
     private Query createQuery(PriorityQueue < Word > q) {
         BooleanQuery query = new BooleanQuery(true); // aqui va el true, da
-                                                        // mejores resultados.
+        // mejores resultados.
         // query.setUseScorer14(true); // no effect
         // query.setMinimumNumberShouldMatch(5);
         query.setMaxClauseCount(Integer.MAX_VALUE);
@@ -287,6 +328,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     protected PriorityQueue < Word > createPriorityQueue(
             Map < Integer, Integer > words) throws IOException {
         // have collected all words in doc and their freqs
+        assert words.size() > 0;
         int numDocs = this.indexReader.numDocs();
         PriorityQueue < Word > res = new PriorityQueue < Word >(words.size());
         Similarity similarity = new DefaultSimilarity();

@@ -13,6 +13,7 @@ import org.ajmm.obsearch.index.IndexShort;
 import org.ajmm.obsearch.ob.OBShort;
 import org.ajmm.obsearch.result.OBPriorityQueueShort;
 import org.ajmm.obsearch.result.OBResultShort;
+import org.apache.log4j.Logger;
 import org.kit.furia.Document;
 import org.kit.furia.ResultCandidate;
 import org.kit.furia.Document.DocumentElement;
@@ -45,6 +46,8 @@ import org.kit.furia.exceptions.IRException;
 public class FIRIndexShort < O extends OBShort >
         extends AbstractIRIndex < O > implements
         org.kit.furia.IRIndexShort < O > {
+    
+    private static final Logger logger = Logger.getLogger(FIRIndexShort.class.getSimpleName());
 
     /**
      * 
@@ -64,7 +67,7 @@ public class FIRIndexShort < O extends OBShort >
         super(dbFolder);
         this.index = index;
     }
-
+    // TODO: re-write this as an iterator to lazily extract the results. 
     public final List < ResultCandidate > search(Document < O > document, byte k,
             short r, short n) throws IRException{
         Iterator < Document < O >.DocumentElement < O >> it = document
@@ -100,6 +103,7 @@ public class FIRIndexShort < O extends OBShort >
                 return processQueryResults(documentInTermsOfTheDatabase,n, intersectionSize, document.multiSetSize());
                 
             }catch(Exception e){
+                logger.fatal("Fatal error while searching" , e);
                 throw new IRException(e);
             }
             

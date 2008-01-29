@@ -5,12 +5,18 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 
 import org.apache.log4j.Logger;
+import org.kit.furia.fragment.MTDFragmentAST;
+import org.kit.furia.fragment.OBFragment;
 import org.kit.furia.fragment.soot.representation.FrimpBody;
+import org.kit.furia.misc.IntegerHolder;
 
 import soot.Body;
 import soot.G;
@@ -68,10 +74,12 @@ public class FragmentExtractor {
     }
 
     /**
-     * Extracts fragments from teh given directory
+     * Extracts fragments from the given directory.
+     * Furia-chan's fragment file format is:
+     * <repetitions count>\t<fragment>
      * @param directory Directory from where we will extract fragments
      * @param graphtype The graph representation used to interpret the methods
-     * @param max_structures_allowed maximum nodes per tree
+     * @param maxStructuresAllowed maximum nodes per tree
      * @param min_structures_allowed minimum nodes per tree
      * @param outputPath Output path where logs will be written
      * @param outputFile The output fragment file that will be used
@@ -81,7 +89,7 @@ public class FragmentExtractor {
      */
     public static void extractMethodsFromDirectory(
             final String directory, final CFGGraphType graphtype,
-            final int max_structures_allowed, final int min_structures_allowed,
+            final int maxStructuresAllowed, final int minStructuresAllowed,
             final String outputPath, String outputFile) throws NoClassesFoundByStealer,
             FileNotFoundException, Exception {
         final BodyStealer stealer = stealBodiesFromDir(directory, outputPath);
@@ -90,18 +98,30 @@ public class FragmentExtractor {
             throw new NoClassesFoundByStealer("In directory:" + directory);
         }
         final Iterator < Body > it = stealer.getIterator();
-        FileWriter output = new FileWriter(outputFile);        
+        FileWriter output = new FileWriter(outputFile);
+        // repetition counter
+        HashMap<String, IntegerHolder> repetitionCounts = new HashMap<String, IntegerHolder>();
         while (it.hasNext()) {
             final Body tempBody = it.next();
             //logger.debug("Fragmenting method: " + tempBody.getMethod().toString());
             FrimpBody fb = new FrimpBody(tempBody);
             FragmentBuilder sootFragmentBuilder = new FragmentBuilder(
                     fb, (BlockGraph) graphtype.buildGraph(fb),
-                    max_structures_allowed, min_structures_allowed);
-            StringBuilder str = new StringBuilder();
-            sootFragmentBuilder.generateString(str);
-            output.write(str.toString());
+                    maxStructuresAllowed, minStructuresAllowed);
+            sootFragmentBuilder.fillRepetitionCounts(repetitionCounts);            
         }
+        
+        Iterator<Map.Entry<String, IntegerHolder>> itAll  = repetitionCounts.entrySet().iterator();
+        while(itAll.hasNext()){
+            Map.Entry<String, IntegerHolder> entry = itAll.next();
+            
+            MTDFragmentAST tree = OBFragment.parseTree(entry.getKey());
+            // process only if the tree has the expected size.
+            if (tree.getSize() >= minStructuresAllowed
+                    && tree.getSize() <= maxStructuresAllowed) {            
+            output.write(entry.getValue().getValue() + "\t" + entry.getKey() + "\n");
+            }
+        }        
         output.close();
     }
 

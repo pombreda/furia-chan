@@ -1,8 +1,11 @@
 package org.kit.furia.io;
 
+import java.io.File;
+
 import org.ajmm.obsearch.OB;
 import org.ajmm.obsearch.exception.OBException;
-import org.kit.furia.fragment.FragmentMullerShinoharaCascon2006;
+import org.kit.furia.fragment.MTDFragmentAST;
+import org.kit.furia.fragment.OBFragment;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -22,19 +25,21 @@ import org.kit.furia.fragment.FragmentMullerShinoharaCascon2006;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * FuriaInputMullerShinoharaCascon2006 creates documents of type
- * {@link org.kit.furia.fragment.FragmentMullerShinoharaCascon2006()}
- * from folders or files.
+ * This class loads objects of type FuriaInputOBFragment.
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
-public class FuriaInputMullerShinoharaCascon2006
-        extends AbstractFuriaInput < FragmentMullerShinoharaCascon2006 > {
-
+public class FuriaInputOBFragment
+        extends AbstractFuriaInput < OBFragment > {
+    
+    public FuriaInputOBFragment(File directory){
+        super(directory);
+    }
+    
     @Override
-    protected FragmentMullerShinoharaCascon2006 readObjectFromStringLine(
+    protected OBFragment readObjectFromStringLine(
             String data) throws OBException {
-        return new FragmentMullerShinoharaCascon2006(data);
+        return new OBFragment(data);
     }
 
 }

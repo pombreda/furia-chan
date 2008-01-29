@@ -17,6 +17,31 @@ Furia-chan is a state of the art Open Source/ Libre software license violation d
 Details:
 ********
 
+
+*********************
+Information for Users
+*********************
+
+Furia-chan is a program matcher. The matching process consist of two steps. At first, you generate fragments of a program. Think of each fragment as the words of a web document.  The next step uses OBSearch and Lucene to calculate the similarity of the program.
+
+Currently, fragments can only be generated from Java Byte-code. There are plans to implement a program fragmentation engine for x86. Stay tuned!
+
+* To fragment a folder of class files:
+
+* To fragment a folder of folders of class files: 
+(folder name used as app name)
+
+Now that you have fragmented a program, we can load them and search them
+with Furia-chan.
+
+* To add a fragmented program:
+
+* To add many fragmented programs at once:
+
+* To find the similarity of programs:
+
+
+
 **************************
 Information for Developers
 **************************
@@ -24,11 +49,11 @@ Information for Developers
  Requirements:
  -------------
 
-* You need a JDK (We have tested OBSearch with Java 1.6.0_01).
+* You need a recent JDK 1.5,1.6.
 * You need to have a recent version Maven and ANT installed and working
-  (We have tested OBSearch with Maven 2.0.6 and 2.0.7 and ANT 1.7.0).
+  (We have tested OBSearch with Maven 2.0.8 and 2.0.7 and ANT 1.7.0).
 
-The first time you checkout OBSearch do a:
+The first time you checkout Furia-chan do a:
 ./install.sh 
 
 This will download and install all the necessary dependencies.
@@ -36,43 +61,11 @@ This will download and install all the necessary dependencies.
 Whenever you do svn update and install.sh is changed please
 run install.sh again.
 
-***********************************
-Information for Furia-chan Developers
-***********************************
-
- Deployment:
- -----------
-Before deploying, change the line in pom.xml from
-<my.test.data.db>slices-small</my.test.data.db>
-to:
-<my.test.data.db>slices</my.test.data.db>
-
-And run: mvn test
-The test will run for 40 hours, if everything is fine, then you can release:
-but first restore the line <my.test.data.db>slices-small</my.test.data.db>
-in pom.xml
-
-perl deploy.pl
-
-This script will generate the binary files, upload the website to
-berlios.de and will also generate an announce.txt file ready to 
-be sent to the mailing lists. The label creation is a manual process
- and it must be done after this script has been completed:
- 
-svn copy https://obsearch.googlecode.com/svn/trunk/ \
-             https://obsearch.googlecode.com/svn/tags/0.7-GSOC \
-             -m "initial release"  --username <you>
 
  Compiling:
  ----------
 
 mvn compile
-
-
-*********************
-Information for Users
-*********************
-
 
 
 
@@ -134,3 +127,25 @@ svn copy https://obsearch.googlecode.com/svn/trunk/ \
 
 
 
+ Deployment:
+ -----------
+Before deploying, change the line in pom.xml from
+<my.test.data.db>slices-small</my.test.data.db>
+to:
+<my.test.data.db>slices</my.test.data.db>
+
+And run: mvn test
+The test will run for 40 hours, if everything is fine, then you can release:
+but first restore the line <my.test.data.db>slices-small</my.test.data.db>
+in pom.xml
+
+perl deploy.pl
+
+This script will generate the binary files, upload the website to
+berlios.de and will also generate an announce.txt file ready to 
+be sent to the mailing lists. The label creation is a manual process
+ and it must be done after this script has been completed:
+ 
+svn copy https://obsearch.googlecode.com/svn/trunk/ \
+             https://obsearch.googlecode.com/svn/tags/0.7-GSOC \
+             -m "initial release"  --username <you>
