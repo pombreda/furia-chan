@@ -1,11 +1,33 @@
 package org.kit.furia;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
+import org.ajmm.obsearch.asserts.OBAsserts;
+import org.ajmm.obsearch.exception.AlreadyFrozenException;
+import org.ajmm.obsearch.exception.IllegalIdException;
+import org.ajmm.obsearch.exception.OBException;
+import org.ajmm.obsearch.exception.OutOfRangeException;
+import org.ajmm.obsearch.index.IndexFactory;
 import org.ajmm.obsearch.index.IndexShort;
 import org.ajmm.obsearch.index.PPTreeShort;
+import org.ajmm.obsearch.index.UnsafeNCorePPTreeShort;
+import org.ajmm.obsearch.index.UnsafePPTreeShort;
+import org.ajmm.obsearch.index.pivotselection.AcceptAll;
+import org.ajmm.obsearch.index.pivotselection.KMeansPPPivotSelector;
 import org.ajmm.obsearch.ob.OBShort;
+import org.apache.log4j.Logger;
+import org.kit.furia.exceptions.IRException;
+import org.kit.furia.fragment.OBFragment;
+import org.kit.furia.index.FIRIndexShort;
+import org.kit.furia.io.FuriaInputOBFragment;
+
+import com.sleepycat.je.DatabaseException;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -29,69 +51,54 @@ import org.ajmm.obsearch.ob.OBShort;
  * FuriaChan This class wraps IRIndex and OBSearch to perform matches on binary
  * programs. This class contains the ideas presented in the paper:
  * 
- *  <pre>
+ * <pre>
  *  Fast Approximate Matching of Programs for Protecting
  *  Libre/Open Source Software by Using Spatial Indexes 
  *  Arnoldo Jose Muller Molina and Shinohara, Takeshi 
  *  Kyushu Institute of Technology, Japan.
  *  In: Source Code Analysis and Manipulation, 2007. SCAM 2007.
- *  </pre>
- * The only difference is that instead of a spatial index, we use an 
- * asymmetric P+Tree.
+ * </pre>
  * 
- * This class operates on folders of folders that contain fragment files, or with
- * fragment files directly. In any case, it can load applications or search fragment multi-sets
- * The class can be invoked from the command line. Each method will explains the command line
- * parameters required to invoke the method.
- * In general, it is faster to operate on folders of folders of fragment files. This is because the databases
- * have to be loaded each time the program is started. Additionally, OBsearch takes advantage of frequently accessed
- * objects that are kept in a cache. Since we are dealing with trees, it makes a huge difference to use this cache.
- *  
+ * The only difference is that instead of a spatial index, we use an asymmetric
+ * P+Tree (OBSearch). This class operates on folders of folders that contain fragment
+ * files, or with fragment files directly. In any case, it can load applications
+ * or search fragment multi-sets The class can be invoked from the command line.
+ * Each method will explains the command line parameters required to invoke the
+ * method. In general, it is faster to operate on folders of folders of fragment
+ * files. This is because the databases have to be loaded each time the program
+ * is started. Additionally, OBsearch takes advantage of frequently accessed
+ * objects that are kept in a cache. Since we are dealing with trees, it makes a
+ * huge difference to use this cache.
+ * 
+ * This program has two modes, insert mode and search mode.
+ * - In insert mode, one or more fragmented applications are added to the database.
+ * - In search mode, queries  of fragments searched in the database, and the corresponding binary program
+ * similarity results are returned.
+ * 
+ * Before search mode can be used, a "freeze" operation must be performed so that OBSearch can efficiently search
+ * trees. It is recommended to freeze the database after many fragmented applications have been inserted.
+ * It will take some time, but it is a one time operation.
+ * 
+ * Insert mode and search mode work in two modes:
+ * Single application mode: One program is inserted/searched.
+ * Directory of applications mode: A directory that contains directories with fragmented applications is inserted/searched.
+ * 
+ * The second is the recommended mode. This is because in single application mode, all the database
+ * has to be loaded several times. 
+ * 
  * @author Arnoldo Jose Muller Molina
  */
 
-public class FuriaChan {
+public class FuriaChan extends AbstractFuriaChanCommandLine{
     
-    /**
-     * Maximum size in nodes of a fragment.  
-     */
-    protected static int MAX_FRAGMENT_SIZE = 1000;
+    private static final Logger logger = Logger.getLogger("FuriaChan");
+
     
-        
-    /**
-     * Creates a FuriaChan object. If the given directory does not exist,
-     * the directory will be created and two folders (one for OBSearch and one for Lucene)
-     * will be created beneath it. If the directory exists, then the corresponding OBSearch index
-     * and the IRIndex index will be loaded.
-     * @param directory the database directory that will be used.
-     * @throws IOException If directory does not exist and it cannot be created.
-     */
-    public FuriaChan(File directory) throws IOException{
-        if(! directory.exists()){
-            if(! directory.mkdirs()){
-                throw new IOException("Could not create directory" + directory.toString());
-            }
-            index = 
-        }else{ // load OBsearch and IRIndex
-            
-        }
-    }
     
-    /**
-     * A convenience method that creates an OBSearch index optimized
-     * to our distance function.
-     * @param folder
-     * @return
-     */
-    protected IndexShort<OBShort> createIndex(String folder){
-        
-        KMeansPPPivotSelector < OBSlice > ps = new KMeansPPPivotSelector < OBSlice >(
-                new AcceptAll < OBSlice >());
-        ps.setRetries(1);
-        return new UnsafeNCorePPTreeShort < OBSlice >(folder,
-                (short) 30, 12, (short) 0,
-                (short) (MAX_FRAGMENT_SIZE * 2),ps,Runtime.getRuntime().availableProcessors() -1);
+    public static void main(String args[]){
         
     }
+
     
+
 }

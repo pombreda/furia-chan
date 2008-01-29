@@ -44,9 +44,9 @@ public class Document < O extends OB > {
     private Map < O, DocumentElement < O > > data;
 
     /**
-     * The identification string of this document
+     * The name (identification string) of this document.
      */
-    private String id;
+    private String name;
     
     /**
      * The size of the multi-set of the words of this document.
@@ -54,8 +54,8 @@ public class Document < O extends OB > {
     private int wordCountMultiSet;
 
 
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     /**
@@ -94,7 +94,7 @@ public class Document < O extends OB > {
      */
     public Document(String id, int initialCapacity) {
         data = new HashMap < O, DocumentElement < O > >(initialCapacity);
-        this.id = id;
+        this.name = id;
         wordCountMultiSet = 0;
     }
 
@@ -114,6 +114,19 @@ public class Document < O extends OB > {
         // increment the number of words in the document.
         r.inc();
         wordCountMultiSet++;
+    }
+    
+    /**
+     * Sets the multiplicity for the given word. 
+     * @param word
+     * @param multiplicity
+     */
+    public void setWord(O word, int multiplicity){
+        // we cannot have an existing word here, because the Furia-chan file format
+        // holds one item per line. All the items are different.
+        assert data.get(word) == null; 
+        data.put(word, new DocumentElement<O>(word, new IntegerHolder(multiplicity)));
+        wordCountMultiSet += multiplicity;
     }
 
     /**

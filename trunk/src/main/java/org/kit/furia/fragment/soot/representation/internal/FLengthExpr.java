@@ -45,7 +45,7 @@ public class FLengthExpr extends AbstractLengthExpr implements Qable
     }
     public String toQ() throws Exception {
 		
-		return FuriaConstructDefinitions.FURIA_flength + "(" + " " + Frimp.toQ(getOp()) + ")";
+		return FuriaConstructDefinitions.FURIA_flength + "(" + Frimp.toQ(getOp()) + ")";
 	}
     
 

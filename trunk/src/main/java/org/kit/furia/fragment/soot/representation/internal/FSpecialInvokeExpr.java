@@ -121,12 +121,12 @@ public class FSpecialInvokeExpr extends AbstractSpecialInvokeExpr
     public String toQ() throws Exception {
     	StringBuffer buffer = new StringBuffer();
 
-        buffer.append(FuriaConstructDefinitions.FURIA_fspecialInvoke + "(" + Frimp.toQ(methodRef)+ ", " + Frimp.toQ(getBase()));
+        buffer.append(FuriaConstructDefinitions.FURIA_fspecialInvoke + "(" + Frimp.toQ(methodRef)+ "," + Frimp.toQ(getBase()));
 
         for(int i = 0; i < argBoxes.length; i++)
         {
             
-            buffer.append(", ");
+            buffer.append(",");
 
             buffer.append(Frimp.toQ(argBoxes[i].getValue()));
         }

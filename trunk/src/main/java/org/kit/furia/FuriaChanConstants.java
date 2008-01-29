@@ -1,8 +1,8 @@
-package org.kit.furia.exceptions;
+package org.kit.furia;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
- Copyright (C) 2007 Kyushu Institute of Technology
+ Copyright (C) 2008 Kyushu Institute of Technology
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,27 +19,22 @@ package org.kit.furia.exceptions;
  */
 
 /**
- * IRException is an exception wrapper. It holds exceptions thrown by the underlying Information Retrieval
- * system implementation.
+ * FuriaChanConstants contains constants used by all the other programs.
  * @author Arnoldo Jose Muller Molina
- * @since 0
  */
-public class IRException
-        extends Exception {
+
+public class FuriaChanConstants {
+
     /**
-     * Internal exception
+     * Maximum number of nodes to be accepted per fragment.
+     * Warning: This value must be observed by all the fragment engines.
      */
-    private Exception e;
-    
-    public IRException(Exception e){
-        this.e = e;
-    }
-    
-    public String toString(){
-        if(e != null){
-        return e.getMessage();
-        }else{
-            return "N/A";
-        }
-    }
+    public static final int MAX_NODES_PER_FRAGMENT = 1000;
+
+    /**
+     * Minimum number of nodes to be accepted per fragment.
+     * Warning: This value must be observed by all the fragment engines.
+     */
+    public static final int MIN_NODES_PER_FRAGMENT = 1;
+
 }

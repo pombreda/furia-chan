@@ -37,9 +37,7 @@ import soot.util.*;
 
 public class FXorExpr extends AbstractFrimpIntLongBinopExpr implements XorExpr 
 {
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -7620299544799657183L;
 
 	public FXorExpr(Value op1, Value op2) { super(op1, op2); }

@@ -52,7 +52,7 @@ options {
 }
 
 // Words, which include our operators
-CONSTRUCT_NAME  : ('a'..'z' | 'A'..'Z' | '$' | '%' | '^' | '#')+ 
+CONSTRUCT_NAME  : ('a'..'z' | 'A'..'Z' | '$' | '%' | '^' | '#' | '|')+ 
                 ;
 
 

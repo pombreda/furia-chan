@@ -3,6 +3,7 @@ package org.kit.furia.fragment.soot;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,6 +98,56 @@ public class FragmentBuilderClient {
     private boolean failOnError;
 
     /**
+     * Number of cpus.
+     */
+    private int cpus;
+
+    /**
+     * Timeout for subprocesses.
+     */
+    private long timeout;
+
+    /**
+     * The frequency we will check each process to complete.
+     */
+    private static final long POLL_INTERVAL = 1000 * 5; // every seconds.
+
+    /**
+     * Error code returned by the caller if there is a timeout exception.
+     */
+    private static final int TIMEOUT_ERRORCODE = -20; // every seconds.
+
+    /**
+     * Takes a directory of a set of directories and generates fragments out of
+     * the given folders. An infinite timeout is set. (Not recommended for Soot)
+     * @param cpus
+     *                The number of CPUS to employ
+     * @param directory
+     *                The directory that will be opened.
+     * @param directoryOfDirectoriesMode
+     *                If the program will receive one directory (that holds in
+     *                its root a set of java class files) (false) or if the
+     *                directory received contains directories that contain class
+     *                files. Each of these directories is treated as a different
+     *                application.
+     * @param outputDirectory
+     *                The directory that holds the resulting files from the
+     *                operation. If directoryOfDirectoriesMode == false then the
+     *                output data files will be copied directory to
+     *                outputDirectory. Otherwise a directory outputDirectory/<app>
+     *                will be created for each application where <app> is the
+     *                application name.
+     * @param failOnError
+     *                If true, stops if there is an error.
+     */
+    public FragmentBuilderClient(boolean directoryOfDirectoriesMode,
+            File directory, int cpus, File outputDirectory, boolean failOnError)
+            throws Exception, InterruptedException {
+        this(directoryOfDirectoriesMode, directory, cpus, outputDirectory,
+                failOnError, (long) 0);
+    }
+
+    /**
      * Takes a directory of a set of directories and generates fragments out of
      * the given folders.
      * @param cpus
@@ -109,9 +160,6 @@ public class FragmentBuilderClient {
      *                directory received contains directories that contain class
      *                files. Each of these directories is treated as a different
      *                application.
-     * @param maxExpansions
-     *                Holds the maximum number of expansions to be performed for
-     *                each fragment.
      * @param outputDirectory
      *                The directory that holds the resulting files from the
      *                operation. If directoryOfDirectoriesMode == false then the
@@ -121,10 +169,17 @@ public class FragmentBuilderClient {
      *                application name.
      * @param failOnError
      *                If true, stops if there is an error.
+     * @param timeout
+     *                Amount of time in milliseconds to wait until one program
+     *                is fragmented.
      */
     public FragmentBuilderClient(boolean directoryOfDirectoriesMode,
-            File directory, int cpus, int maxExpansions, File outputDirectory,
-            boolean failOnError) throws Exception, InterruptedException {
+            File directory, int cpus, File outputDirectory,
+            boolean failOnError, long timeout) throws Exception,
+            InterruptedException {
+
+        this.timeout = timeout;
+        this.cpus = cpus;
 
         if (directoryOfDirectoriesMode) {
             filesToProcess = directory.listFiles();
@@ -134,7 +189,6 @@ public class FragmentBuilderClient {
         }
         this.directoryOfDirectoriesMode = directoryOfDirectoriesMode;
         this.outputDirectory = outputDirectory;
-        this.maxExpansions = maxExpansions;
         this.i = new AtomicInteger(0);
         join = new CountDownLatch(filesToProcess.length);
         this.failOnError = failOnError;
@@ -167,127 +221,176 @@ public class FragmentBuilderClient {
     private class FragmentExecutor implements Runnable {
 
         public void run() {
-            
-            try{
 
-            while (exception == null) {
-                int cx = i.getAndIncrement();
-                if (cx < filesToProcess.length) {
-                    File dirToProcess = filesToProcess[cx];
-                    logger.info("Processing: " + (cx + 1) + " of "
-                            + filesToProcess.length + " % " + dirToProcess + " count: " + join.getCount());
-                    execApp(dirToProcess);
-                    join.countDown();
-                    // if there is an error in the execution, we expect
-                } else {
-                    break;
-                }
-            }
-            if (exception != null) {
-                logger.fatal("Quitting thread because exception was not null "
-                        + exception.toString());
-                while (join.getCount() > 0) {
-                    join.countDown();
-                }
-            }
-           
-            logger.debug("Quitting thread");
-            
-        }catch(Exception e){
-            logger.fatal("Caught Exception",e);
-        }
-
-    }
-    }
-
-    /**
-     * Calls a sub-process that will fragment
-     * @param dirToProcess
-     */
-    private void execApp(File dirToProcess) {
-        File appOutputDir;
-        // fixed the proper output directory
-        if (directoryOfDirectoriesMode) {
-            appOutputDir = new File(outputDirectory, dirToProcess.getName());
-        } else {
-            appOutputDir = outputDirectory;
-        }
-
-        List < String > command = new LinkedList < String >();
-        command.add("java");
-        command.add("-Xmx" + (Runtime.getRuntime().maxMemory() / 1024 / 1024) + "m");
-        command.add(FragmentBuilderClientAux.class.getCanonicalName());
-        command.add(dirToProcess.toString());
-        command.add(maxExpansions + "");
-        command.add(appOutputDir.toString());
-      
-        try {
-            // create dir if it is not created
-            if (!outputDirectory.exists()) {
-                outputDirectory.mkdirs();
-            }
-            OBAsserts.chkAssert(outputDirectory.exists(), "Directory "
-                    + outputDirectory + " was not created succesfully");
-
-            // add the current directory as part of the classpath.
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.directory(new File(System.getProperty("user.dir")));
-            Map < String, String > env = pb.environment();
-
-            env.put("CLASSPATH", System.getProperty("java.class.path"));
-            env.put("log4j.file", FuriaProperties.getProperty("log4j.file"));
-            pb.redirectErrorStream(true);
-
-            Process p = pb.start();
-            boolean interrupted = true;
-            // while (interrupted) {
             try {
-                InputStream in = p.getInputStream();
-                InputStreamReader inR = new InputStreamReader(in);
-                BufferedReader bIn = new BufferedReader(inR);
-                int res = p.waitFor();
-                logger.info("Completed app:" + dirToProcess.toString() +  " count "  + join.getCount());
-                // assert res == 0: "Error while extracting fragments from " +
-                // dirToProcess; // for the junit tests.
 
-                
-                // logger.info("user.dir: " + System.getProperty("user.dir"));
-                // logger.info("java.class.path: "
-                // +System.getProperty("java.class.path"));
-                // logger.info("java.library.path: "
-                // +System.getProperty("java.library.path"));
-                if (res != 0 && failOnError) {
-                 
-                 // Read the output of the invoked program and
-                    // print it to string.
-                   
-                    String line = bIn.readLine();
-                    StringBuilder x = new StringBuilder();
-                    while (line != null) {
-                        x.append(line + "\n");
-                        line = bIn.readLine();
+                while (exception == null) {
+                    int cx = i.getAndIncrement();
+                    if (cx < filesToProcess.length) {
+                        File dirToProcess = filesToProcess[cx];
+                        logger.info("Processing: " + (cx + 1) + " of "
+                                + filesToProcess.length + " % " + dirToProcess
+                                + " count: " + join.getCount());
+                        execApp(dirToProcess);
+                        join.countDown();
+                        // if there is an error in the execution, we expect
+                    } else {
+                        break;
                     }
-                    bIn.close();
-                    FileWriter result = new FileWriter(new File(appOutputDir, "fatal.txt"));
-                    result.write(x.toString());
-                    result.close();
-                    throw new Exception("Failed while executing command:"
-                            + command.toString() + " returned code: " + res
-                            + "\n" + x.toString());// + "\n Passed env:\n" +
-                                                    // pb.environment().toString()
-                                                    // + " \nworking dir: " +
-                                                    // pb.directory());
                 }
-                interrupted = false;
-            } catch (InterruptedException e) {
-                logger.fatal("Process interrupted");
-            }
-            // }
+                if (exception != null) {
+                    logger
+                            .fatal("Quitting thread because exception was not null "
+                                    + exception.toString());
+                    while (join.getCount() > 0) {
+                        join.countDown();
+                    }
+                }
 
-        } catch (Exception e) {
-            logger.fatal("Error while executing command", e);
-            exception = e;
+                logger.debug("Quitting thread");
+
+            } catch (Exception e) {
+                logger.fatal("Caught Exception", e);
+            }
 
         }
+
+        /**
+         * Calls a sub-process that will fragment
+         * @param dirToProcess
+         */
+        private void execApp(File dirToProcess) {
+            File appOutputDir;
+            // fixed the proper output directory
+            if (directoryOfDirectoriesMode) {
+                appOutputDir = new File(outputDirectory, dirToProcess.getName());
+            } else {
+                appOutputDir = outputDirectory;
+            }
+
+            List < String > command = new LinkedList < String >();
+            command.add("java");
+            long ramToAllocate = Runtime.getRuntime().maxMemory() / 1024 / 1024
+                    / cpus;
+            command.add("-Xmx" + (ramToAllocate) + "m");
+            command.add(FragmentBuilderClientAux.class.getCanonicalName());
+            command.add(dirToProcess.toString());
+            command.add(appOutputDir.toString());
+
+            try {
+                // create dir if it is not created
+                if (!outputDirectory.exists()) {
+                    outputDirectory.mkdirs();
+                }
+                OBAsserts.chkAssert(outputDirectory.exists(), "Directory "
+                        + outputDirectory + " was not created succesfully");
+
+                // add the current directory as part of the classpath.
+                ProcessBuilder pb = new ProcessBuilder(command);
+                pb.directory(new File(System.getProperty("user.dir")));
+                Map < String, String > env = pb.environment();
+
+                env.put("CLASSPATH", System.getProperty("java.class.path"));
+                env
+                        .put("log4j.file", FuriaProperties
+                                .getProperty("log4j.file"));
+                pb.redirectErrorStream(true);
+                long endTime = System.currentTimeMillis() + timeout;
+                Process p = pb.start();
+                boolean interrupted = true;
+                // while (interrupted) {
+                StringBuilder x = null;
+                try {
+                    InputStream in = p.getInputStream();
+                    InputStreamReader inR = new InputStreamReader(in);
+                    BufferedReader bIn = new BufferedReader(inR);
+
+                    int res = TIMEOUT_ERRORCODE; // code for timeout
+                    if (timeout == 0) {
+                           res = p.waitFor();
+                    } else {
+                        boolean finished = false;
+                        Object lock = new Object();
+                        while (!finished) {
+                            try {
+                                res = p.exitValue();
+                                finished = true;
+                            } catch (IllegalThreadStateException notFinished) {
+                                try {
+                                    synchronized (lock) {
+                                        lock.wait(POLL_INTERVAL);
+                                    }
+                                } catch (InterruptedException waitInterrupted) {
+                                    // nothing to do.
+                                }
+                                if (endTime < System.currentTimeMillis()) {
+                                    // we have to stop
+                                    finished = true;
+                                    res = TIMEOUT_ERRORCODE; // :)
+                                }
+                            }
+                        }
+                    }
+
+                    logger.info("Completed app:" + dirToProcess.toString()
+                            + " count " + join.getCount());
+                 
+                    if (res != 0) {
+
+                        // Read the output of the invoked program and
+                        // print it to string.
+                        String line = bIn.readLine();
+                        x = new StringBuilder();
+                        while (line != null) {
+                            x.append(line + "\n");
+                            line = bIn.readLine();
+                        }
+                        bIn.close();
+                        FileWriter result = new FileWriter(new File(
+                                appOutputDir, "fatal.txt"));
+                        // add the msg timeout to the result.
+                        if (res == TIMEOUT_ERRORCODE) {
+                            x.append("\n Timeout ! :(\n ");
+                        }
+                        result.write(x.toString());                                                                          
+                        result.close();
+                        if (failOnError) {
+                            throw new Exception(
+                                    "Failed while executing command:"
+                                            + command.toString()
+                                            + " returned code: " + res + "\n"
+                                            + x.toString());
+                        } else {
+                            logger.warn("Failed to process: "
+                                    + dirToProcess
+                                    + " check "
+                                    + (new File(appOutputDir, "fatal.txt"))
+                                            .toString());
+                        }
+                    }
+                    interrupted = false;
+                } catch (InterruptedException e) {
+                    logger.fatal("Process interrupted");
+                } catch (FileNotFoundException e2) { // we could not even
+                                                        // create the fatal.txt
+                                                        // msg.
+                    if (x != null) {
+                        throw new Exception("Failed while executing command:"
+                                + command.toString() + "\n" + "\n"
+                                + x.toString());// + "\n Passed env:\n" +
+                        // pb.environment().toString()
+                        // + " \nworking dir: " +
+                        // pb.directory());
+                    }
+                }
+                // }
+
+            } catch (Exception e) {
+                logger.fatal("Error while executing command", e);
+                exception = e;
+            }
+        }
+
     }
+
 }

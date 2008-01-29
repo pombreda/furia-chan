@@ -55,7 +55,7 @@ public class FShrExpr extends AbstractFrimpIntLongBinopExpr implements ShrExpr
     public String getQSymbol() { return " >> "; }
     
     public String toQ() throws Exception{
-    	return FuriaConstructDefinitions.FURIA_fshr + "(" + Frimp.toQ(getOp1()) + ", " +  Frimp.toQ(getOp2())  + ")";
+    	return FuriaConstructDefinitions.FURIA_fshr + "(" + Frimp.toQ(getOp1()) + "," +  Frimp.toQ(getOp2())  + ")";
     }
 
 }

@@ -3,12 +3,14 @@ package org.kit.furia.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.ajmm.obsearch.OB;
 import org.ajmm.obsearch.exception.OBException;
+import org.apache.log4j.Logger;
 import org.kit.furia.Document;
 
 /*
@@ -38,6 +40,18 @@ import org.kit.furia.Document;
 
 public abstract class AbstractFuriaInput < O extends OB > {
 
+    private static final Logger logger = Logger.getLogger(AbstractFuriaInput.class);
+
+    private File directory;
+    
+    /**
+     * Creates a new fragment file reader based on the given directory.
+     * @param directory
+     */
+    public AbstractFuriaInput(File directory){
+        this.directory = directory;
+    }
+    
     /**
      * Reads and creates an O object from the given string.
      * @param data
@@ -63,7 +77,7 @@ public abstract class AbstractFuriaInput < O extends OB > {
      * @return An iterator that will return one by one all the documents found
      *         in the given directory.
      */
-    public Iterator < Document < O >> getDocumentsFromDirectory(File directory)
+    public Iterator < Document < O >> getDocumentsFromDirectory()
             throws IOException {
         if (!directory.exists()) {
             throw new IOException("Directory does not exist: " + directory);
@@ -94,11 +108,14 @@ public abstract class AbstractFuriaInput < O extends OB > {
         String re = r.readLine();
         while (re != null) {
             if (isParsableLine(re)) {
-                O word = readObjectFromStringLine(re);
-                doc.addWord(word);
+                String[] tuple = re.split("\t");
+                int multiplicity = Integer.parseInt(tuple[0]);
+                O word = readObjectFromStringLine(tuple[1]);
+                doc.setWord(word,multiplicity);
             }
             re = r.readLine();
         }
+        r.close();
         return doc;
     }
 
@@ -107,10 +124,25 @@ public abstract class AbstractFuriaInput < O extends OB > {
      * @return true if the given line can be parsed.
      */
     public boolean isParsableLine(final String line) {
-        return "".equals(line.trim()) || (line.startsWith("#"));
+        return  !("".equals(line.trim()) || (line.startsWith("#")));
     }
 
+    /**
+     * Iterator class that creates Documents from the given directory.
+     * @author Arnoldo Jose Muller Molina
+     *
+     */
     private class FuriaInputIterator implements Iterator < Document < O >> {
+        
+        private class FragmentsFileFilter implements FilenameFilter{
+
+            public boolean accept(File dir, String name) {
+                return name.equals(fragmentFileName);
+            }            
+        }
+        
+        private FragmentsFileFilter  fileFilter = new FragmentsFileFilter();
+        
         /**
          * The documents that will be lazily processed.
          */
@@ -121,10 +153,33 @@ public abstract class AbstractFuriaInput < O extends OB > {
          */
         private int i;
 
+        /**
+         * Builds an iterator of applications. If the given directory
+         * has a "fragments" file, then the program works in Single app mode.
+         * Otherwise, we run in directory of applications mode.
+         * @param directory
+         */
         FuriaInputIterator(File directory) {
-            documents = directory.listFiles();
+            if(directoryOfDirectoriesMode(directory)){
+                documents = directory.listFiles();
+            }else{
+                File[] documents = new File[1];
+                documents[0] = directory;
+            }
+           
             i = 0;
             moveTapeToNextValidDocument();
+        }
+        
+        /**
+         * Returns true if the given directory does not have a fragments file.
+         * This means that we will operate on a directory of directories.
+         * @param directory
+         * @return
+         */
+        private boolean directoryOfDirectoriesMode(File directory){
+            File [] all = directory.listFiles(fileFilter);            
+            return all.length !=1;
         }
 
         /**
@@ -158,8 +213,12 @@ public abstract class AbstractFuriaInput < O extends OB > {
             Document < O > res = null;
             try {
                 res = getDocument(name, data);
+                i++;
                 moveTapeToNextValidDocument();
             } catch (Exception e) {
+                if(logger.isDebugEnabled()){
+                    logger.debug(e);
+                }
                 throw new NoSuchElementException(res.toString());
             }
             return res;
@@ -170,7 +229,7 @@ public abstract class AbstractFuriaInput < O extends OB > {
          * method does not do anything.
          */
         public void remove() {
-
+            assert false;
         }
 
         public boolean hasNext() {

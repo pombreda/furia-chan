@@ -49,7 +49,7 @@ public class FInstanceOfExpr extends AbstractInstanceOfExpr implements Qable, Sp
         
     public String toQ() throws Exception {	
 
-		 return FuriaConstructDefinitions.FURIA_finstanceof + "(" + Frimp.toQ(getOp()) + ", "  + Frimp.toQ(getCheckType()) + ")";
+		 return FuriaConstructDefinitions.FURIA_finstanceof + "(" + Frimp.toQ(getOp()) + ","  + Frimp.toQ(getCheckType()) + ")";
 	}
 
     public List getContainedSpecialConstructs() {

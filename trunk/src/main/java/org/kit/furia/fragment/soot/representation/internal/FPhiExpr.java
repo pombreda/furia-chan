@@ -133,7 +133,7 @@ public class FPhiExpr implements  PhiExpr, Qable {
 	Value arg = vb.getValue();
 	expr.append(Frimp.toQ(arg));            
 	if(argPairsIt.hasNext())
-	  expr.append(", ");
+	  expr.append(",");
             
 	i++;
       }
