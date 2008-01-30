@@ -23,6 +23,10 @@ package org.kit.furia;
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
+/**
+ * @author amuller
+ *
+ */
 public class ResultCandidate {
 
     /**
@@ -34,44 +38,79 @@ public class ResultCandidate {
      * The score for the given document
      */
     private float score;
+      
     
     /**
-     * Returns the following value:
-     * ( |matched objects| * 2) / (|DOC| + |Query|)
-     * where: "matched objects" is the size of the objects found by OB.
-     * DOC is the multi-set of OB objects of the found document name.
-     * Query is the multi-set of OB objects of the original query.
-     * @return naive score.
+     * Number of fragments of the DB document (multi-set).
+     */    
+    private int mSetFragmentsCount;
+    
+    /**
+     * Number of words found (multi-set).
      */
-    private float naiveScore;
+    private int mSetFoundFragments;
+    
+    /**
+     * Number of fragments of the DB document (set).
+     */    
+    private int setFragmentsCount;
+    
+    /**
+     * Number of words found (set).
+     */
+    private int setFoundFragments;
 
     public String getDocumentName() {
         return documentName;
     }
 
-    /**
-     * Returns the score calculated by the IR engine
-     * @return score calculated by the IR engine
-     */
-    public float getScore() {
+    public float getScore(){
         return score;
     }
+ 
     /**
-     * Returns the following value:
-     * ( |matched objects| * 2) / (|DOC| + |Query|)
-     * where: "matched objects" is the size of the objects found by OB.
-     * DOC is the multi-set of OB objects of the found document name.
-     * Query is the multi-set of OB objects of the original query.
+     * Returns the naive similarity score.
      * @return naive score.
      */
-    public float getNaiveScore(){
-        return naiveScore;
+    public float getNaiveScoreMSet(){
+        return ((float)mSetFoundFragments ) / ((float) mSetFragmentsCount);
+    }
+    
+    /**
+     * Returns the naive similarity score.
+     * @return naive score.
+     */
+    public float getNaiveScoreSet(){
+        return ((float)setFoundFragments ) / ((float) setFragmentsCount);
     }
 
-    public ResultCandidate(String documentName, float score, float naiveScore) {
+    public ResultCandidate(String documentName, float score, int mSetFoundFragments, int mSetFragmentsCount, int setFoundFragments, int setFragmentsCount) {
         super();
         this.documentName = documentName;
         this.score = score;
-        this.naiveScore = naiveScore;
+        this.mSetFoundFragments = mSetFoundFragments;
+        this.mSetFragmentsCount = mSetFragmentsCount;    
+        this.setFoundFragments = setFoundFragments;
+        this.setFragmentsCount = setFragmentsCount;
     }
+
+    public int getMSetFragmentsCount() {
+        return mSetFragmentsCount;
+    }
+
+    public int getMSetFoundFragments() {
+        return mSetFoundFragments;
+    }
+
+    public int getSetFoundFragments() {
+        return setFoundFragments;
+    }
+
+    public int getSetFragmentsCount() {
+        return setFragmentsCount;
+    }
+
+
+    
+    
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.ajmm.obsearch.index.utils.Directory;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 
@@ -42,7 +43,7 @@ import org.kit.furia.misc.FuriaProperties;
  */
 
 public class OverallTest {
-    
+    private static final Logger logger = Logger.getLogger("OverallTest");
     /**
      * Properties for the test.
      */    
@@ -68,14 +69,15 @@ public class OverallTest {
         // delete the output directory before starting a new test.
         String output = FuriaProperties.getProperty("test.db.output");
         File outputDir = new File(output);
-      /* Directory.deleteDirectory(outputDir); TODO: uncomment this block
+                     
+       /*Directory.deleteDirectory(outputDir); 
        assertTrue(outputDir.mkdirs());
        fragmentDataSet("JPackageClass");
        fragmentDataSet("JPackageClassObfuscatedSandMarkNoClassEnc");
-       fragmentDataSet("JPackageClassObfuscatedZelix");*/
+       fragmentDataSet("JPackageClassObfuscatedZelix");
        
        // now we perform matches with IRIndex and the results
-       // should be within the top 10.
+       // should be within the top 10.*/
        
        // first we create the database:
        File furiaChanDBDir = new File(outputDir, "FuriaChanDB");
@@ -89,10 +91,13 @@ public class OverallTest {
        engine = new FuriaChanEngine(furiaChanDBDir);   
        engine.setValidationMode(true);
        engine.setN((short)10);
-       engine.setR((short) 10);
+       engine.setR((short) 3);
+       logger.info("*** Matching base ***");
        // performs the search. Makes sure all the items were found in the specified range
-       //assertEquals(engine.search(new File(outputDir, "JPackageClass")), 1f);       
-       //assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedZelix")), 1f);
+       assertEquals(engine.search(new File(outputDir, "JPackageClass")), 1f);       
+       logger.info("*** Matching zelix ***");
+       assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedZelix")), 1f);
+       logger.info("*** Matching SandMark ***");
        assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedSandMarkNoClassEnc")), 1f);
     }
     
