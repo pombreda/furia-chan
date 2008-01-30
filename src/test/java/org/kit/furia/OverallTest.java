@@ -70,7 +70,7 @@ public class OverallTest {
         String output = FuriaProperties.getProperty("test.db.output");
         File outputDir = new File(output);
                      
-       /*Directory.deleteDirectory(outputDir); 
+       Directory.deleteDirectory(outputDir); 
        assertTrue(outputDir.mkdirs());
        fragmentDataSet("JPackageClass");
        fragmentDataSet("JPackageClassObfuscatedSandMarkNoClassEnc");
@@ -94,7 +94,7 @@ public class OverallTest {
        engine.setR((short) 3);
        logger.info("*** Matching base ***");
        // performs the search. Makes sure all the items were found in the specified range
-       //assertEquals(engine.search(new File(outputDir, "JPackageClass")), 1f);       
+       assertEquals(engine.search(new File(outputDir, "JPackageClass")), 1f);       
        logger.info("*** Matching zelix ***");
        assertEquals(engine.search(new File(outputDir, "JPackageClassObfuscatedZelix")), 1f);
       // logger.info("*** Matching SandMark ***");
