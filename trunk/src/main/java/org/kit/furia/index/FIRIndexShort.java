@@ -77,8 +77,7 @@ public class FIRIndexShort < O extends OBShort >
         // fragments available in the database.
         // we store term id -> term freq. This will be used to create the query.
         Map<Integer, Integer> documentInTermsOfTheDatabase = new HashMap<Integer, Integer>(document.size() * k);
-        int intersectionSizeMSet = 0;
-        int intersectionSizeSet = 0;
+
         while (it.hasNext()) {
             Document < O >.DocumentElement < O > elem = it.next();
             O toMatch = elem.getObject();
@@ -87,8 +86,7 @@ public class FIRIndexShort < O extends OBShort >
             try{
                 // match the object in the database.
                 index.searchOB(toMatch, r, result);
-                intersectionSizeMSet +=  (result.getSize() * elem.getCount());
-                intersectionSizeSet++;
+
                 // for all the returned elements, we add their ids and the initial
                 // count that came from "document".
                 Iterator<OBResultShort<O>> itO = result.iterator();
@@ -110,7 +108,7 @@ public class FIRIndexShort < O extends OBShort >
             }
             
         }
-        return processQueryResults(documentInTermsOfTheDatabase,n, intersectionSizeMSet, intersectionSizeSet);
+        return processQueryResults(documentInTermsOfTheDatabase,n);
     }
     
     

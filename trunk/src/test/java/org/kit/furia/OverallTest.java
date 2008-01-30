@@ -81,15 +81,15 @@ public class OverallTest {
        
        // first we create the database:
        File furiaChanDBDir = new File(outputDir, "FuriaChanDB");
-       /*Directory.deleteDirectory(furiaChanDBDir);
+       Directory.deleteDirectory(furiaChanDBDir);
         engine = new FuriaChanEngine(furiaChanDBDir);      
        
        engine.insert(new File(outputDir, "JPackageClass"));
        engine.freeze();
-       engine.close();*/
+       engine.close();
        // got to reopen everything or lucene won't have anything refreshed.
        engine = new FuriaChanEngine(furiaChanDBDir);   
-       engine.setValidationMode(true);
+       engine.setValidate(true);
        engine.setN((short)10);
        engine.setR((short) 3);
        logger.info("*** Matching base ***");

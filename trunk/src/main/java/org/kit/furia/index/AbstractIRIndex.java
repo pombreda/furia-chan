@@ -23,6 +23,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.DefaultSimilarity;
@@ -98,7 +99,10 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         DOC_NAME,
         /* Cardinality of the multi-set of OB objects in a document */
         MULTI_SET_SIZE,
-        
+
+        /* Details of the doc word-freq */
+        DOC_DETAILS,
+
         /* Cardinality of the set of OB objects in a document */
         SET_SIZE,
     }
@@ -154,53 +158,66 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      *                A map that contains OB_id -> freq
      * @param n
      *                Return the top n results only.
-     * @param intersectionQueryMSet
-     *                Size of the common elements (multi-set).
-     * @param originalQuerySize
-     *                The size of the multi-set of the query.
      * @return The top n candidates.
      */
     protected List < ResultCandidate > processQueryResults(
-            Map < Integer, Integer > normalizedQuery, short n,
-            int intersectionQueryMSet, int intersectionQuerySet)
+            Map < Integer, Integer > normalizedQuery, short n)
             throws IRException {
-        try{
-        // at this stage we have created a map that holds all the matched
-        // elements,
-        // the initial document that is in terms of the original objects
-        // (obfuscated fragments in the case of furia)
-        // is now transformed in terms of the database.
-        // we now generate a priority queue with the terms, in order to sort
-        // them and put the most
-        // relevant at the beginning of the query.
+        try {
+            // at this stage we have created a map that holds all the matched
+            // elements,
+            // the initial document that is in terms of the original objects
+            // (obfuscated fragments in the case of furia)
+            // is now transformed in terms of the database.
+            // we now generate a priority queue with the terms, in order to sort
+            // them and put the most
+            // relevant at the beginning of the query.
 
-        List < ResultCandidate > res = new LinkedList < ResultCandidate >();
-        if (normalizedQuery.size() > 0) {
-            PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
-            Query q = createQuery(sorted);
-            // now we just perform the search and return the results.
-            Hits hits = searcher.search(q);
-            Iterator < Hit > it = hits.iterator();
-            int i = 0;
-            while (it.hasNext() && i < n) {
-                Hit h = it.next();
-                String docName = h.getDocument().getField(
-                        FieldName.DOC_NAME.toString()).stringValue();
-                TupleInput in = new TupleInput(h.getDocument().getField(
-                        FieldName.MULTI_SET_SIZE.toString()).binaryValue());
-                // size of the doc in the DB.
-                int docSizeMSet = in.readInt();
-                
-                int docSizeSet =  new TupleInput(h.getDocument().getField(
-                        FieldName.SET_SIZE.toString()).binaryValue()).readInt();
-                
-                res.add(new ResultCandidate(docName, h.getScore(),
-                        intersectionQueryMSet,docSizeMSet, intersectionQuerySet, docSizeSet));
-                i++;
+            List < ResultCandidate > res = new LinkedList < ResultCandidate >();
+            if (normalizedQuery.size() > 0) {
+                PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
+                Query q = createQuery(sorted);
+                // now we just perform the search and return the results.
+                Hits hits = searcher.search(q);
+                Iterator < Hit > it = hits.iterator();
+                int i = 0;
+                while (it.hasNext() && i < n) {
+                    Hit h = it.next();
+                    String docName = h.getDocument().getField(
+                            FieldName.DOC_NAME.toString()).stringValue();
+                    TupleInput in = new TupleInput(h.getDocument().getField(
+                            FieldName.MULTI_SET_SIZE.toString()).binaryValue());
+                    // size of the doc in the DB.
+                    int docSizeMSet = in.readInt();
+
+                    int docSizeSet = new TupleInput(h.getDocument().getField(
+                            FieldName.SET_SIZE.toString()).binaryValue())
+                            .readInt();
+
+                    int cx = 0;
+                    int intersectionQueryMSet = 0;
+                    int intersectionQuerySet = 0;
+                    TupleInput freqs = new TupleInput(h.getDocument().getField(
+                            FieldName.DOC_DETAILS.toString()).binaryValue());
+                    while (cx < docSizeSet) {
+                        int wordId = freqs.readInt();
+                        int frecuency = freqs.readInt();
+                        Integer frequencyQuery = normalizedQuery.get(wordId);
+                        if (frequencyQuery != null) {
+                            intersectionQuerySet++;
+                            intersectionQueryMSet += Math.min(frecuency,
+                                    frequencyQuery);
+                        }
+                        cx++;
+                    }
+                    res.add(new ResultCandidate(docName, h.getScore(),
+                            intersectionQueryMSet, docSizeMSet,
+                            intersectionQuerySet, docSizeSet));
+                    i++;
+                }
             }
-        }
-        return res;
-        }catch(IOException e){
+            return res;
+        } catch (IOException e) {
             throw new IRException(e);
         }
     }
@@ -234,14 +251,17 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             StringBuilder contents = new StringBuilder();
             int i = 0;
             long prevTime = System.currentTimeMillis();
+            // write the multi-set representation of the document into lucene.
+            TupleOutput mSetOut = new TupleOutput();
+
             while (it.hasNext()) {
                 Document < O >.DocumentElement < O > elem = it.next();
                 Result res = index.insert(elem.getObject());
                 assert res.getStatus() == Result.Status.OK
                         || res.getStatus() == Result.Status.EXISTS;
                 contents.append(repeat(res.getId(), elem.getCount()));
-
-                // TODO: put the multi-set not the set
+                mSetOut.writeInt(res.getId());
+                mSetOut.writeInt(elem.getCount());
                 i++;
             }
             if (logger.isDebugEnabled()) {
@@ -258,16 +278,21 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             out.writeInt(document.multiSetSize());
             Field multiSetSize = new Field(FieldName.MULTI_SET_SIZE.toString(),
                     out.getBufferBytes(), Field.Store.YES);
+
+            Field docDetails = new Field(FieldName.DOC_DETAILS.toString(),
+                    mSetOut.getBufferBytes(), Field.Store.YES);
+
             TupleOutput out2 = new TupleOutput();
             out2.writeInt(document.size());
-            Field setSize = new Field(FieldName.SET_SIZE.toString(),
-                    out2.getBufferBytes(), Field.Store.YES);
+            Field setSize = new Field(FieldName.SET_SIZE.toString(), out2
+                    .getBufferBytes(), Field.Store.YES);
 
             org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
             doc.add(contentsField);
             doc.add(docName);
             doc.add(multiSetSize);
             doc.add(setSize);
+            doc.add(docDetails);
             indexWriter.addDocument(doc);
         } catch (Exception e) {
             throw new IRException(e);
@@ -316,13 +341,10 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             TermQuery tq = new TermQuery(new Term(FieldName.WORDS.toString(),
                     cur.getId().toString()));
 
-        /*    if (boost) {
-                if (qterms == 0) {
-                    bestScore = cur.getScore();
-                }
-                float myScore = cur.getScore();
-                tq.setBoost(myScore / bestScore);
-            }*/
+            /*
+             * if (boost) { if (qterms == 0) { bestScore = cur.getScore(); }
+             * float myScore = cur.getScore(); tq.setBoost(myScore / bestScore); }
+             */
 
             query.add(tq, BooleanClause.Occur.SHOULD);
 

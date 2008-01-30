@@ -105,7 +105,7 @@ public class FuriaChanEngine {
         return validationMode;
     }
 
-    public void setValidationMode(boolean validationMode) {
+    public void setValidate(boolean validationMode) {
         this.validationMode = validationMode;
     }
 
@@ -196,7 +196,7 @@ public class FuriaChanEngine {
                 .getDocumentsFromDirectory();
         int foundResults = 0; // only meaningful in validationMode
         int totalDocs = 0;
-        logger.info("(name, luceneScore, scoreMSet, intersectMSet, totalMSet, scoreSet, intersectSet, totalSet)");
+        logger.info("(name, luceneScore, scoreMSet, scoreSet)");
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
             if (toSearch.size() >= MIN_DOC_SIZE) {
@@ -219,11 +219,11 @@ public class FuriaChanEngine {
                     logger.info(docName
                             + " " + resultCandidate.getScore()  
                             + " " + resultCandidate.getNaiveScoreMSet()
-                            + " " + resultCandidate.getMSetFoundFragments()
-                            + " " + resultCandidate.getMSetFragmentsCount()
+                            //+ " " + resultCandidate.getMSetFoundFragments()
+                            //+ " " + resultCandidate.getMSetFragmentsCount()
                             + " " + resultCandidate.getNaiveScoreSet()
-                            + " " + resultCandidate.getSetFoundFragments()
-                            + " " + resultCandidate.getSetFragmentsCount()
+                            //+ " " + resultCandidate.getSetFoundFragments()
+                            //+ " " + resultCandidate.getSetFragmentsCount()
                         );
                 }
             }
@@ -299,6 +299,10 @@ public class FuriaChanEngine {
 
     public void setN(short n) {
         this.n = n;
+    }
+
+    public void setK(byte k) {
+        this.k = k;
     }
 
 }
