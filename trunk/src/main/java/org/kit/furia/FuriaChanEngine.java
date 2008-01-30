@@ -196,15 +196,18 @@ public class FuriaChanEngine {
                 .getDocumentsFromDirectory();
         int foundResults = 0; // only meaningful in validationMode
         int totalDocs = 0;
+        logger.info("(name, luceneScore, scoreMSet, intersectMSet, totalMSet, scoreSet, intersectSet, totalSet)");
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
             if (toSearch.size() >= MIN_DOC_SIZE) {
                 totalDocs++;
+                long prevTime = System.currentTimeMillis();
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         n);
-                Iterator < ResultCandidate > it2 = result.iterator();
                 logger.info("||Match for " + toSearch.getName()
-                        + " (name, naive, score)||");
+                        + " || time sec:" +  ((System.currentTimeMillis() - prevTime)/ 1000));
+                Iterator < ResultCandidate > it2 = result.iterator();
+                
                 while (it2.hasNext()) {
                     ResultCandidate resultCandidate = it2.next();
                     String docName = resultCandidate.getDocumentName();
@@ -213,9 +216,15 @@ public class FuriaChanEngine {
                         docName = "<<" + docName + ">>";
                         foundResults++;                 
                     }
-                    logger.info(docName + "\t"
-                            + resultCandidate.getNaiveScore() + "\t"
-                            + resultCandidate.getScore());
+                    logger.info(docName
+                            + " " + resultCandidate.getScore()  
+                            + " " + resultCandidate.getNaiveScoreMSet()
+                            + " " + resultCandidate.getMSetFoundFragments()
+                            + " " + resultCandidate.getMSetFragmentsCount()
+                            + " " + resultCandidate.getNaiveScoreSet()
+                            + " " + resultCandidate.getSetFoundFragments()
+                            + " " + resultCandidate.getSetFragmentsCount()
+                        );
                 }
             }
         }
@@ -223,7 +232,7 @@ public class FuriaChanEngine {
         // validationMode's summary
         if (validationMode) {
             logger
-                    .info("FuriaPrecision: (% of programs found in the first n documents) "
+                    .info("*** FuriaPrecision: (% of programs found in the first n documents) "
                             + result + " " + foundResults + " of " + totalDocs);
             // TODO: Add more statistics. Average n. Average naive score.
             // Average difference between score A and B.
@@ -283,9 +292,6 @@ public class FuriaChanEngine {
                 (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps);
     }
 
-    public void setK(byte k) {
-        this.k = k;
-    }
 
     public void setR(short r) {
         this.r = r;

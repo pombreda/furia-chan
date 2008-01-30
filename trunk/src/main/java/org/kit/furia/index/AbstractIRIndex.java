@@ -96,8 +96,11 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         WORDS,
         /* The name of the document */
         DOC_NAME,
-        /* Total count of OB objects in a document */
+        /* Cardinality of the multi-set of OB objects in a document */
         MULTI_SET_SIZE,
+        
+        /* Cardinality of the set of OB objects in a document */
+        SET_SIZE,
     }
 
     /**
@@ -151,16 +154,17 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      *                A map that contains OB_id -> freq
      * @param n
      *                Return the top n results only.
-     * @param intersectionQuerySize
-     *                Size of the common elements.
+     * @param intersectionQueryMSet
+     *                Size of the common elements (multi-set).
      * @param originalQuerySize
      *                The size of the multi-set of the query.
      * @return The top n candidates.
      */
     protected List < ResultCandidate > processQueryResults(
             Map < Integer, Integer > normalizedQuery, short n,
-            int intersectionQuerySize, int originalQuerySize)
-            throws IOException {
+            int intersectionQueryMSet, int intersectionQuerySet)
+            throws IRException {
+        try{
         // at this stage we have created a map that holds all the matched
         // elements,
         // the initial document that is in terms of the original objects
@@ -177,7 +181,6 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             // now we just perform the search and return the results.
             Hits hits = searcher.search(q);
             Iterator < Hit > it = hits.iterator();
-
             int i = 0;
             while (it.hasNext() && i < n) {
                 Hit h = it.next();
@@ -186,14 +189,20 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                 TupleInput in = new TupleInput(h.getDocument().getField(
                         FieldName.MULTI_SET_SIZE.toString()).binaryValue());
                 // size of the doc in the DB.
-                int docSize = in.readInt();
-
+                int docSizeMSet = in.readInt();
+                
+                int docSizeSet =  new TupleInput(h.getDocument().getField(
+                        FieldName.SET_SIZE.toString()).binaryValue()).readInt();
+                
                 res.add(new ResultCandidate(docName, h.getScore(),
-                        ((float) (intersectionQuerySize) / (float) (docSize))));
+                        intersectionQueryMSet,docSizeMSet, intersectionQuerySet, docSizeSet));
                 i++;
             }
         }
         return res;
+        }catch(IOException e){
+            throw new IRException(e);
+        }
     }
 
     /**
@@ -207,7 +216,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         assert times > 0;
         StringBuilder res = new StringBuilder();
         while (i < times) {
-            res.append(x);
+            res.append(Integer.toString(x));
             res.append(" ");
             i++;
         }
@@ -239,6 +248,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                 logger.debug("Added " + i + " fragments into OB. msec: "
                         + (System.currentTimeMillis() - prevTime));
             }
+
             // now we just have to create the fields
             Field contentsField = new Field(FieldName.WORDS.toString(),
                     contents.toString(), Field.Store.NO, Field.Index.TOKENIZED);
@@ -248,11 +258,16 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             out.writeInt(document.multiSetSize());
             Field multiSetSize = new Field(FieldName.MULTI_SET_SIZE.toString(),
                     out.getBufferBytes(), Field.Store.YES);
+            TupleOutput out2 = new TupleOutput();
+            out2.writeInt(document.size());
+            Field setSize = new Field(FieldName.SET_SIZE.toString(),
+                    out2.getBufferBytes(), Field.Store.YES);
 
             org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
             doc.add(contentsField);
             doc.add(docName);
             doc.add(multiSetSize);
+            doc.add(setSize);
             indexWriter.addDocument(doc);
         } catch (Exception e) {
             throw new IRException(e);
@@ -292,22 +307,22 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         // query.setUseScorer14(true); // no effect
         // query.setMinimumNumberShouldMatch(5);
         query.setMaxClauseCount(Integer.MAX_VALUE);
-
+        boolean boost = true;
         Word cur;
         int qterms = 0;
         // float bestScore = 0;
-
+        float bestScore = 0;
         while (((cur = q.poll()) != null)) {
             TermQuery tq = new TermQuery(new Term(FieldName.WORDS.toString(),
                     cur.getId().toString()));
 
-            // if (boost) {
-            // if (qterms == 0) {
-            // / bestScore = ((Float) ar[2]).floatValue();
-            // }
-            // float myScore = ((Float) ar[2]).floatValue();
-            // tq.setBoost(myScore / bestScore);
-            // }
+        /*    if (boost) {
+                if (qterms == 0) {
+                    bestScore = cur.getScore();
+                }
+                float myScore = cur.getScore();
+                tq.setBoost(myScore / bestScore);
+            }*/
 
             query.add(tq, BooleanClause.Occur.SHOULD);
 
