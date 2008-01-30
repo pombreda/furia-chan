@@ -441,7 +441,7 @@ Would be cool to use this.
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
 					<argLine>-enableassertions</argLine>
-          <argLine>-Xmx4000M</argLine>
+          <argLine>-Xmx1200M</argLine>
         </configuration>
       </plugin>
 

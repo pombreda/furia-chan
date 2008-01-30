@@ -119,8 +119,7 @@ public class BytecodeFrag  extends AbstractFuriaChanCommandLine{
                 true).withDescription("Output directory where the fragments will be stored.").create("output");
         
         final Option timeout = OptionBuilder.withArgName("seconds").hasArg().isRequired(
-                true).withDescription("Timeout in seconds to give to the processing of each application").create("timeout");
-        timeout.setRequired(false);
+                false).withDescription("Timeout in seconds to give to the processing of each application").create("timeout");
         
         Options options = new Options();
         options.addOption(in);
