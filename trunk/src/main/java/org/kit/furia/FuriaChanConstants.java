@@ -37,4 +37,10 @@ public class FuriaChanConstants {
      */
     public static final int MIN_NODES_PER_FRAGMENT = 1;
 
+    /**
+     * Minimum number of different fragments that a program must hold to be
+     * retrieved successfully.
+     */
+    public static int MIN_DOC_SIZE = 100;
+
 }

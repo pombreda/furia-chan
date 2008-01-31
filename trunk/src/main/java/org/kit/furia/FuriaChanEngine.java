@@ -57,12 +57,6 @@ public class FuriaChanEngine {
     private static final Logger logger = Logger.getLogger("FuriaChanEngine");
 
     /**
-     * Minimum number of different fragments that a program must hold to be
-     * retrieved successfully.
-     */
-    public static int MIN_DOC_SIZE = 100;
-
-    /**
      * Folder name where OB will reside.
      */
     protected static String OBSEARCH_FOLDER = "obsearch";
@@ -181,7 +175,7 @@ public class FuriaChanEngine {
             logger.debug("Loaded: " + toAdd.getName() + " size: "
                     + toAdd.size() + " msec: "
                     + (System.currentTimeMillis() - prevTime));
-            if (toAdd.size() >= MIN_DOC_SIZE) {
+            if (toAdd.size() >= FuriaChanConstants.MIN_DOC_SIZE) {
                 mIndex.insert(toAdd);
             }
         }
@@ -212,7 +206,7 @@ public class FuriaChanEngine {
         NumberFormat f  = new DecimalFormat("0.000");
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
-            if (toSearch.size() >= MIN_DOC_SIZE) {
+            if (toSearch.size() >= FuriaChanConstants.MIN_DOC_SIZE) {
                 totalDocs++;
                 long prevTime = System.currentTimeMillis();
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,

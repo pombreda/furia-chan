@@ -150,7 +150,7 @@
 </target>
 
 <target name="execMatch" depends="maven">
-
+<echo>Executing query set: ${inputDir}</echo>
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
 				<jvmarg value="-server" />
@@ -161,7 +161,7 @@
 				<arg value="-db"/>
 				<arg value="${db}"/>
 				<arg value="-r"/>
-				<arg value="3"/>
+				<arg value="10"/>
 				<arg value="-n"/>
 				<arg value="10"/>
 				<arg value="-validate"/>

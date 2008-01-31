@@ -1,0 +1,13 @@
+
+Exp 1 marta Jan 31 600am
+Range 3. Min size 100. 
+Default performance was 84% 
+
+Exp2 amanda Jan 31 400pm
+Range 3 Min size 100 (same as above)
+I want to find the min size that is necessary to increase
+the precision.
+
+Exp3 marta Jan 31 500pm 
+Range 10 Min size 100 
+I want to find the effects of a range 10 and compare it against exp 1
