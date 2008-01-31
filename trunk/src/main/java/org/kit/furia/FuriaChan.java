@@ -108,16 +108,20 @@ public class FuriaChan
 
             File db = new File(cline.getOptionValue("db"));
 
-            OBAsserts.chkFileExists(db);
+            
 
             engine = new FuriaChanEngine(db);
             if(cline.hasOption("learn")){
-                engine.freeze();
+                OBAsserts.chkFileExists(db);
+                throw new Exception("Cannot freeze now at this point. The first insert will freeze so make sure it has a bunch of apps");
+                //engine.freeze();
             }else{ 
                 File input = new File(cline.getOptionValue("input"));
+                OBAsserts.chkFileExists(db);
                 OBAsserts.chkFileExists(input);
                 if(cline.hasOption("load")){ // load data into the DB
                     engine.insert(input);
+                    engine.freeze();
                 }else if(cline.hasOption("search")){ // search for 
                     if(cline.hasOption("k")){
                         engine.setK(Byte.parseByte(cline.getOptionValue("k")));
@@ -137,7 +141,6 @@ public class FuriaChan
                     throw new Exception("Operation mode is missing. Accepted values: search, load, learn");
                 }
             }
-            engine.close();
         } catch (final ParseException exp) {
             logger.fatal("Argument parsing failed args: "
                     + Arrays.toString(args), exp);

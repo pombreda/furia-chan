@@ -25,8 +25,8 @@ chmod 755 install.sh
 wget http://obsearch.googlecode.com/files/obsearch-$OBVERSION.jar
 
 
-
-mvn install:install-file -Dfile=obsearch-$OBVERSION.jar -DgroupId=gsoc -DartifactId=obsearch -Dversion=$OBVERSION -Dpackaging=jar -DpomFile=pom.xml
+# TODO: re-enable this!
+#mvn install:install-file -Dfile=obsearch-$OBVERSION.jar -DgroupId=gsoc -DartifactId=obsearch -Dversion=$OBVERSION -Dpackaging=jar -DpomFile=pom.xml
 
 cd ..
 cd ..
@@ -37,7 +37,7 @@ cd ..
 
 # install lucene
 
-wget http://ftp.kddilabs.jp/infosystems/apache/lucene/java/lucene-2.2.0.tar.gz
+wget http://ftp.kddilabs.jp/infosystems/apache/lucene/java/archive/lucene-2.2.0.tar.gz
 
 tar -xzf lucene-2.2.0.tar.gz
 
