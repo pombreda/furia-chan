@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 
@@ -130,6 +132,7 @@ public class FuriaChanEngine {
             InstantiationException, OBException {
         File obFolder = new File(directory, OBSEARCH_FOLDER);
         File irFolder = new File(directory, IRINDEX_FOLDER);
+        File sporeFile = new File(obFolder, "PPTreeShort");
         if (!directory.exists()) {
             directoryCreation(directory);
             directoryCreation(obFolder);
@@ -139,9 +142,9 @@ public class FuriaChanEngine {
             OBAsserts.chkFileExists(obFolder);
             OBAsserts.chkFileExists(irFolder);
             // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified. it should
-            // accept a filename for the "spore" (metadata) file.
+            // accept a filename for the "spore" (metadata) file.            
             index = (UnsafePPTreeShort < OBFragment >) IndexFactory
-                    .createFromXML(readString(new File(obFolder, "PPTreeShort")));
+                    .createFromXML(readString(sporeFile));
             index.relocateInitialize(null);
         }
         mIndex = new FIRIndexShort < OBFragment >(index, irFolder);
@@ -193,6 +196,7 @@ public class FuriaChanEngine {
      * @throws IRException
      */
     public float search(File dir) throws IOException, IRException {
+        logger.debug("Starting search with n:" + n + " r: " + r + " k: " + k + " validation: " + this.validationMode);
         FuriaInputOBFragment reader = new FuriaInputOBFragment(dir);
         Iterator < Document < OBFragment >> it = reader
                 .getDocumentsFromDirectory();
@@ -201,8 +205,11 @@ public class FuriaChanEngine {
         StaticBin1D setScoreStats = new StaticBin1D(); //statistics on sets scores.
         StaticBin1D mSetScoreStats = new StaticBin1D(); //statistics on multi-sets scores.
         StaticBin1D nStats = new StaticBin1D(); //statistics on n
-        
-        logger.info("(name, luceneScore, scoreMSet, scoreSet)");
+        StaticBin1D objectsPerSecond = new StaticBin1D(); //statistics on n
+        int maxSizeOfAppsNotFound = 0;
+        StaticBin1D maxSizeStatsOfAppsNotFound = new StaticBin1D();
+        logger.info("(name, luceneScore, scoreMSet, scoreSet, size)");
+        NumberFormat f  = new DecimalFormat("0.000");
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
             if (toSearch.size() >= MIN_DOC_SIZE) {
@@ -210,10 +217,15 @@ public class FuriaChanEngine {
                 long prevTime = System.currentTimeMillis();
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         n);
-                logger.info("||Match for " + toSearch.getName()
-                        + " || time sec:" +  ((System.currentTimeMillis() - prevTime)/ 1000));
+                long time = ((System.currentTimeMillis() - prevTime)/ 1000);
+                logger.info("|| Match for " + toSearch.getName()
+                        + " sec:" + time  + " size: " + toSearch.size());
+                if(toSearch.size() > 0){
+                    objectsPerSecond.add( (float)toSearch.size() / ((float)(time * 1000)));
+                }
                 Iterator < ResultCandidate > it2 = result.iterator();
                 int nth = 1;
+                boolean found = false;
                 while (it2.hasNext()) {
                     ResultCandidate resultCandidate = it2.next();
                     String docName = resultCandidate.getDocumentName();
@@ -224,19 +236,31 @@ public class FuriaChanEngine {
                         setScoreStats.add(resultCandidate.getNaiveScoreSet());
                         mSetScoreStats.add(resultCandidate.getNaiveScoreMSet());
                         nStats.add(nth);
+                        found = true;
                     }
                     logger.info(docName
-                            + " " + resultCandidate.getScore()  
-                            + " " + resultCandidate.getNaiveScoreMSet()
+                            + " " + f.format(resultCandidate.getScore())  
+                            + " " + f.format(resultCandidate.getNaiveScoreMSet())
                             //+ " " + resultCandidate.getMSetFoundFragments()
                             //+ " " + resultCandidate.getMSetFragmentsCount()
-                            + " " + resultCandidate.getNaiveScoreSet()
+                            + " " + f.format(resultCandidate.getNaiveScoreSet())
                             //+ " " + resultCandidate.getSetFoundFragments()
                             //+ " " + resultCandidate.getSetFragmentsCount()
+                            + " " + resultCandidate.getSetFragmentsCount()
                         );
                 }
                 nth++;
+             // check if the item was found
+                if(validationMode && ! found){
+                    if(maxSizeOfAppsNotFound < toSearch.size()){
+                        maxSizeOfAppsNotFound = toSearch.size();
+                    }
+                    maxSizeStatsOfAppsNotFound.add(toSearch.size());
+                }
+            }else{
+                logger.warn(toSearch.getName() +" ignored because it is too small");
             }
+            
         }
         float result = ((float) foundResults / (float) totalDocs);
         // validationMode's summary
@@ -248,6 +272,8 @@ public class FuriaChanEngine {
             logger.info("MSet. Mean: " + mSetScoreStats.mean() + " Std. Dev " + mSetScoreStats.standardDeviation());
             logger.info("Set. Mean: " + setScoreStats.mean() + " Std. Dev " + setScoreStats.standardDeviation());
             logger.info("N. Mean: " + nStats.mean() + " Std. Dev " + nStats.standardDeviation());
+            logger.info("OBs per sec: " + objectsPerSecond.mean() + " Std. Dev " + objectsPerSecond.standardDeviation());
+            logger.info("OBs not found (size). Mean: " + maxSizeStatsOfAppsNotFound.mean() + " Std. Dev " + maxSizeStatsOfAppsNotFound.standardDeviation() + " variance " + maxSizeStatsOfAppsNotFound.variance() + " max: " + maxSizeOfAppsNotFound);
             // TODO: Add more statistics. Average n. Average naive score.
             // Average difference between score A and B.
         }
@@ -282,10 +308,8 @@ public class FuriaChanEngine {
      *                 If the directory cannot be created
      */
     private void directoryCreation(File directory) throws IOException {
-        if (!directory.mkdirs()) {
-            throw new IOException("Could not create directory"
-                    + directory.toString());
-        }
+        directory.mkdirs();
+        OBAsserts.chkFileExists(directory);
     }
 
     /**
@@ -311,7 +335,8 @@ public class FuriaChanEngine {
         this.r = r;
     }
 
-    public void setN(short n) {
+    public void setN(short n) throws OBException{
+        OBAsserts.chkAssert(n > 0, "n should be greater than 0");
         this.n = n;
     }
 
