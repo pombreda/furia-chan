@@ -45,6 +45,11 @@ cd lucene-2.2.0
 
 mvn install:install-file -Dfile=lucene-core-2.2.0.jar -DgroupId=apache -DartifactId=lucene -Dversion=2.2.0 -Dpackaging=jar -DpomFile=pom.xml
 
+cd contrib/queries
+
+mvn install:install-file -Dfile=lucene-queries-2.2.0.jar -DgroupId=apache -DartifactId=luceneQueries -Dversion=2.2.0 -Dpackaging=jar -DpomFile=pom.xml
+cd ..
+cd ..
 cd ..
 
 rm -fdr lucene-2.2.0

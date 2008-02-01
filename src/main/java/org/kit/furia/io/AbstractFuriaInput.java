@@ -163,7 +163,7 @@ public abstract class AbstractFuriaInput < O extends OB > {
             if(directoryOfDirectoriesMode(directory)){
                 documents = directory.listFiles();
             }else{
-                File[] documents = new File[1];
+                documents = new File[1];
                 documents[0] = directory;
             }
            
