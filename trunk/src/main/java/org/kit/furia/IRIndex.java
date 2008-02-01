@@ -43,7 +43,6 @@ import com.sleepycat.je.DatabaseException;
  * document is taken into account. So, instead of matching a huge syntax tree of
  * for example, music, we cut a song into pieces, match the pieces and then the
  * overall finger-print of the multi-set of OB objects is matched.
- * 
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
@@ -78,8 +77,7 @@ public interface IRIndex < O extends OB > {
     /**
      * Freezes the index. From this point data can be inserted, searched and
      * deleted. The index might deteriorate at some point so every once in a
-     * while it is a good idea to rebuild the index. This method will also 
-     * 
+     * while it is a good idea to rebuild the index. This method will also
      * @throws IRException
      *                 If something goes wrong with the IR engine or with
      *                 OBSearch.
@@ -94,4 +92,18 @@ public interface IRIndex < O extends OB > {
      *                 OBSearch.
      */
     void close() throws IRException;
+
+    /**
+     * Returns the number of documents stored in this index.
+     * @return the number of documents stored in this index.
+     */
+    int getSize();
+
+    /**
+     * Returns true if the document corresponding to x's name exists in the DB.
+     * This method is intended to be used in validation mode only.
+     * @param x
+     * @return true if the DB does not contain a document with name x.getName()
+     */
+    boolean shouldSkipDoc(Document<O> x) throws IOException;
 }

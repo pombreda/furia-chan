@@ -27,8 +27,11 @@ package org.kit.furia;
  * @author amuller
  *
  */
-public class ResultCandidate {
+public class ResultCandidate implements Comparable<ResultCandidate>{
 
+    
+    
+    
     /**
      * The name of the document of the result
      */
@@ -111,6 +114,14 @@ public class ResultCandidate {
     }
 
 
-    
+    public int compareTo(ResultCandidate w) {
+        int res = 0;
+        if (score < w.score) {
+            res = -1;
+        } else if (score > w.score) {
+            res = 1;
+        }// else they are equal
+        return res * -1;// invert the result
+    }
     
 }

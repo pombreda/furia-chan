@@ -149,6 +149,16 @@
 
 </target>
 
+<target name="small" depends="maven">
+<antcall target="execMatch">
+  <param name="inputDir" value="${zelixFragments}/ecs-1.4.2-2jpp.noarch.rpm.jpackage"/>
+</antcall>
+
+<antcall target="execMatch">
+		<param name="inputDir" value="${zelixFragments}/jakarta-commons-jelly-tags-jsl-1.0-1jpp.noarch.rpm.jpackage"/>
+ </antcall>
+</target>
+
 <target name="execMatch" depends="maven">
 <echo>Executing query set: ${inputDir}</echo>
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
@@ -160,8 +170,10 @@
 				<arg value="${inputDir}"/>	
 				<arg value="-db"/>
 				<arg value="${db}"/>
+				<arg value="-k"/>
+				<arg value="1"/>
 				<arg value="-r"/>
-				<arg value="10"/>
+				<arg value="3"/>
 				<arg value="-n"/>
 				<arg value="10"/>
 				<arg value="-validate"/>

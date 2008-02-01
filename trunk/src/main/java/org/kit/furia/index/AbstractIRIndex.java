@@ -1,5 +1,6 @@
 package org.kit.furia.index;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,12 +29,16 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Hit;
+import org.apache.lucene.search.HitCollector;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.similar.MoreLikeThis;
+import org.apache.lucene.search.similar.MoreLikeThisQuery;
+import org.apache.lucene.search.similar.SimilarityQueries;
 import org.kit.furia.Document;
 import org.kit.furia.IRIndex;
 import org.kit.furia.ResultCandidate;
@@ -121,6 +126,12 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      * This object is used to search the index;
      */
     protected Searcher searcher;
+    
+    
+    /**
+     * At least the given score must be obtained to consider a term in the result.
+     */
+    protected float mSetScoreThreshold = 0.70f;
 
     /**
      * The index where all the data will be stored.
@@ -150,6 +161,124 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         }
         return res;
     }
+    
+    /**
+     * Returns true if the document corresponding
+     * to x's name exists in the DB. This method is intended to be
+     * used in validation mode only. 
+     * @param x
+     * @return true if the DB does not contain a document with name x.getName()
+     */
+    public boolean shouldSkipDoc(Document<O> x) throws IOException{
+        return this.indexReader.docFreq(new Term(FieldName.DOC_NAME.toString(), x.getName()) )< 1;
+    }
+    
+    private class FHitCollector extends HitCollector{
+        
+        PriorityQueue < ResultCandidate > candidates;
+        Map < Integer, Integer > normalizedQuery;
+        
+        public FHitCollector(Map < Integer, Integer > normalizedQuery){
+            this.candidates = new PriorityQueue < ResultCandidate >();
+            this.normalizedQuery = normalizedQuery;
+        }
+        
+        public void collect(int doc, float score) {
+            
+            org.apache.lucene.document.Document document = null;
+            try{
+                document = searcher.doc(doc);
+            }catch(IOException e){
+                logger.fatal("This is bad", e);
+                candidates =null;
+                normalizedQuery = null;
+                assert false;
+            }
+            
+            String docName = document.getField(
+                    FieldName.DOC_NAME.toString()).stringValue();
+            TupleInput in = new TupleInput(document.getField(
+                    FieldName.MULTI_SET_SIZE.toString()).binaryValue());
+            // size of the doc in the DB.
+            int docSizeMSet = in.readInt();
+
+            int docSizeSet = new TupleInput(document.getField(
+                    FieldName.SET_SIZE.toString()).binaryValue())
+                    .readInt();
+
+            int cx = 0;
+            int intersectionQueryMSet = 0;
+            int intersectionQuerySet = 0;
+            TupleInput freqs = new TupleInput(document.getField(
+                    FieldName.DOC_DETAILS.toString()).binaryValue());
+            while (cx < docSizeSet) {
+                int wordId = freqs.readInt();
+                int frecuency = freqs.readInt();
+                Integer frequencyQuery = normalizedQuery.get(wordId);
+                if (frequencyQuery != null) {
+                    intersectionQuerySet++;
+                    intersectionQueryMSet += Math.min(frecuency,
+                            frequencyQuery);
+                }
+                cx++;
+            }
+            ResultCandidate can = new ResultCandidate(docName, score,
+                    intersectionQueryMSet, docSizeMSet,
+                    intersectionQuerySet, docSizeSet);
+            
+            if(can.getNaiveScoreMSet() >= mSetScoreThreshold){
+                candidates.add(can);
+            }
+            
+        }
+        
+        public List<ResultCandidate> getResults(){
+            List<ResultCandidate> res = new LinkedList<ResultCandidate>();
+            ResultCandidate cur;
+            int total = 0;
+            while (((cur = candidates.poll()) != null)) {
+                res.add(cur);
+            }
+            return res;
+        }
+    }
+    
+    /**
+     * Returns the # of documents in this DB.
+     * @return
+     */
+    public int getSize(){
+        return this.indexReader.numDocs();
+    }
+    
+    protected List < ResultCandidate > processQueryResults(
+            Map < Integer, Integer > normalizedQuery, short n)
+            throws IRException {
+        List < ResultCandidate > res = new LinkedList < ResultCandidate >();
+        try {
+            // at this stage we have created a map that holds all the matched
+            // elements,
+            // the initial document that is in terms of the original objects
+            // (obfuscated fragments in the case of furia)
+            // is now transformed in terms of the database.
+            // we now generate a priority queue with the terms, in order to sort
+            // them and put the most
+            // relevant at the beginning of the query.
+
+            
+            if (normalizedQuery.size() > 0) {
+                PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
+                Query q = createQuery(sorted);
+                FHitCollector collector = new FHitCollector(normalizedQuery);
+                // now we just perform the search and return the results.
+                 searcher.search(q,collector);
+                 return(collector.getResults());
+            }
+        }catch (IOException e) {
+            throw new IRException(e);
+        }
+        return res;
+    }
 
     /**
      * Receives a map with normalized OB_id -> freq and returns the closest
@@ -160,7 +289,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      *                Return the top n results only.
      * @return The top n candidates.
      */
-    protected List < ResultCandidate > processQueryResults(
+    /*protected List < ResultCandidate > processQueryResults(
             Map < Integer, Integer > normalizedQuery, short n)
             throws IRException {
         try {
@@ -177,8 +306,13 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             if (normalizedQuery.size() > 0) {
                 PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
                 Query q = createQuery(sorted);
+
                 // now we just perform the search and return the results.
                 Hits hits = searcher.search(q);
+                if(logger.isDebugEnabled()){
+                    logger.info("Hits size: " + hits.length());
+                }
+
                 Iterator < Hit > it = hits.iterator();
                 int i = 0;
                 while (it.hasNext() && i < n) {
@@ -220,7 +354,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         } catch (IOException e) {
             throw new IRException(e);
         }
-    }
+    }*/
 
     /**
      * Repeats times times the given string, separates everything with a space
@@ -239,6 +373,8 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         }
         return res;
     }
+    
+    
 
     public void insert(Document < O > document) throws IRException {
         // OBSearch index that we use for "stemming".
@@ -321,6 +457,47 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             throw new IRException(e);
         }
     }
+   /* 
+    private Query createQuery(PriorityQueue < Word > q) {
+        StringBuilder contents  = new StringBuilder();
+        Word cur;
+        int total = 0;
+        while (((cur = q.poll()) != null)) {
+            total += cur.getDocFreq();
+            contents.append(repeat(cur.getId(), cur.getDocFreq()));
+            //contents.append(cur.getId());
+            //contents.append(" ");
+        }
+        
+        MoreLikeThis yay = new MoreLikeThis(indexReader);
+        yay.setAnalyzer(new WhitespaceAnalyzer());
+        yay.setBoost(true);
+        yay.setMaxNumTokensParsed(total);
+        yay.setMaxQueryTerms(0);
+
+        yay.setFieldNames(new String[] { FieldName.WORDS.toString() });
+        Query res = null;
+        try{
+            res = yay.like(new ByteArrayInputStream(contents.toString().getBytes()));
+        }catch(IOException e){
+            logger.fatal("Error while creating query", e);
+        }
+        return res; 
+        
+        //MoreLikeThisQuery res = new MoreLikeThisQuery(contents.toString(), new String[]{ FieldName.WORDS.toString() }, new WhitespaceAnalyzer() );
+        
+        //res.setMaxQueryTerms(100);
+        //res.setPercentTermsToMatch(0.3f);
+        //return res;
+        
+        //Query res = null;
+        //try{
+        //    res = SimilarityQueries.formSimilarQuery(contents.toString(), new WhitespaceAnalyzer(), FieldName.WORDS.toString(), null);
+        //}catch(IOException e){
+         //   logger.fatal("Problem while creating Query", e);
+        //}
+        //return res;
+    }*/
 
     /**
      * Create the "more like" query from a PriorityQueue. (This code was
@@ -330,8 +507,9 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         BooleanQuery query = new BooleanQuery(true); // aqui va el true, da
         // mejores resultados.
         // query.setUseScorer14(true); // no effect
-        // query.setMinimumNumberShouldMatch(5);
-        query.setMaxClauseCount(Integer.MAX_VALUE);
+        query.setAllowDocsOutOfOrder(true);
+        //query.setMinimumNumberShouldMatch(100);
+        BooleanQuery.setMaxClauseCount(q.size());
         boolean boost = true;
         Word cur;
         int qterms = 0;
@@ -340,17 +518,15 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         while (((cur = q.poll()) != null)) {
             TermQuery tq = new TermQuery(new Term(FieldName.WORDS.toString(),
                     cur.getId().toString()));
-
-            /*
-             * if (boost) { if (qterms == 0) { bestScore = cur.getScore(); }
-             * float myScore = cur.getScore(); tq.setBoost(myScore / bestScore); }
-             */
-
-            query.add(tq, BooleanClause.Occur.SHOULD);
-
+            
+              //if (boost) { if (qterms == 0) { bestScore = cur.getScore(); }
+              //float myScore = cur.getScore(); tq.setBoost(myScore / bestScore); }
+             //tq.setBoost( (float)cur.getDocFreq()/ (float)q.size());
+            
+             
+            query.add(tq, BooleanClause.Occur.SHOULD);            
             qterms++;
         }
-
         return query;
     }
 
