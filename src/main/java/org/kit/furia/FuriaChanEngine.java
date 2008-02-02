@@ -89,6 +89,8 @@ public class FuriaChanEngine {
      * Get the top n elements.
      */
     private short n = 10;
+    
+    private float mSetThreshold = 0.50f;
 
     /**
      * Validation mode assumes that the query's document names are the same
@@ -239,13 +241,14 @@ public class FuriaChanEngine {
             if (toSearch.size() >= FuriaChanConstants.MIN_DOC_SIZE) {
                 totalDocs++;
                 long prevTime = System.currentTimeMillis();
+
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         nToUse);
                 long time = ((System.currentTimeMillis() - prevTime)/ 1000);
                 logger.info("|| Match for " + toSearch.getName()
                         + " sec:" + time  + " MSet: " + toSearch.multiSetSize() + " Set:" + toSearch.size());
                 if(toSearch.size() > 0){
-                    objectsPerSecond.add( (float)toSearch.size() / ((float)(time / 1000)));
+                    objectsPerSecond.add(   ((float)(time / 1000)) / (float)toSearch.size());
                 }
                 Iterator < ResultCandidate > it2 = result.iterator();
                 int nth = 1;
@@ -414,5 +417,47 @@ public class FuriaChanEngine {
     public void setK(byte k) {
         this.k = k;
     }
+
+    public float getMSetThreshold() {
+        return mSetThreshold;
+    }
+
+    public void setMSetThreshold(float setThreshold) {
+        mSetThreshold = setThreshold;
+    }
+
+    public byte getK() {
+        return k;
+    }
+
+    public short getR() {
+        return r;
+    }
+
+    public short getN() {
+        return n;
+    }
+
+    public void setValidationMode(boolean validationMode) {
+        this.validationMode = validationMode;
+    }
+
+    public float getMSetScoreThreshold() {
+        return mIndex.getMSetScoreThreshold();
+    }
+
+    public float getSetScoreThreshold() {
+        return mIndex.getSetScoreThreshold();
+    }
+
+    public void setMSetScoreThreshold(float setScoreThreshold) {
+        mIndex.setMSetScoreThreshold(setScoreThreshold);
+    }
+
+    public void setSetScoreThreshold(float setScoreThreshold) {
+        mIndex.setSetScoreThreshold(setScoreThreshold);
+    }
+    
+    
 
 }

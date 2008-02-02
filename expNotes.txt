@@ -96,7 +96,20 @@ ecs-1.4.2-2jpp.noarch.rpm.jpackage
 *** Found the Problem!!! ***
 
 Exp 7. Amanda Revised the query code. Using hitcollector so that I can get
-the raw score. Final sort by using msets
-r=3 k=3
+the raw score. Final sort by using msets. Not including guys smaller than 100
+in the validation.
+r=3 k=1 Filter:0.70
 
-Exp 8. 
+[java] 07:09:15,184  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 440 of 440
+[java] 10:45:46,877  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 337 of 337
+[java] 13:33:13,195  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.72786885 222 of 305
+
+
+By changing the filter to 0.50: things improved for sandmark:
+
+
+Exp 8. Marta Same as #7 but:
+k=3 r=7
+
+Exp 9 only sandmark
+same as #7 but with threshold 0.5. Result: 95%. 

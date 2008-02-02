@@ -129,9 +129,14 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     
     
     /**
-     * At least the given score must be obtained to consider a term in the result.
+     * At least the given naive mset score must be obtained to consider a term in the result.
      */
-    protected float mSetScoreThreshold = 0.70f;
+    protected float mSetScoreThreshold = 0.50f;
+    
+    /**
+     * At least the given naive set score must be obtained to consider a term in the result.
+     */
+    protected float setScoreThreshold = 0f;
 
     /**
      * The index where all the data will be stored.
@@ -226,7 +231,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                     intersectionQueryMSet, docSizeMSet,
                     intersectionQuerySet, docSizeSet);
             
-            if(can.getNaiveScoreMSet() >= mSetScoreThreshold){
+            if(can.getNaiveScoreMSet() >= mSetScoreThreshold && can.getNaiveScoreSet() >= setScoreThreshold){
                 candidates.add(can);
             }
             
@@ -637,6 +642,22 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             return res * -1;// invert the result
         }
 
+    }
+
+    public float getMSetScoreThreshold() {
+        return mSetScoreThreshold;
+    }
+
+    public void setMSetScoreThreshold(float setScoreThreshold) {
+        mSetScoreThreshold = setScoreThreshold;
+    }
+
+    public float getSetScoreThreshold() {
+        return setScoreThreshold;
+    }
+
+    public void setSetScoreThreshold(float setScoreThreshold) {
+        this.setScoreThreshold = setScoreThreshold;
     }
 
 }

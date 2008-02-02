@@ -133,11 +133,11 @@
 -->
 <!-- execute the searches -->
 
-<!--
+
 <antcall target="execMatch">
     <param name="inputDir" value="${jdkFragments}"/>
  </antcall>
--->
+
 
 <antcall target="execMatch">
     <param name="inputDir" value="${zelixFragments}"/>
