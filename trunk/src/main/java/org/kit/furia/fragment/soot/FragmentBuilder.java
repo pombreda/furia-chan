@@ -2,6 +2,7 @@ package org.kit.furia.fragment.soot;
 
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.kit.furia.exceptions.IRException;
 import org.kit.furia.fragment.MTDFragmentAST;
 import org.kit.furia.fragment.OBFragment;
 import org.kit.furia.fragment.soot.representation.Frimp;
@@ -258,8 +259,8 @@ public class FragmentBuilder {
      */
     public void fillRepetitionCounts(
             HashMap < String, IntegerHolder > repetitionCounts)
-            throws Exception {
-
+            throws IRException {
+        try{
         // result.append("// Method: " + getMethodName() + "\n");
         Iterator < Value > keys = slices.keySet().iterator();
         while (keys.hasNext()) {
@@ -274,6 +275,9 @@ public class FragmentBuilder {
                 }
                 counter.inc();
             
+        }
+        }catch(Exception e){
+            throw new IRException(e);
         }
     }
 

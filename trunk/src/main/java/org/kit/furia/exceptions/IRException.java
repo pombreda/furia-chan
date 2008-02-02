@@ -30,6 +30,11 @@ public class IRException
      * Internal exception
      */
     private Exception e;
+    private String msg;
+           
+    public IRException(String x){
+        msg = x;
+    }
     
     public IRException(Exception e){
         this.e = e;
@@ -38,6 +43,8 @@ public class IRException
     public String toString(){
         if(e != null){
         return e.getMessage();
+        }else if(msg != null){
+            return msg;
         }else{
             return "N/A";
         }

@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kit.furia.fragment.soot.FragmentBuilderClient;
+import org.kit.furia.fragment.FragmentBuilderClient;
 import org.kit.furia.misc.FuriaProperties;
 
 /*

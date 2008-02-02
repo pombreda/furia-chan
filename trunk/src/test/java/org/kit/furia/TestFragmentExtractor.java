@@ -8,7 +8,8 @@ import org.ajmm.obsearch.index.utils.Directory;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 import org.junit.Test;
-import org.kit.furia.fragment.soot.FragmentBuilderClientAux;
+import org.kit.furia.fragment.FragmentBuilderClientAux;
+import org.kit.furia.misc.FuriaProperties;
 
 import static org.junit.Assert.*;
 
@@ -34,15 +35,15 @@ public class TestFragmentExtractor {
         String[] params = new String[3];
         params[0]= input.toString();
         params[1] = "100";
-        params[2] = output.toString();
-        */
-        /*System.setProperty("log4j.file", "furiaLog4j.config");
+        params[2] = output.toString();*/
+        
+        System.setProperty("log4j.file", "furiaLog4j.config");
         String[] params = new String[3];
         params[0] = "/home/amuller/temp/SmallDataSetJava/JPackageClass/batik-1.6-1jpp.noarch.rpm.jpackage/";
-        params[1] = "1000";
-        params[2] = "target/test-classes/extractorTest";
-        Directory.deleteDirectory(new File(params[2]));
-        FragmentBuilderClientAux.main(params);*/
+        params[1] = "target/test-classes/extractorTest";
+        params[2] = "asm";
+        Directory.deleteDirectory(new File(params[1]));
+        FragmentBuilderClientAux.main(params);
     }
 
 }
