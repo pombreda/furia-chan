@@ -3,6 +3,7 @@ package org.kit.furia.fragment.soot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +12,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
+import org.kit.furia.exceptions.IRException;
+import org.kit.furia.fragment.AbstractFragmentExtractor;
+import org.kit.furia.fragment.FragmentExtractor;
+import org.kit.furia.fragment.FragmentParseException;
 import org.kit.furia.fragment.MTDFragmentAST;
 import org.kit.furia.fragment.OBFragment;
 import org.kit.furia.fragment.soot.representation.FrimpBody;
@@ -46,87 +50,99 @@ import soot.util.cfgcmd.CFGGraphType;
  */
 
 /**
- * FragmentExtractor takes a directory and loads SootFragmentBuilder objects
- * for each method found. From the SootFragmentBuilder object, fragments can
- * be extracted.
+ * FragmentExtractor takes a directory and loads SootFragmentBuilder objects for
+ * each method found. From the SootFragmentBuilder object, fragments can be
+ * extracted.
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
 
-public class FragmentExtractor {
+public class FragmentExtractorSoot extends AbstractFragmentExtractor implements FragmentExtractor {
     private static final Logger logger = Logger
-            .getLogger(FragmentExtractor.class);
+            .getLogger(FragmentExtractorSoot.class);
 
     // this is the default graph type used in furia.
     // TODO: We could try using some other (simpler) cfg without exceptions :)
     public static final CFGGraphType defaultGraphType = CFGGraphType.EXCEPTIONAL_BLOCK_GRAPH;
-    //public static final CFGGraphType defaultGraphType = CFGGraphType.BRIEF_BLOCK_GRAPH;
-    private FragmentExtractor() {
+
+    // public static final CFGGraphType defaultGraphType =
+    // CFGGraphType.BRIEF_BLOCK_GRAPH;
+    public FragmentExtractorSoot() {
 
     }
 
-    public static void extractMethodsFromDirectory(
-            final String directory, final int max_structures_allowed,
-            final int min_structures_allowed, final String outputPath, final String outputFile)
-            throws NoClassesFoundByStealer, FileNotFoundException, Exception {
+    public void extractMethodsFromDirectory(final String directory,
+            final int maxStructuresAllowed, final int minStructuresAllowed,
+            final String outputPath, String outputFile)
+            throws FileNotFoundException, NoClassesFound, IOException,
+            IRException, FragmentParseException {
         extractMethodsFromDirectory(directory, defaultGraphType,
-                max_structures_allowed, min_structures_allowed, outputPath, outputFile);
+                maxStructuresAllowed, minStructuresAllowed, outputPath,
+                outputFile);
     }
 
     /**
-     * Extracts fragments from the given directory.
-     * Furia-chan's fragment file format is:
-     * <repetitions count>\t<fragment>
-     * @param directory Directory from where we will extract fragments
-     * @param graphtype The graph representation used to interpret the methods
-     * @param maxStructuresAllowed maximum nodes per tree
-     * @param min_structures_allowed minimum nodes per tree
-     * @param outputPath Output path where logs will be written
-     * @param outputFile The output fragment file that will be used
+     * Extracts fragments from the given directory. Furia-chan's fragment file
+     * format is: <repetitions count>\t<fragment>
+     * @param directory
+     *                Directory from where we will extract fragments
+     * @param graphtype
+     *                The graph representation used to interpret the methods
+     * @param maxStructuresAllowed
+     *                maximum nodes per tree
+     * @param min_structures_allowed
+     *                minimum nodes per tree
+     * @param outputPath
+     *                Output path where logs will be written
+     * @param outputFile
+     *                The output fragment file that will be used
      * @throws NoClassesFoundByStealer
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public static void extractMethodsFromDirectory(
-            final String directory, final CFGGraphType graphtype,
-            final int maxStructuresAllowed, final int minStructuresAllowed,
-            final String outputPath, String outputFile) throws NoClassesFoundByStealer,
-            FileNotFoundException, Exception {
+    public void extractMethodsFromDirectory(final String directory,
+            final CFGGraphType graphtype, final int maxStructuresAllowed,
+            final int minStructuresAllowed, final String outputPath,
+            String outputFile) throws FileNotFoundException, NoClassesFound,
+            IOException, IRException, FragmentParseException {
         final BodyStealer stealer = stealBodiesFromDir(directory, outputPath);
 
         if (!stealer.isFound()) {
-            throw new NoClassesFoundByStealer("In directory:" + directory);
+            throw new NoClassesFound("In directory:" + directory);
         }
         final Iterator < Body > it = stealer.getIterator();
         FileWriter output = new FileWriter(outputFile);
         // repetition counter
-        HashMap<String, IntegerHolder> repetitionCounts = new HashMap<String, IntegerHolder>();
+        HashMap < String, IntegerHolder > repetitionCounts = new HashMap < String, IntegerHolder >();
         while (it.hasNext()) {
             final Body tempBody = it.next();
-            //logger.debug("Fragmenting method: " + tempBody.getMethod().toString());
+            // logger.debug("Fragmenting method: " +
+            // tempBody.getMethod().toString());
             FrimpBody fb = new FrimpBody(tempBody);
-            FragmentBuilder sootFragmentBuilder = new FragmentBuilder(
-                    fb, (BlockGraph) graphtype.buildGraph(fb),
+            FragmentBuilder sootFragmentBuilder = new FragmentBuilder(fb,
+                    (BlockGraph) graphtype.buildGraph(fb),
                     maxStructuresAllowed, minStructuresAllowed);
-            sootFragmentBuilder.fillRepetitionCounts(repetitionCounts);            
+            sootFragmentBuilder.fillRepetitionCounts(repetitionCounts);
         }
-        
-        Iterator<Map.Entry<String, IntegerHolder>> itAll  = repetitionCounts.entrySet().iterator();
-        while(itAll.hasNext()){
-            Map.Entry<String, IntegerHolder> entry = itAll.next();
-            
+
+        Iterator < Map.Entry < String, IntegerHolder >> itAll = repetitionCounts
+                .entrySet().iterator();
+        while (itAll.hasNext()) {
+            Map.Entry < String, IntegerHolder > entry = itAll.next();
+
             MTDFragmentAST tree = OBFragment.parseTree(entry.getKey());
             // process only if the tree has the expected size.
             if (tree.getSize() >= minStructuresAllowed
-                    && tree.getSize() <= maxStructuresAllowed) {            
-            output.write(entry.getValue().getValue() + "\t" + entry.getKey() + "\n");
+                    && tree.getSize() <= maxStructuresAllowed) {
+                output.write(entry.getValue().getValue() + "\t"
+                        + entry.getKey() + "\n");
             }
-        }        
+        }
         output.close();
     }
 
-    public static BodyStealer stealBodiesFromDir(String dir, String outputPath)
-            throws FileNotFoundException, Exception {
+    public BodyStealer stealBodiesFromDir(String dir, String outputPath)
+            throws FileNotFoundException, NoClassesFound {
         List < String > argumentos = new LinkedList < String >();
 
         argumentos.add("-allow-phantom-refs");
@@ -156,7 +172,7 @@ public class FragmentExtractor {
         int size = argumentos.size();
         getClassFiles(new File(dir), argumentos, dir);
         if (size == argumentos.size()) {
-            throw new Exception("Could not find any classes :(");
+            throw new NoClassesFound();
         }
 
         // G.v().reset(); // reset soot
@@ -178,33 +194,6 @@ public class FragmentExtractor {
         G.v().out.close();
         return stealer;
 
-    }
-
-    /**
-     * Iterates the given directory, and returns all the .class files found in
-     * it, if there are other directories. iterates through all of them
-     * @param x
-     *                the directory
-     * @param output
-     *                the output where class file names will be stored
-     */
-    protected static void getClassFiles(File x, List < String > output,
-            String dir) {
-        File[] files = x.listFiles();
-        int i = 0;
-        while (i < files.length) {
-            if (files[i].isDirectory()) {
-                getClassFiles(files[i], output, dir);
-            } else if (files[i].getName().matches(".*[.]class$")) {
-                String p = files[i].getParent().replace(dir + File.separator,
-                        "").replaceAll(File.separator, ".");
-                String c = p + "."
-                        + files[i].getName().replaceFirst("[.]class$", "");
-                // logger.info("processing class:" + c);
-                output.add(c);
-            }
-            i++;
-        }
     }
 
 }

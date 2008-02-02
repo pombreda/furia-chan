@@ -1,4 +1,4 @@
-package org.kit.furia.fragment.soot;
+package org.kit.furia.fragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

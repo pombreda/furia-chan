@@ -1,4 +1,4 @@
-package org.kit.furia.fragment.soot;
+package org.kit.furia.fragment;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.kit.furia.FuriaChanConstants;
+import org.kit.furia.fragment.asm.FragmentExtractorASM;
+import org.kit.furia.fragment.soot.FragmentExtractorSoot;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -36,22 +38,28 @@ import org.kit.furia.FuriaChanConstants;
  * FragmentBuilderClientAux fragments a directory of class files. It is designed
  * to be called from the command line. This program is not intended to be called
  * by humans, only intended to be called by other programs. Receives the
- * following parameters: [1] The directory that is to be processed. [2] The
- * maximum number of expansions to allow. (To prevent huge Fragments) [3] The
- * output directory in which the fragments will be stored in a "fragments" file.
+ * following parameters:
+ * 
+ * <pre>
+ * [1] The directory that is to be processed. 
+ * [2] The output directory in which the fragments will be stored in a &quot;fragments&quot; file.
  * If the filename {@value org.kit.furia.io.AbstractFuriaInput.fragmentFileName}
  * is found in the output directory, this directory is silently skipped.
- * @author Arnoldo Jose Muller Molina
- * TODO: remove the fragments file if there is an error.
+ * [3] The fragment extractor engine: soot or asm. ASM is faster and works almost in any class files. 
+ *  Soot is slower and sometimes fails to load the class files.
+ * </pre>
+ * 
+ * @author Arnoldo Jose Muller Molina TODO: remove the fragments file if there
+ *         is an error.
  */
 
 public class FragmentBuilderClientAux {
 
     private static Logger logger = Logger.getLogger("FragmentBuilderClientAux");
 
-    public static void main(String[] args) throws Exception{
-       
-        //try {
+    public static void main(String[] args) throws Exception {
+
+        try {
             File dir = new File(args[0]);
             File output = new File(args[1]);
             if (!dir.exists()) {
@@ -62,46 +70,51 @@ public class FragmentBuilderClientAux {
             output.mkdirs();
 
             if (!output.exists()) {
-                String msg = "Output directory does not exist: "
-                    + output;
+                String msg = "Output directory does not exist: " + output;
                 System.err.println(msg);
                 throw new IOException(msg);
             }
-            
+
             Logger root = Logger.getRootLogger();
-            root.addAppender(new FileAppender(
-                   new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN), output.toString() + File.separator +"output.txt"));
+            root.addAppender(new FileAppender(new PatternLayout(
+                    PatternLayout.TTCC_CONVERSION_PATTERN), output.toString()
+                    + File.separator + "output.txt"));
             root.setLevel(Level.DEBUG);
-            
+
             File fragmentsFile = new File(output,
                     org.kit.furia.io.AbstractFuriaInput.fragmentFileName);
             if (fragmentsFile.exists()) {
                 // nothing to do here. the file was already processed.
                 System.exit(0);
             }
-
-            
-             FragmentExtractor
-                    .extractMethodsFromDirectory(dir.toString(),
-                            FuriaChanConstants.MAX_NODES_PER_FRAGMENT, FuriaChanConstants.MIN_NODES_PER_FRAGMENT, output.toString(), fragmentsFile.toString());
-            /*Iterator < FragmentBuilder > it = result.iterator();
-            FileWriter outputFile = new FileWriter(fragmentsFile);
-            while (it.hasNext()) {
-                FragmentBuilder fb = it.next();
-                StringBuilder tmp = new StringBuilder();
-                fb.generateString(tmp);
-                outputFile.write(tmp.toString());
+            FragmentExtractor fEx = null;
+            if (args[2].equals("asm")) {
+                fEx = new FragmentExtractorASM();
+            } else if (args[2].equals("soot")) {
+                fEx = new FragmentExtractorSoot();
+            } else {
+                throw new Exception(
+                        "Must specify fragment extraction engine: soot or asm");
             }
-            outputFile.close();*/
+
+            fEx.extractMethodsFromDirectory(dir.toString(),
+                    FuriaChanConstants.MAX_NODES_PER_FRAGMENT,
+                    FuriaChanConstants.MIN_NODES_PER_FRAGMENT, output
+                            .toString(), fragmentsFile.toString());
+            /*
+             * Iterator < FragmentBuilder > it = result.iterator(); FileWriter
+             * outputFile = new FileWriter(fragmentsFile); while (it.hasNext()) {
+             * FragmentBuilder fb = it.next(); StringBuilder tmp = new
+             * StringBuilder(); fb.generateString(tmp);
+             * outputFile.write(tmp.toString()); } outputFile.close();
+             */
             logger.info("Completed Fragmentation for " + args[0]);
-        /*} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.fatal("Aborting", e);
             // logger.fatal("Received Env:\n" + System.getenv().toString());
             System.exit(48);
         }
-       
-        System.exit(0);
-        */
+
     }
 }

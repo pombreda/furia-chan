@@ -89,8 +89,6 @@ public class FuriaChanEngine {
      * Get the top n elements.
      */
     private short n = 10;
-    
-    private float mSetThreshold = 0.50f;
 
     /**
      * Validation mode assumes that the query's document names are the same
@@ -416,14 +414,6 @@ public class FuriaChanEngine {
 
     public void setK(byte k) {
         this.k = k;
-    }
-
-    public float getMSetThreshold() {
-        return mSetThreshold;
-    }
-
-    public void setMSetThreshold(float setThreshold) {
-        mSetThreshold = setThreshold;
     }
 
     public byte getK() {

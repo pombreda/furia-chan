@@ -16,7 +16,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.kit.furia.fragment.soot.FragmentBuilderClient;
+import org.kit.furia.fragment.FragmentBuilderClient;
 
 /*
  Furia-chan: An Open Source software license violation detector.    

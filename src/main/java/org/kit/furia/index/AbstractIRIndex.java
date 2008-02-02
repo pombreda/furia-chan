@@ -231,7 +231,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                     intersectionQueryMSet, docSizeMSet,
                     intersectionQuerySet, docSizeSet);
             
-            if(can.getNaiveScoreMSet() >= mSetScoreThreshold && can.getNaiveScoreSet() >= setScoreThreshold){
+            if(can.getNaiveScoreMSet() >= mSetScoreThreshold){// && can.getNaiveScoreSet() >= setScoreThreshold){
                 candidates.add(can);
             }
             
