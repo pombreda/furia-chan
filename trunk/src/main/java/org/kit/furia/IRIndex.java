@@ -106,4 +106,31 @@ public interface IRIndex < O extends OB > {
      * @return true if the DB does not contain a document with name x.getName()
      */
     boolean shouldSkipDoc(Document<O> x) throws IOException;
+    
+    /**
+     * The M-set score threshold is the minimum naive score for multi-sets
+     * that the index will accept.
+     * @return Returns the current M-set score threshold.
+     */
+    float getMSetScoreThreshold();
+
+    /**
+     * The M-set score threshold is the minimum naive score for multi-sets
+     * that the index will accept.
+     * @param setScoreThreshold the new threshold
+     */
+    void setMSetScoreThreshold(float setScoreThreshold);
+
+    /**
+     * * The Set score threshold is the minimum naive score for Sets
+     * that the index will accept.
+     * @return Returns the current Set score threshold.
+     */
+    float getSetScoreThreshold();
+    /**
+     * The Set score threshold is the minimum naive score for Sets
+     * that the index will accept.
+     * @param setScoreThreshold the new threshold
+     */
+    void setSetScoreThreshold(float setScoreThreshold);
 }

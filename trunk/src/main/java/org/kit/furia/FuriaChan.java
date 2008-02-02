@@ -136,6 +136,9 @@ public class FuriaChan
                     if(cline.hasOption("validate")){
                         engine.setValidate(true);
                     }
+                    if(cline.hasOption("msetT")){
+                        engine.setMSetScoreThreshold(Float.parseFloat(cline.getOptionValue("msetT")));
+                    }
                     engine.search(input);
                 }else{
                     throw new Exception("Operation mode is missing. Accepted values: search, load, learn");
@@ -208,6 +211,10 @@ public class FuriaChan
         final Option n = OptionBuilder.withArgName("#").hasArg().isRequired(
                 false).withDescription(
                 "Retrieve the top n closest programs only").create("n");
+        
+        final Option msetT = OptionBuilder.withArgName("#").hasArg().isRequired(
+                false).withDescription(
+                "Multi-set threshold").create("msetT");
 
         Options options = new Options();
         options.addOption(in);
@@ -219,6 +226,7 @@ public class FuriaChan
         options.addOption(search);
         options.addOption(load);
         options.addOption(validate);
+        options.addOption(msetT);
         return options;
     }
 
