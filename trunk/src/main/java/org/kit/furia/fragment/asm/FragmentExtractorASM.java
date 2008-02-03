@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.kit.furia.exceptions.IRException;
 import org.kit.furia.fragment.AbstractFragmentExtractor;
 import org.kit.furia.fragment.FragmentParseException;
@@ -31,7 +32,9 @@ import org.objectweb.asm.tree.analysis.Value;
 
 public class FragmentExtractorASM
         extends AbstractFragmentExtractor {
-
+    
+    private static final Logger logger = Logger.getLogger(FragmentExtractorASM.class);
+    private int huge = 0;
     public void extractMethodsFromDirectory(final String directory,
             final int maxStructuresAllowed, final int minStructuresAllowed,
             final String outputPath, String outputFile)
@@ -44,11 +47,17 @@ public class FragmentExtractorASM
             throw new NoClassesFound();
         }
         Iterator < File > it = classFiles.iterator();
-        HashMap < String, IntegerHolder > fragments = new HashMap < String, IntegerHolder >();
+        HashMap < String, IntegerHolder > fragments = new HashMap < String, IntegerHolder >(100000);
+        int i = 0;
         while (it.hasNext()) {
             File f = it.next();
+            System.out.println(i + " of " + classFiles.size() + " size: " + fragments.size() + " huge: " + huge);
+            System.out.flush();
+            //logger.info(i + " of " + classFiles.size() + " size: " + fragments.size());
             processClass(f, fragments, maxStructuresAllowed);
+            i++;
         }
+        System.out.println("finished");
         // now we just have to write the fragments down into the file.
         FileWriter output = new FileWriter(outputFile);
         for (Map.Entry < String, IntegerHolder > entry : fragments.entrySet()) {
@@ -79,6 +88,7 @@ public class FragmentExtractorASM
         ClassNode cn = new ClassNode();
         cr.accept(cn, ClassReader.SKIP_DEBUG);
         List < MethodNode > methods = cn.methods;
+        Set expanded = new HashSet();        
         for (MethodNode m : methods) {
             if (m.instructions.size() > 0) {
                 Analyzer a = new Analyzer(new FragmentInterpreter());
@@ -87,12 +97,13 @@ public class FragmentExtractorASM
                 } catch (Exception ignored) {
                 }
                 if (a.getFrames() != null) {
-                    for (Frame frame : a.getFrames()) {
-                        int i = 0;
+                    for (Frame frame : a.getFrames()) {                        
                         if (frame != null) {
+                            int i = 0;
                             while (i < frame.getLocals()) {
                                 Value val = frame.getLocal(i);
-                                if (val instanceof FValue) {
+                                
+                                if (val instanceof FValue && ! expanded.contains(val)) {
                                     try{
                                     String fragment = toString(((FValue) val), max);
                                     
@@ -104,14 +115,14 @@ public class FragmentExtractorASM
                                     }
                                     multiplicity.inc();
                                     }catch(HugeFragmentException e){
-                                        
+                                        huge++;
                                     }
+                                    expanded.add(val);
                                 }
                                 i++;
                             }
                         }
                     }
-
                 }
             }
         }

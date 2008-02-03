@@ -36,9 +36,7 @@ public class PhiFunctionValue
     public void merge(PhiFunctionValue other){
         if(this != other){
             for(Value v : other.params){
-                if(! this.params.contains(v)){
-                    this.params.add(v);
-                }
+                    super.addParam(v);
             }
         }
     }
