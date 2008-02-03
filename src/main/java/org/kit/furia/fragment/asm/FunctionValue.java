@@ -29,6 +29,8 @@ import org.objectweb.asm.tree.analysis.Value;
 public class FunctionValue extends AbstractFunction {
 
     private AbstractInsnNode insn;
+    
+    private static String[] functionNameCache = new String[1000];
 
     public FunctionValue(AbstractInsnNode insn) {
         super();
@@ -54,18 +56,24 @@ public class FunctionValue extends AbstractFunction {
     }
 
     protected  String printFunctionName(){
-        String fName = (new Integer(insn.getOpcode())).toString()
-        .replace("1", "a")
-        .replace("2", "b")
-        .replace("3", "c")
-        .replace("4", "d")
-        .replace("5", "e")
-        .replace("6", "f")
-        .replace("7", "g")
-        .replace("8", "h")
-        .replace("9", "i")
-        .replace("0", "j")
-        ; 
-        return  fName;
+        
+        if(functionNameCache[insn.getOpcode()] == null){
+            String fName = (new Integer(insn.getOpcode())).toString()
+            .replace("1", "a")
+            .replace("2", "b")
+            .replace("3", "c")
+            .replace("4", "d")
+            .replace("5", "e")
+            .replace("6", "f")
+            .replace("7", "g")
+            .replace("8", "h")
+            .replace("9", "i")
+            .replace("0", "j")
+            ; 
+            functionNameCache[insn.getOpcode()]  = fName;
+        }
+        
+       
+        return functionNameCache[insn.getOpcode()];
     }
 }

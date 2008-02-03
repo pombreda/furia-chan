@@ -1,5 +1,7 @@
 package org.kit.furia.fragment.asm;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,10 +37,12 @@ import org.objectweb.asm.tree.analysis.Value;
 
 public abstract class AbstractFunction implements FValue{
     protected List < Value > params;
+    protected Set < Value > paramSet;
     private int size;
     protected AbstractFunction(){
         super();
         params = new LinkedList<Value>();
+        paramSet = new HashSet<Value>();
         size = 0;
     }
   
@@ -47,8 +51,9 @@ public abstract class AbstractFunction implements FValue{
      * @param param the new parameter.
      */
     public void addParam(Value param){
-        if(!params.contains(param)){
+        if(!paramSet.contains(param) && this != param){
             params.add(param);
+            paramSet.add(param);
             size+= param.getSize();
         }
     }

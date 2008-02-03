@@ -117,6 +117,8 @@ same as #7 but with threshold 0.5. Result: 95%.
 Exp 10 base zelix sandmark. Final confirmation
 same as #7 but with threshold 0.5. Result: 92 sandmark.everything else 100.
 
-Exp 11 confirming the results again.
+Exp 11 confirming the results again. 92
+
+Exp 12 amanda setting range to 1
 
 
