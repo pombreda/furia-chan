@@ -116,6 +116,11 @@ public class FragmentBuilderClient {
      * Error code returned by the caller if there is a timeout exception.
      */
     private static final int TIMEOUT_ERRORCODE = -20; // every seconds.
+    
+    /**
+     * Fragment engine to employ.
+     */
+    private String engine;
 
     /**
      * Takes a directory of a set of directories and generates fragments out of
@@ -137,14 +142,15 @@ public class FragmentBuilderClient {
      *                outputDirectory. Otherwise a directory outputDirectory/<app>
      *                will be created for each application where <app> is the
      *                application name.
+     * @param engine Fragment engine that will be used 'soot' or 'asm'.
      * @param failOnError
      *                If true, stops if there is an error.
      */
     public FragmentBuilderClient(boolean directoryOfDirectoriesMode,
-            File directory, int cpus, File outputDirectory, boolean failOnError)
+            File directory, int cpus, File outputDirectory, boolean failOnError, String engine)
             throws Exception, InterruptedException {
         this(directoryOfDirectoriesMode, directory, cpus, outputDirectory,
-                failOnError, (long) 0);
+                failOnError, (long) 0, engine);
     }
 
     /**
@@ -169,15 +175,19 @@ public class FragmentBuilderClient {
      *                application name.
      * @param failOnError
      *                If true, stops if there is an error.
+     * @param fragmentEngine The fragment engine to be used, currently soot or ASM.
      * @param timeout
      *                Amount of time in milliseconds to wait until one program
      *                is fragmented.
      */
     public FragmentBuilderClient(boolean directoryOfDirectoriesMode,
             File directory, int cpus, File outputDirectory,
-            boolean failOnError, long timeout) throws Exception,
+            boolean failOnError, long timeout, String fragmentEngine) throws Exception,
             InterruptedException {
-
+        if(! ( fragmentEngine.equals("asm") ||  fragmentEngine.equals("soot"))){
+            throw new IllegalArgumentException("Engines available are 'asm' or 'soot'.");
+        }
+        this.engine = fragmentEngine;
         this.timeout = timeout;
         this.cpus = cpus;
 
@@ -276,6 +286,7 @@ public class FragmentBuilderClient {
             command.add(FragmentBuilderClientAux.class.getCanonicalName());
             command.add(dirToProcess.toString());
             command.add(appOutputDir.toString());
+            command.add(engine);
 
             try {
                 // create dir if it is not created

@@ -114,11 +114,14 @@ k=3 r=7
 Exp 9 only sandmark
 same as #7 but with threshold 0.5. Result: 95%. 
 
+maybe the difference is that we were matching only the first 100 queries???
+
+
 Exp 10 base zelix sandmark. Final confirmation
 same as #7 but with threshold 0.5. Result: 92 sandmark.everything else 100.
 
 Exp 11 confirming the results again. 92
 
 Exp 12 amanda setting range to 1
-
+cromming :( I don't know what was the different thing.
 

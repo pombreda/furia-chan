@@ -16,7 +16,7 @@
 
 	<!-- paths used through all the example -->
 	<property name="classFilesBase" value="${user.home}/ALMACEN/SCAM/"/>
-	<property name="fragmentsBase" value="${user.home}/ALMACEN/BigDB/"/>
+	<property name="fragmentsBase" value="${user.home}/ALMACEN/BigDBASM/"/>
 	<property name="jdk" value="${classFilesBase}/JPackageClass/"/>
 	<property name="zelix" value="${classFilesBase}/JPackageClassObfuscatedZelix/"/>
 	<property name="sandMark" value="${classFilesBase}/JPackageClassObfuscatedSandMarkNoClassEnc/"/>
@@ -71,7 +71,7 @@
 
  
 <target name="fragment" depends="maven">
-	<delete dir="${user.home}/ALMACEN/BigDB/Base"/>
+	<delete dir="${jdkFragments}"/>
 
 	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
@@ -82,6 +82,9 @@
 				<arg value="${jdk}"/>
 				<arg value="-output"/>
 				<arg value="${jdkFragments}"/>
+				<arg value="-engine"/>
+				<arg value="asm"/>
+
 			</java>
 
 	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
@@ -93,6 +96,9 @@
 				<arg value="${zelix}"/>
 				<arg value="-output"/>
 				<arg value="${zelixFragments}"/>
+								<arg value="-engine"/>
+				<arg value="asm"/>
+
 			</java>
 
 
@@ -105,11 +111,14 @@
 				<arg value="${sandMark}"/>
 				<arg value="-output"/>
 				<arg value="${sandmarkFragments}"/>
+								<arg value="-engine"/>
+				<arg value="asm"/>
+
 			</java>
 </target>
 
 <target name="go" depends="maven">
-<!--
+
 <delete dir="${db}"/>
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
 
@@ -121,20 +130,19 @@
 				<arg value="-db"/>
 				<arg value="${db}"/>
 			</java>
--->
-<!--
-<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
+
+
+<!--<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
 				<jvmarg value="-server" />
 				<jvmarg value="-Xmx4000M" />
 				<arg value="-learn"/>			
 				<arg value="-db"/>
 				<arg value="${db}"/>
-			</java>
--->
+			</java>-->
 <!-- execute the searches -->
 
 
-<!--<antcall target="execMatch">
+<antcall target="execMatch">
     <param name="inputDir" value="${jdkFragments}"/>
  </antcall>
 
@@ -142,7 +150,7 @@
 <antcall target="execMatch">
     <param name="inputDir" value="${zelixFragments}"/>
  </antcall>
--->
+
 <antcall target="execMatch">
     <param name="inputDir" value="${sandmarkFragments}"/>
  </antcall>

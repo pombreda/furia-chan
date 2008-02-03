@@ -30,7 +30,7 @@ public class FunctionValue extends AbstractFunction {
 
     private AbstractInsnNode insn;
     
-    private static String[] functionNameCache = new String[1000];
+    private static String[] functionNameCache = new String[10000];
 
     public FunctionValue(AbstractInsnNode insn) {
         super();

@@ -520,6 +520,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         int qterms = 0;
         // float bestScore = 0;
         float bestScore = 0;
+        //while (((cur = q.poll()) != null) && qterms < 100) {
         while (((cur = q.poll()) != null)) {
             TermQuery tq = new TermQuery(new Term(FieldName.WORDS.toString(),
                     cur.getId().toString()));
