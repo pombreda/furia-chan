@@ -192,7 +192,7 @@ public class FuriaChanEngine {
      * @throws IRException
      */
     public float search(File dir) throws IOException, IRException {
-        logger.debug("Starting search with n:" + n + " r: " + r + " k: " + k + " validation: " + this.validationMode);
+        logger.debug("Starting search with n:" + n + " r: " + r + " k: " + k + " validation: " + this.validationMode + " msetThreshold " + mIndex.getMSetScoreThreshold());
         FuriaInputOBFragment reader = new FuriaInputOBFragment(dir);
         Iterator < Document < OBFragment >> it = reader
                 .getDocumentsFromDirectory();

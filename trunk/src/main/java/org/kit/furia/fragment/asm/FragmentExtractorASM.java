@@ -51,13 +51,13 @@ public class FragmentExtractorASM
         int i = 0;
         while (it.hasNext()) {
             File f = it.next();
-            System.out.println(i + " of " + classFiles.size() + " size: " + fragments.size() + " huge: " + huge);
-            System.out.flush();
+            //System.out.println(i + " of " + classFiles.size() + " size: " + fragments.size() + " huge: " + huge);
+            //System.out.flush();
             //logger.info(i + " of " + classFiles.size() + " size: " + fragments.size());
             processClass(f, fragments, maxStructuresAllowed);
             i++;
         }
-        System.out.println("finished");
+        //System.out.println("finished");
         // now we just have to write the fragments down into the file.
         FileWriter output = new FileWriter(outputFile);
         for (Map.Entry < String, IntegerHolder > entry : fragments.entrySet()) {

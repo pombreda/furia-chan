@@ -110,7 +110,9 @@ public abstract class AbstractFunction implements FValue{
             
         // check for repeated elements.
         if(visited.contains(this)){
-            result.append("s");//self
+            result.append("s()");//self
+            count.inc();
+            return;
         }else{
             visited.add(this);
         }
@@ -124,7 +126,11 @@ public abstract class AbstractFunction implements FValue{
             result.append(comma);
             if(n instanceof BasicValue){
                 BasicValue n2 = (BasicValue)n;
-                result.append(n2.toString());
+                String j = n2.toString();
+                if(j.equals(".")){
+                    j = "z";
+                }
+                result.append(j);
                 count.inc();
             }else if (n instanceof FValue){
                 FValue n2 = (FValue)n;

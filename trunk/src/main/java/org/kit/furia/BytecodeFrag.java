@@ -81,9 +81,9 @@ public class BytecodeFrag  extends AbstractFuriaChanCommandLine{
             File input = new File(cline.getOptionValue("input"));
             OBAsserts.chkFileExists(input);
             File output = new File(cline.getOptionValue("output"));
-       
+            String engine = cline.getOptionValue("engine");
             FragmentBuilderClient c = new FragmentBuilderClient(directoryOfDirectoriesMode,
-                    input, Runtime.getRuntime().availableProcessors(), output, false, timeout);
+                    input, Runtime.getRuntime().availableProcessors(), output, false, timeout, engine);
             
         }catch (final ParseException exp) {
             logger.fatal("Argument parsing failed args: "
@@ -121,11 +121,15 @@ public class BytecodeFrag  extends AbstractFuriaChanCommandLine{
         final Option timeout = OptionBuilder.withArgName("seconds").hasArg().isRequired(
                 false).withDescription("Timeout in seconds to give to the processing of each application").create("timeout");
         
+        final Option engine = OptionBuilder.withArgName("seconds").hasArg().isRequired(
+                true).withDescription("Fragment engine to employ: soot or asm").create("engine");
+        
         Options options = new Options();
         options.addOption(in);
         options.addOption(dm);
         options.addOption(output);
         options.addOption(timeout);
+        options.addOption(engine);
         return options;
     }
 

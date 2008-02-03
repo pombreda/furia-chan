@@ -120,7 +120,7 @@ public class OverallTest {
         File outputFile = new File(output);
         Directory.deleteDirectory(outputFile);
         FragmentBuilderClient c = new FragmentBuilderClient(true,
-                new File(input), Runtime.getRuntime().availableProcessors(), outputFile, true);
+                new File(input), Runtime.getRuntime().availableProcessors(), outputFile, true,"asm");
         // fragments were created.         
     }
 
