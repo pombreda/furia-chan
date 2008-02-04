@@ -281,13 +281,13 @@ public class FuriaChanEngine {
 
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         nToUse);
-                long time = ((System.currentTimeMillis() - prevTime) / 1000);
+                float time = (float)(System.currentTimeMillis() - prevTime) /  (float)1000;
                 logger.info("|| Match for " + toSearch.getName() + " sec:"
                         + time + " MSet: " + toSearch.multiSetSize() + " Set:"
                         + toSearch.size());
                 if (time > 0) {
                     objectsPerSecond.add((float) toSearch.size()
-                            / ((float)time / (float)1000));
+                            / time);
                 }
                 Iterator < ResultCandidate > it2 = result.iterator();
                 int nth = 1;
