@@ -118,7 +118,7 @@
 </target>
 
 <target name="go" depends="maven">
-
+<!--
 <delete dir="${db}"/>
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
 
@@ -130,7 +130,7 @@
 				<arg value="-db"/>
 				<arg value="${db}"/>
 			</java>
-
+-->
 
 <!--<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
 				<jvmarg value="-server" />
@@ -141,29 +141,29 @@
 			</java>-->
 <!-- execute the searches -->
 
-
+<!--
 <antcall target="execMatch">
     <param name="inputDir" value="${jdkFragments}"/>
  </antcall>
 
-
+-->
 <antcall target="execMatch">
     <param name="inputDir" value="${zelixFragments}"/>
  </antcall>
-
+<!--
 <antcall target="execMatch">
     <param name="inputDir" value="${sandmarkFragments}"/>
  </antcall>
-
+-->
 </target>
 
 <target name="small" depends="maven">
 <antcall target="execMatch">
-  <param name="inputDir" value="${zelixFragments}/ecs-1.4.2-2jpp.noarch.rpm.jpackage"/>
+  <param name="inputDir" value="${sandmarkFragments}/jsch-0.1.20-1jpp.noarch.rpm.jpackage"/>
 </antcall>
 
 <antcall target="execMatch">
-		<param name="inputDir" value="${zelixFragments}/jakarta-commons-jelly-tags-jsl-1.0-1jpp.noarch.rpm.jpackage"/>
+		<param name="inputDir" value="${sandmarkFragments}/cryptix-pgp-3.2.0-4jpp.noarch.rpm.jpackage"/>
  </antcall>
 </target>
 
@@ -181,9 +181,13 @@
 				<arg value="-k"/>
 				<arg value="1"/>
 				<arg value="-r"/>
-				<arg value="3"/>
+				<arg value="1"/>
 				<arg value="-n"/>
 				<arg value="10"/>
+				<arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
 				<arg value="-validate"/>
 			</java>
 

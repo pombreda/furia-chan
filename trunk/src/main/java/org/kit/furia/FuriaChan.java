@@ -139,6 +139,9 @@ public class FuriaChan
                     if(cline.hasOption("msetT")){
                         engine.setMSetScoreThreshold(Float.parseFloat(cline.getOptionValue("msetT")));
                     }
+                    if(cline.hasOption("setT")){
+                        engine.setSetScoreThreshold(Float.parseFloat(cline.getOptionValue("setT")));
+                    }
                     engine.search(input);
                 }else{
                     throw new Exception("Operation mode is missing. Accepted values: search, load, learn");
@@ -214,7 +217,11 @@ public class FuriaChan
         
         final Option msetT = OptionBuilder.withArgName("#").hasArg().isRequired(
                 false).withDescription(
-                "Multi-set threshold").create("msetT");
+                "Multi-set score threshold").create("msetT");
+        
+        final Option setT = OptionBuilder.withArgName("#").hasArg().isRequired(
+                false).withDescription(
+                "Set score threshold").create("setT");
 
         Options options = new Options();
         options.addOption(in);
@@ -227,6 +234,7 @@ public class FuriaChan
         options.addOption(load);
         options.addOption(validate);
         options.addOption(msetT);
+        options.addOption(setT);
         return options;
     }
 

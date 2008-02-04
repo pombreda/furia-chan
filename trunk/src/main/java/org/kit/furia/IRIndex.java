@@ -133,4 +133,27 @@ public interface IRIndex < O extends OB > {
      * @param setScoreThreshold the new threshold
      */
     void setSetScoreThreshold(float setScoreThreshold);
+    
+    /**
+     * Returns the count different words that
+     * are used by the documents indexed. 
+     * @return the count different words that
+     * are used by the documents indexed. 
+     */
+    int getWordsSize() throws DatabaseException;
+    
+    /**
+     * Tells whether or not the index is in validation mode. 
+     * In validation mode we assume that documents with the same name are equal.
+     * This helps us to add additional statistics on the performance of the scoring technique.
+     * @return true if this index is in validation mode.
+     */
+    boolean isValidationMode();
+    /**
+     * Sets whether or not the index is in validation mode. 
+     * In validation mode we assume that documents with the same name are equal.
+     * This helps us to add additional statistics on the performance of the scoring technique.
+     * @param validationMode The new validation mode.
+     * */
+    void setValidationMode(boolean validationMode);
 }

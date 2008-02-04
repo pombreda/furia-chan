@@ -1,5 +1,8 @@
 package org.kit.furia;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /*
  Furia-chan: An Open Source software license violation detector.
  Copyright (C) 2007 Kyushu Institute of Technology
@@ -29,7 +32,7 @@ package org.kit.furia;
  */
 public class ResultCandidate implements Comparable<ResultCandidate>{
 
-    
+    private static NumberFormat f  = new DecimalFormat("0.000");
     
     
     /**
@@ -122,6 +125,18 @@ public class ResultCandidate implements Comparable<ResultCandidate>{
             res = 1;
         }// else they are equal
         return res * -1;// invert the result
+    }
+    
+    public String toString(){
+        return documentName
+        + " " + f.format(getScore())  
+        + " " + f.format(getNaiveScoreMSet())
+        //+ " " + resultCandidate.getMSetFoundFragments()
+        //+ " " + resultCandidate.getMSetFragmentsCount()
+        + " " + f.format(getNaiveScoreSet())
+        //+ " " + resultCandidate.getSetFoundFragments()                            
+        + " " + getMSetFragmentsCount()
+        + " " + getSetFragmentsCount();
     }
     
 }

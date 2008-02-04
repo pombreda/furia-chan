@@ -19,6 +19,8 @@ import org.kit.furia.ResultCandidate;
 import org.kit.furia.Document.DocumentElement;
 import org.kit.furia.exceptions.IRException;
 
+import com.sleepycat.je.DatabaseException;
+
 /*
  Furia-chan: An Open Source software license violation detector.    
  Copyright (C) 2007 Kyushu Institute of Technology
@@ -108,12 +110,16 @@ public class FIRIndexShort < O extends OBShort >
             }
             
         }
-        return processQueryResults(documentInTermsOfTheDatabase,n);
+        return processQueryResults(documentInTermsOfTheDatabase,n, document);
     }
     
     
     public Index < O > getIndex() {
         return index;
+    }
+    
+    public int getWordsSize() throws DatabaseException{
+        return this.index.databaseSize();
     }
 
 }
