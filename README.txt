@@ -40,6 +40,10 @@ with Furia-chan.
 
 * To find the similarity of programs:
 
+Caveats:
+
+Furia-chan will work fine if each query has at least 100 different
+fragments. Additionally, she requires that the 
 
 
 **************************

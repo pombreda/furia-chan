@@ -135,16 +135,17 @@ public class FuriaChanEngine {
         } else { // load OBsearch and IRIndex
             OBAsserts.chkFileExists(obFolder);
             OBAsserts.chkFileExists(irFolder);
-            // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified. it should
-            // accept a filename for the "spore" (metadata) file.            
+            // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified.
+            // it should
+            // accept a filename for the "spore" (metadata) file.
             index = (UnsafePPTreeShort < OBFragment >) IndexFactory
                     .createFromXML(readString(sporeFile));
             index.relocateInitialize(null);
         }
         mIndex = new FIRIndexShort < OBFragment >(index, irFolder);
     }
-    
-    public void close() throws IRException{
+
+    public void close() throws IRException {
         mIndex.close();
     }
 
@@ -180,8 +181,6 @@ public class FuriaChanEngine {
             }
         }
     }
-    
-    
 
     /**
      * Performs a search in the database and prints the result to the user.
@@ -192,7 +191,10 @@ public class FuriaChanEngine {
      * @throws IRException
      */
     public float search(File dir) throws IOException, IRException {
-        logger.debug("Starting search with n:" + n + " r: " + r + " k: " + k + " validation: " + this.validationMode + " msetThreshold " + mIndex.getMSetScoreThreshold());
+        logger.debug("Starting search with n:" + n + " r: " + r + " k: " + k
+                + " validation: " + this.validationMode + " msetThreshold "
+                + mIndex.getMSetScoreThreshold() + " setThreshold "
+                + mIndex.getSetScoreThreshold());
         FuriaInputOBFragment reader = new FuriaInputOBFragment(dir);
         Iterator < Document < OBFragment >> it = reader
                 .getDocumentsFromDirectory();
@@ -200,39 +202,76 @@ public class FuriaChanEngine {
         int totalDocs = 0;
         // ********************************************************
         // The following applies to queries that are found within n top docs
-        StaticBin1D setScoreStats = new StaticBin1D(); //statistics on sets scores.
-        StaticBin1D mSetScoreStats = new StaticBin1D(); //statistics on multi-sets scores.
-        StaticBin1D nStats = new StaticBin1D(); //statistics on n
-        StaticBin1D objectsPerSecond = new StaticBin1D(); //statistics on n
+        StaticBin1D setScoreStats = new StaticBin1D(); // statistics on sets
+                                                        // scores.
+        StaticBin1D mSetScoreStats = new StaticBin1D(); // statistics on
+                                                        // multi-sets scores.
+        StaticBin1D nStats = new StaticBin1D(); // statistics on n
+        StaticBin1D objectsPerSecond = new StaticBin1D(); // statistics on n
         int maxSizeOfAppsNotFound = 0;
-        StaticBin1D maxSizeStatsOfAppsNotFound = new StaticBin1D();        
-        // The following are stats that apply only for real answers found after n
-        StaticBin1D notMatchedMSet = new StaticBin1D(); // MSet score when the query is not in n      
-        StaticBin1D notMatchedSet = new StaticBin1D();  // Set score when the query is not in n
-        StaticBin1D notMatchedN = new StaticBin1D();    // Position when the result is not found in n
+        StaticBin1D maxSizeStatsOfAppsNotFound = new StaticBin1D();
+        // The following are stats that apply only for real answers found after
+        // n
+        StaticBin1D notMatchedMSet = new StaticBin1D(); // MSet score when the
+                                                        // query is not in n
+        StaticBin1D notMatchedSet = new StaticBin1D(); // Set score when the
+                                                        // query is not in n
+        StaticBin1D notMatchedN = new StaticBin1D(); // Position when the
+                                                        // result is not found
+                                                        // in n
         int notMatchedFountAfter = 0; // amount of not matched found after n.
-        StaticBin1D completelyUnableToFindSize = new StaticBin1D(); // the guys that even after extending n can't be found
-        // The following are stats that apply only to apps that are not candidates but are within the top
+        StaticBin1D completelyUnableToFindSize = new StaticBin1D(); // the guys
+                                                                    // that even
+                                                                    // after
+                                                                    // extending
+                                                                    // n can't
+                                                                    // be found
+        // The following are stats that apply only to apps that are not
+        // candidates but are within the top
         // n results
-        StaticBin1D notMatchedMSetWithinN = new StaticBin1D(); // MSet score when the query is not in n      
-        StaticBin1D notMatchedSetWithinN = new StaticBin1D();  // Set score when the query is not in n
-        // The following are stats that apply only to the apps that are not the candidate that
+        StaticBin1D notMatchedMSetWithinN = new StaticBin1D(); // MSet score
+                                                                // when the
+                                                                // query is not
+                                                                // in n
+        StaticBin1D notMatchedSetWithinN = new StaticBin1D(); // Set score
+                                                                // when the
+                                                                // query is not
+                                                                // in n
+        // The following are stats that apply only to the apps that are not the
+        // candidate that
         // are found after n
-        StaticBin1D notMatchedMSetAfterN = new StaticBin1D(); // MSet score when the query is not in n      
-        StaticBin1D notMatchedSetAfterN = new StaticBin1D();  // Set score when the query is not in n
+        StaticBin1D notMatchedMSetAfterN = new StaticBin1D(); // MSet score
+                                                                // when the
+                                                                // query is not
+                                                                // in n
+        StaticBin1D notMatchedSetAfterN = new StaticBin1D(); // Set score
+                                                                // when the
+                                                                // query is not
+                                                                // in n
         // ********************************************************
-        logger.info("# of docs" + this.mIndex.getSize()) ;
+        logger.info("# of docs" + this.mIndex.getSize());
+        try{
+        logger.info("# of words" + this.mIndex.getWordsSize());
+        }catch(DatabaseException d){
+            // :)
+        }
         logger.info("(name, luceneScore, scoreMSet, scoreSet, size)");
-        NumberFormat f  = new DecimalFormat("0.000");
+        NumberFormat f = new DecimalFormat("0.000");
         short nToUse = n;
-        if(this.validationMode){
-            nToUse = (short)(n +1000); // used to get the unmatched guys and get statistics about them
+        int notFound = 0; // # of guys that were not even found in the list of candidates.
+        if (this.validationMode) {
+            mIndex.setValidationMode(true);
+            nToUse = (short) (n + mIndex.getSize()); // used to get the
+                                                        // unmatched guys and
+                                                        // get statistics about
+                                                        // them
         }
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
-            if(validationMode){
-                if(mIndex.shouldSkipDoc(toSearch)){
-                    logger.info("Validation mode: skipping:" + toSearch.getName());
+            if (validationMode) {
+                if (mIndex.shouldSkipDoc(toSearch)) {
+                    logger.info("Validation mode: skipping:"
+                            + toSearch.getName());
                     continue;
                 }
             }
@@ -242,87 +281,84 @@ public class FuriaChanEngine {
 
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         nToUse);
-                long time = ((System.currentTimeMillis() - prevTime)/ 1000);
-                logger.info("|| Match for " + toSearch.getName()
-                        + " sec:" + time  + " MSet: " + toSearch.multiSetSize() + " Set:" + toSearch.size());
-                if(toSearch.size() > 0){
-                    objectsPerSecond.add(   ((float)(time / 1000)) / (float)toSearch.size());
+                long time = ((System.currentTimeMillis() - prevTime) / 1000);
+                logger.info("|| Match for " + toSearch.getName() + " sec:"
+                        + time + " MSet: " + toSearch.multiSetSize() + " Set:"
+                        + toSearch.size());
+                if (time > 0) {
+                    objectsPerSecond.add((float) toSearch.size()
+                            / ((float)time / (float)1000));
                 }
                 Iterator < ResultCandidate > it2 = result.iterator();
                 int nth = 1;
                 boolean found = false;
+              
                 logger.info("Total results:" + result.size());
                 while (it2.hasNext() && nth <= this.n) {
                     ResultCandidate resultCandidate = it2.next();
-                    String docName = resultCandidate.getDocumentName();
+                    String pre = "";
                     // hightlight the matched result.
-                    if (validationMode && docName.equals(toSearch.getName())) {
-                        docName = "<<" + docName + ">>";
-                        foundResults++;      
+                    if (validationMode
+                            && resultCandidate.getDocumentName().equals(
+                                    toSearch.getName())) {
+                        foundResults++;
                         setScoreStats.add(resultCandidate.getNaiveScoreSet());
                         mSetScoreStats.add(resultCandidate.getNaiveScoreMSet());
                         nStats.add(nth);
                         found = true;
-                    }else if(validationMode){
-                        notMatchedMSetWithinN.add(resultCandidate.getNaiveScoreMSet());
-                        notMatchedSetWithinN.add(resultCandidate.getNaiveScoreSet());
+                        pre = "<<";
+                    } else if (validationMode) {
+                        notMatchedMSetWithinN.add(resultCandidate
+                                .getNaiveScoreMSet());
+                        notMatchedSetWithinN.add(resultCandidate
+                                .getNaiveScoreSet());
                     }
-                    logger.info(docName
-                            + " " + f.format(resultCandidate.getScore())  
-                            + " " + f.format(resultCandidate.getNaiveScoreMSet())
-                            //+ " " + resultCandidate.getMSetFoundFragments()
-                            //+ " " + resultCandidate.getMSetFragmentsCount()
-                            + " " + f.format(resultCandidate.getNaiveScoreSet())
-                            //+ " " + resultCandidate.getSetFoundFragments()                            
-                            + " " + resultCandidate.getMSetFragmentsCount()
-                            + " " + resultCandidate.getSetFragmentsCount()
-                        );
+
+                    logger.info(pre + resultCandidate.toString());
+
                     nth++;
                 }
-                
-             // check if the item was found
-                if(validationMode && ! found){
-                    if(maxSizeOfAppsNotFound < toSearch.size()){
+
+                // check if the item was found
+                if (validationMode && !found) {
+                    if (maxSizeOfAppsNotFound < toSearch.size()) {
                         maxSizeOfAppsNotFound = toSearch.size();
                     }
-                    maxSizeStatsOfAppsNotFound.add(toSearch.size());    
-                    boolean found2 =false;
-                    while(it2.hasNext()){
+                    maxSizeStatsOfAppsNotFound.add(toSearch.size());
+                    boolean found2 = false;
+                    while (it2.hasNext()) {
                         ResultCandidate resultCandidate = it2.next();
                         String docName = resultCandidate.getDocumentName();
                         // hightlight the matched result.
                         if (docName.equals(toSearch.getName())) {
                             found2 = true;
-                            notMatchedMSet.add(resultCandidate.getNaiveScoreMSet());
-                            notMatchedSet.add(resultCandidate.getNaiveScoreSet());
+                            notMatchedMSet.add(resultCandidate
+                                    .getNaiveScoreMSet());
+                            notMatchedSet.add(resultCandidate
+                                    .getNaiveScoreSet());
                             notMatchedN.add(nth);
-                            logger.info(":(:(:( Found! pos: " + nth + " " + docName
-                                   + " " + f.format(resultCandidate.getScore())  
-                                    + " " + f.format(resultCandidate.getNaiveScoreMSet())
-                                    //+ " " + resultCandidate.getMSetFoundFragments()
-                                    //+ " " + resultCandidate.getMSetFragmentsCount()
-                                    + " " + f.format(resultCandidate.getNaiveScoreSet())
-                                    //+ " " + resultCandidate.getSetFoundFragments()
-                                    + " " + resultCandidate.getMSetFragmentsCount()
-                                    + " " + resultCandidate.getSetFragmentsCount()
-                                );
-                            break;		
-                        }
-                        else{
-                            notMatchedMSetAfterN.add(resultCandidate.getNaiveScoreMSet());
-                            notMatchedSetAfterN.add(resultCandidate.getNaiveScoreSet());
+                            logger.info(":(:(:( Found! pos: " + nth + " "
+                                    + resultCandidate.toString());
+                            break;
+                        } else {
+                            notMatchedMSetAfterN.add(resultCandidate
+                                    .getNaiveScoreMSet());
+                            notMatchedSetAfterN.add(resultCandidate
+                                    .getNaiveScoreSet());
                         }
                         nth++;
                     }
-                    if(! found2){
+                    if (!found2) {
                         completelyUnableToFindSize.add(toSearch.size());
                         logger.info(":(:(:(not found :( ");
+                        notFound++;
                     }
                 }
-            }else{
-                logger.warn(toSearch.getName() +" ignored because it is too small");
+            } else {
+                logger.warn(toSearch.getName()
+                        + " ignored because it is too small");
             }
-            
+
         }
         float result = ((float) foundResults / (float) totalDocs);
         // validationMode's summary
@@ -330,26 +366,37 @@ public class FuriaChanEngine {
             logger
                     .info("*** FuriaPrecision: (% of programs found in the first n documents) "
                             + result + " " + foundResults + " of " + totalDocs);
-            
-            logger.info("MSet. Mean: " + mSetScoreStats.mean() + " Std. Dev " + mSetScoreStats.standardDeviation());
-            logger.info("Set. Mean: " + setScoreStats.mean() + " Std. Dev " + setScoreStats.standardDeviation());
-            logger.info("N. Mean: " + nStats.mean() + " Std. Dev " + nStats.standardDeviation());
-            logger.info("OBs per sec: " + objectsPerSecond.mean() + " Std. Dev " + objectsPerSecond.standardDeviation());
-            logger.info("OBs not found (size). Mean: " + maxSizeStatsOfAppsNotFound.mean() + " Std. Dev " + maxSizeStatsOfAppsNotFound.standardDeviation() + " max: " + maxSizeOfAppsNotFound);
-            
-            logger.info("Not matched (within N) MSet. Mean: " + notMatchedMSetWithinN.mean() + " Std. Dev " + notMatchedMSetWithinN.standardDeviation());
-            logger.info("Not matched (within N) Set. Mean: " + notMatchedSetWithinN.mean() + " Std. Dev " + notMatchedSetWithinN.standardDeviation());
-            logger.info("Not matched (after N) MSet. Mean: " + notMatchedMSetAfterN.mean() + " Std. Dev " + notMatchedMSetAfterN.standardDeviation());
-            logger.info("Not matched (after N) Set. Mean: " + notMatchedSetAfterN.mean() + " Std. Dev " + notMatchedSetAfterN.standardDeviation());
-            logger.info(":(:(:(MSet. Mean: " + notMatchedMSet.mean() + " Std. Dev" + notMatchedMSet.standardDeviation() );
-            logger.info(":(:(:(Set. Mean: " + notMatchedSet.mean() + " Std. Dev" + notMatchedSet.standardDeviation() );
-            logger.info(":(:(:(Nth. Mean: " + notMatchedN.mean() + " Std. Dev" + notMatchedN.standardDeviation() );
-            logger.info("Not in the results! " + completelyUnableToFindSize.mean() + " Std. Dev" + completelyUnableToFindSize.standardDeviation() + " Max: " + completelyUnableToFindSize.max());
-            
+
+            printStats("MSet. Mean: ", mSetScoreStats);
+            printStats("Set. Mean: ", setScoreStats);
+            printStats("N. Mean: ", nStats);
+            printStats("OBs per sec: ", objectsPerSecond);
+            printStats("OBs not found (size). Mean: ",
+                    maxSizeStatsOfAppsNotFound);
+
+            printStats("Not matched (within N) MSet. Mean: ",
+                    notMatchedMSetWithinN);
+            printStats("Not matched (within N) Set. Mean: ",
+                    notMatchedSetWithinN);
+            printStats("Not matched (after N) MSet. Mean: ",
+                    notMatchedMSetAfterN);
+            printStats("Not matched (after N) Set. Mean: ", notMatchedSetAfterN);
+            printStats(":(:(:(MSet. Mean: ", notMatchedMSet);
+            printStats(":(:(:(Set. Mean: ", notMatchedSet);
+            printStats(":(:(:(Nth. Mean: ", notMatchedN);
+            printStats("Not in the results! ", completelyUnableToFindSize);
+            logger.info("Not found count: " + notFound);
+
             // TODO: Add more statistics. Average n. Average naive score.
             // Average difference between score A and B.
         }
         return result;
+    }
+
+    private void printStats(String msg, StaticBin1D stats) {
+        logger.info(msg + " " + stats.mean() + " StdDev: "
+                + stats.standardDeviation() + " min: " + stats.min() + " max: "
+                + stats.max());
     }
 
     /**
@@ -402,12 +449,11 @@ public class FuriaChanEngine {
                 (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps);
     }
 
-
     public void setR(short r) {
         this.r = r;
     }
 
-    public void setN(short n) throws OBException{
+    public void setN(short n) throws OBException {
         OBAsserts.chkAssert(n > 0, "n should be greater than 0");
         this.n = n;
     }
@@ -447,7 +493,5 @@ public class FuriaChanEngine {
     public void setSetScoreThreshold(float setScoreThreshold) {
         mIndex.setSetScoreThreshold(setScoreThreshold);
     }
-    
-    
 
 }

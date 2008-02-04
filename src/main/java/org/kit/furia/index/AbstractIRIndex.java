@@ -24,6 +24,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -136,7 +137,12 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     /**
      * At least the given naive set score must be obtained to consider a term in the result.
      */
-    protected float setScoreThreshold = 0f;
+    protected float setScoreThreshold = 0.05f;
+    
+    /**
+     * Tells whether or not the index is in validation mode.
+     */
+    protected boolean validationMode = false;
 
     /**
      * The index where all the data will be stored.
@@ -175,19 +181,76 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
      * @return true if the DB does not contain a document with name x.getName()
      */
     public boolean shouldSkipDoc(Document<O> x) throws IOException{
+        
+        //TermDocs td = this.indexReader.termDocs(new Term(FieldName.DOC_NAME.toString(), x.getName()));
+        //org.apache.lucene.document.Document document = searcher.doc(td.doc());
+       
         return this.indexReader.docFreq(new Term(FieldName.DOC_NAME.toString(), x.getName()) )< 1;
+    }
+    
+    /**
+     * Calculates the ResultCandidate between a normalized query and a Lucene document.
+     * @return A result candidate for the given document and normalized query.
+     */
+    protected ResultCandidate calculateSimilarity( org.apache.lucene.document.Document document , Map < Integer, Integer > normalizedQuery, float score){
+        String docName = document.getField(
+                FieldName.DOC_NAME.toString()).stringValue();
+        TupleInput in = new TupleInput(document.getField(
+                FieldName.MULTI_SET_SIZE.toString()).binaryValue());
+        // size of the doc in the DB.
+        int docSizeMSet = in.readInt();
+
+        int docSizeSet = new TupleInput(document.getField(
+                FieldName.SET_SIZE.toString()).binaryValue())
+                .readInt();
+
+        int cx = 0;
+        int intersectionQueryMSet = 0;
+        int intersectionQuerySet = 0;
+        TupleInput freqs = new TupleInput(document.getField(
+                FieldName.DOC_DETAILS.toString()).binaryValue());
+        while (cx < docSizeSet) {
+            int wordId = freqs.readInt();
+            int frecuency = freqs.readInt();
+            Integer frequencyQuery = normalizedQuery.get(wordId);
+            if (frequencyQuery != null) {
+                intersectionQuerySet++;
+                intersectionQueryMSet += Math.min(frecuency,
+                        frequencyQuery);
+            }
+            cx++;
+        }
+        ResultCandidate can = new ResultCandidate(docName, score,
+                intersectionQueryMSet, docSizeMSet,
+                intersectionQuerySet, docSizeSet);
+        return can;
     }
     
     private class FHitCollector extends HitCollector{
         
         PriorityQueue < ResultCandidate > candidates;
         Map < Integer, Integer > normalizedQuery;
-        
-        public FHitCollector(Map < Integer, Integer > normalizedQuery){
+        private boolean found = false; /* to be used only in validation mode */
+        private String queryName; /* name of the query, only used in validation mode */
+        private ResultCandidate match; /* the document, only used in validation mode */
+        public FHitCollector(Map < Integer, Integer > normalizedQuery, String queryName){
             this.candidates = new PriorityQueue < ResultCandidate >();
             this.normalizedQuery = normalizedQuery;
+            this.queryName = queryName;
         }
         
+        
+        
+        public ResultCandidate getMatch() {
+            return match;
+        }
+
+
+
+        public boolean isFound() {
+            return found;
+        }
+
         public void collect(int doc, float score) {
             
             org.apache.lucene.document.Document document = null;
@@ -199,43 +262,32 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                 normalizedQuery = null;
                 assert false;
             }
-            
-            String docName = document.getField(
-                    FieldName.DOC_NAME.toString()).stringValue();
-            TupleInput in = new TupleInput(document.getField(
-                    FieldName.MULTI_SET_SIZE.toString()).binaryValue());
-            // size of the doc in the DB.
-            int docSizeMSet = in.readInt();
-
-            int docSizeSet = new TupleInput(document.getField(
-                    FieldName.SET_SIZE.toString()).binaryValue())
-                    .readInt();
-
-            int cx = 0;
-            int intersectionQueryMSet = 0;
-            int intersectionQuerySet = 0;
-            TupleInput freqs = new TupleInput(document.getField(
-                    FieldName.DOC_DETAILS.toString()).binaryValue());
-            while (cx < docSizeSet) {
-                int wordId = freqs.readInt();
-                int frecuency = freqs.readInt();
-                Integer frequencyQuery = normalizedQuery.get(wordId);
-                if (frequencyQuery != null) {
-                    intersectionQuerySet++;
-                    intersectionQueryMSet += Math.min(frecuency,
-                            frequencyQuery);
+          
+            ResultCandidate can = calculateSimilarity(document, normalizedQuery, score);
+            if(validationMode){
+                String docName = document.getField(
+                        FieldName.DOC_NAME.toString()).stringValue();
+                        if(docName.equals(queryName)){
+                            found  = true;
+                            logger.debug("Collector: Found :)" + can.toString());
+                        }
+                        
+                        if(! shouldAddToTheFinalResult(can)){
+                            candidates.add(can); // only in validation mode, we add the result so that we can analyze everything
+                        }
                 }
-                cx++;
-            }
-            ResultCandidate can = new ResultCandidate(docName, score,
-                    intersectionQueryMSet, docSizeMSet,
-                    intersectionQuerySet, docSizeSet);
             
-            if(can.getNaiveScoreMSet() >= mSetScoreThreshold){// && can.getNaiveScoreSet() >= setScoreThreshold){
+            if(shouldAddToTheFinalResult(can)){
                 candidates.add(can);
             }
             
         }
+        
+        private boolean shouldAddToTheFinalResult(ResultCandidate can){
+            return can.getNaiveScoreMSet() >= mSetScoreThreshold && can.getNaiveScoreSet() >= setScoreThreshold;
+        }
+        
+        
         
         public List<ResultCandidate> getResults(){
             List<ResultCandidate> res = new LinkedList<ResultCandidate>();
@@ -257,7 +309,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     }
     
     protected List < ResultCandidate > processQueryResults(
-            Map < Integer, Integer > normalizedQuery, short n)
+            Map < Integer, Integer > normalizedQuery, short n, Document query)
             throws IRException {
         List < ResultCandidate > res = new LinkedList < ResultCandidate >();
         try {
@@ -274,9 +326,21 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
             if (normalizedQuery.size() > 0) {
                 PriorityQueue < Word > sorted = createPriorityQueue(normalizedQuery);
                 Query q = createQuery(sorted);
-                FHitCollector collector = new FHitCollector(normalizedQuery);
+                FHitCollector collector = new FHitCollector(normalizedQuery, query.getName());
                 // now we just perform the search and return the results.
                  searcher.search(q,collector);
+                 /*if(validationMode && ! collector.isFound()){
+                     // we did not found the doc. Print the stats of the doc so we can understand what is going on.
+                     TermDocs td = this.indexReader.termDocs(new Term(FieldName.DOC_NAME.toString(), query.getName()));
+                     org.apache.lucene.document.Document document = null;
+                     try{
+                         document = searcher.doc(td.doc());
+                     }catch(IOException e){
+                         logger.fatal("This is bad", e);
+                         throw new IRException(e);
+                     }
+                     logger.info("Forced: " + calculateSimilarity(document, normalizedQuery, -1.0f).toString());
+                 }*/
                  return(collector.getResults());
             }
         }catch (IOException e) {
@@ -661,4 +725,13 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
         this.setScoreThreshold = setScoreThreshold;
     }
 
+    public boolean isValidationMode() {
+        return validationMode;
+    }
+
+    public void setValidationMode(boolean validationMode) {
+        this.validationMode = validationMode;
+    }
+
+    
 }

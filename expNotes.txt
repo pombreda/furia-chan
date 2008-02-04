@@ -125,3 +125,19 @@ Exp 11 confirming the results again. 92
 Exp 12 amanda setting range to 1
 cromming :( I don't know what was the different thing.
 
+Exp 56 Marta 
+			  <arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
+
+A ver que pasa!
+
+Exp 58 Amanda:
+Full Mset exp
+<arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
+
+Full success 99.9% 1% 96% con ASM!
