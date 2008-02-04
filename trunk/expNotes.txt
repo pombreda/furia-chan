@@ -140,4 +140,12 @@ Full Mset exp
 				<arg value="-setT"/>
 				<arg value="0.04"/>
 
+[java] 03:12:07,209  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9976247 420 of 421
+     [java] 03:26:42,497  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 316 of 316
+     [java] 03:35:09,391  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
+
+
 Full success 99.9% 1% 96% con ASM!
+
+There was an error with the code... I need to try again.
+But maybe it is ok. I think it is ok.

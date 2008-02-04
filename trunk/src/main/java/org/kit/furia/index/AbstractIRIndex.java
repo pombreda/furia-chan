@@ -272,9 +272,9 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                             logger.debug("Collector: Found :)" + can.toString());
                         }
                         
-                        if(! shouldAddToTheFinalResult(can)){
+                      /*  if(! shouldAddToTheFinalResult(can)){
                             candidates.add(can); // only in validation mode, we add the result so that we can analyze everything
-                        }
+                        }*/
                 }
             
             if(shouldAddToTheFinalResult(can)){

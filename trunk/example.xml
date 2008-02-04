@@ -146,15 +146,15 @@
     <param name="inputDir" value="${jdkFragments}"/>
  </antcall>
 
--->
+
 <antcall target="execMatch">
     <param name="inputDir" value="${zelixFragments}"/>
  </antcall>
-<!--
+-->
 <antcall target="execMatch">
     <param name="inputDir" value="${sandmarkFragments}"/>
  </antcall>
--->
+
 </target>
 
 <target name="small" depends="maven">
