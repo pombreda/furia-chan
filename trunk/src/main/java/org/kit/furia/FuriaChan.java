@@ -111,17 +111,17 @@ public class FuriaChan
             
 
             engine = new FuriaChanEngine(db);
-            if(cline.hasOption("learn")){
+            if(cline.hasOption("freeze")){
                 OBAsserts.chkFileExists(db);
-                throw new Exception("Cannot freeze now at this point. The first insert will freeze so make sure it has a bunch of apps");
-                //engine.freeze();
+                //throw new Exception("Cannot freeze now at this point. The first insert will freeze so make sure it has a bunch of apps");
+                engine.freeze();
             }else{ 
                 File input = new File(cline.getOptionValue("input"));
                 OBAsserts.chkFileExists(db);
                 OBAsserts.chkFileExists(input);
                 if(cline.hasOption("load")){ // load data into the DB
                     engine.insert(input);
-                    engine.freeze();
+                    //engine.freeze();
                 }else if(cline.hasOption("search")){ // search for 
                     if(cline.hasOption("k")){
                         engine.setK(Byte.parseByte(cline.getOptionValue("k")));
@@ -144,7 +144,7 @@ public class FuriaChan
                     }
                     engine.search(input);
                 }else{
-                    throw new Exception("Operation mode is missing. Accepted values: search, load, learn");
+                    throw new IllegalArgumentException("Operation mode is missing. Accepted values: search, load, learn");
                 }
             }
         } catch (final ParseException exp) {
@@ -191,8 +191,8 @@ public class FuriaChan
                 "Enables the loading of data in the database. The input option is required");
         search.setRequired(false);
 
-        final Option learn = new Option(
-                "learn",
+        final Option freeze = new Option(
+                "freeze",
                 "OBSearch 'Leans' the database so that queries can be performed faster. This operation must be executed once and it must be executed before searching for license violations!");
         search.setRequired(false);
         
@@ -229,7 +229,7 @@ public class FuriaChan
         options.addOption(n);
         options.addOption(k);
         options.addOption(r);
-        options.addOption(learn);
+        options.addOption(freeze);
         options.addOption(search);
         options.addOption(load);
         options.addOption(validate);

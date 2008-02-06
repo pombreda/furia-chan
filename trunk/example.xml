@@ -26,7 +26,7 @@
 	<property name="sandmarkFragments" value="${fragmentsBase}/SandMark"/>
 
 	<property name="db" value="${fragmentsBase}/FuriaChanDB"/>
-
+	<property name="MEM" value="1200m"/>
 
 </target>
 
@@ -76,7 +76,7 @@
 	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
+				<jvmarg value="-Xmx${MEM}" />
 				<arg value="-dm"/>
 				<arg value="-input"/>
 				<arg value="${jdk}"/>
@@ -90,7 +90,7 @@
 	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
+				<jvmarg value="-Xmx${MEM}" />
 				<arg value="-dm"/>
 				<arg value="-input"/>
 				<arg value="${zelix}"/>
@@ -105,7 +105,7 @@
 			<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
+				<jvmarg value="-Xmx${MEM}" />
 				<arg value="-dm"/>
 				<arg value="-input"/>
 				<arg value="${sandMark}"/>
@@ -118,27 +118,29 @@
 </target>
 
 <target name="go" depends="maven">
-<!--
+
 <delete dir="${db}"/>
+<echo>Loading data... </echo>
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
 
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
+				<jvmarg value="-Xmx${MEM}" />
 				<arg value="-load"/>
 				<arg value="-input"/>
 				<arg value="${jdkFragments}"/>	
 				<arg value="-db"/>
 				<arg value="${db}"/>
 			</java>
--->
 
-<!--<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
+
+<echo>Freeze! </echo>
+<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
-				<arg value="-learn"/>			
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-freeze"/>			
 				<arg value="-db"/>
 				<arg value="${db}"/>
-			</java>-->
+			</java>
 <!-- execute the searches -->
 
 <!--
@@ -172,7 +174,7 @@
 <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
 				<!--<jvmarg value="-ea" />-->
 				<jvmarg value="-server" />
-				<jvmarg value="-Xmx4000M" />
+				<jvmarg value="-Xmx${MEM}" />
 				<arg value="-search"/>
 				<arg value="-input"/>
 				<arg value="${inputDir}"/>	

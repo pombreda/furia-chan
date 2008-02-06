@@ -43,7 +43,7 @@ with Furia-chan.
 Caveats:
 
 Furia-chan will work fine if each query has at least 100 different
-fragments. Additionally, she requires that the 
+fragments. Additionally, she requires that the queries retain some %
 
 
 **************************
