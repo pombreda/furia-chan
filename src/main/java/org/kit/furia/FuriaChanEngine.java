@@ -126,7 +126,6 @@ public class FuriaChanEngine {
             InstantiationException, OBException {
         File obFolder = new File(directory, OBSEARCH_FOLDER);
         File irFolder = new File(directory, IRINDEX_FOLDER);
-        File sporeFile = new File(obFolder, "PPTreeShort");
         if (!directory.exists()) {
             directoryCreation(directory);
             directoryCreation(obFolder);
@@ -138,11 +137,12 @@ public class FuriaChanEngine {
             // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified.
             // it should
             // accept a filename for the "spore" (metadata) file.
-            if(sporeFile.exists()){
-            index = (UnsafePPTreeShort < OBFragment >) IndexFactory
-                    .createFromXML(readString(sporeFile));
-            index.relocateInitialize(null);
-            }else{ // the index is not frozen
+            IndexFactory < OBFragment > ifac = new IndexFactory < OBFragment >();
+            if (ifac.isFrozen(obFolder)) {
+                index = (UnsafePPTreeShort < OBFragment >) ifac
+                        .createFromOBFolder(obFolder);
+                index.relocateInitialize(null);
+            } else { // the index is not frozen
                 index = createIndex(obFolder);
             }
         }
@@ -177,14 +177,15 @@ public class FuriaChanEngine {
         while (it.hasNext()) {
             long prevTime = System.currentTimeMillis();
             Document < OBFragment > toAdd = it.next();
-           
+
             if (toAdd.size() >= FuriaChanConstants.MIN_DOC_SIZE) {
                 mIndex.insert(toAdd);
                 logger.info("Loaded: " + toAdd.getName() + " size: "
                         + toAdd.size() + " msec: "
                         + (System.currentTimeMillis() - prevTime));
-            }else{
-                logger.info("Document " + toAdd.getName() + " was ignored because it is too small.");
+            } else {
+                logger.info("Document " + toAdd.getName()
+                        + " was ignored because it is too small.");
             }
         }
     }
@@ -210,9 +211,9 @@ public class FuriaChanEngine {
         // ********************************************************
         // The following applies to queries that are found within n top docs
         StaticBin1D setScoreStats = new StaticBin1D(); // statistics on sets
-                                                        // scores.
+        // scores.
         StaticBin1D mSetScoreStats = new StaticBin1D(); // statistics on
-                                                        // multi-sets scores.
+        // multi-sets scores.
         StaticBin1D nStats = new StaticBin1D(); // statistics on n
         StaticBin1D objectsPerSecond = new StaticBin1D(); // statistics on n
         int maxSizeOfAppsNotFound = 0;
@@ -220,58 +221,59 @@ public class FuriaChanEngine {
         // The following are stats that apply only for real answers found after
         // n
         StaticBin1D notMatchedMSet = new StaticBin1D(); // MSet score when the
-                                                        // query is not in n
+        // query is not in n
         StaticBin1D notMatchedSet = new StaticBin1D(); // Set score when the
-                                                        // query is not in n
+        // query is not in n
         StaticBin1D notMatchedN = new StaticBin1D(); // Position when the
-                                                        // result is not found
-                                                        // in n
+        // result is not found
+        // in n
         int notMatchedFountAfter = 0; // amount of not matched found after n.
         StaticBin1D completelyUnableToFindSize = new StaticBin1D(); // the guys
-                                                                    // that even
-                                                                    // after
-                                                                    // extending
-                                                                    // n can't
-                                                                    // be found
+        // that even
+        // after
+        // extending
+        // n can't
+        // be found
         // The following are stats that apply only to apps that are not
         // candidates but are within the top
         // n results
         StaticBin1D notMatchedMSetWithinN = new StaticBin1D(); // MSet score
-                                                                // when the
-                                                                // query is not
-                                                                // in n
+        // when the
+        // query is not
+        // in n
         StaticBin1D notMatchedSetWithinN = new StaticBin1D(); // Set score
-                                                                // when the
-                                                                // query is not
-                                                                // in n
+        // when the
+        // query is not
+        // in n
         // The following are stats that apply only to the apps that are not the
         // candidate that
         // are found after n
         StaticBin1D notMatchedMSetAfterN = new StaticBin1D(); // MSet score
-                                                                // when the
-                                                                // query is not
-                                                                // in n
+        // when the
+        // query is not
+        // in n
         StaticBin1D notMatchedSetAfterN = new StaticBin1D(); // Set score
-                                                                // when the
-                                                                // query is not
-                                                                // in n
+        // when the
+        // query is not
+        // in n
         // ********************************************************
         logger.info("# of docs" + this.mIndex.getSize());
-        try{
-        logger.info("# of words" + this.mIndex.getWordsSize());
-        }catch(DatabaseException d){
+        try {
+            logger.info("# of words" + this.mIndex.getWordsSize());
+        } catch (DatabaseException d) {
             // :)
         }
         logger.info("(name, luceneScore, scoreMSet, scoreSet, size)");
         NumberFormat f = new DecimalFormat("0.000");
         short nToUse = n;
-        int notFound = 0; // # of guys that were not even found in the list of candidates.
+        int notFound = 0; // # of guys that were not even found in the list of
+                            // candidates.
         if (this.validationMode) {
             mIndex.setValidationMode(true);
             nToUse = (short) (n + mIndex.getSize()); // used to get the
-                                                        // unmatched guys and
-                                                        // get statistics about
-                                                        // them
+            // unmatched guys and
+            // get statistics about
+            // them
         }
         while (it.hasNext()) {
             Document < OBFragment > toSearch = it.next();
@@ -288,18 +290,18 @@ public class FuriaChanEngine {
 
                 List < ResultCandidate > result = mIndex.search(toSearch, k, r,
                         nToUse);
-                float time = (float)(System.currentTimeMillis() - prevTime) /  (float)1000;
+                float time = (float) (System.currentTimeMillis() - prevTime)
+                        / (float) 1000;
                 logger.info("|| Match for " + toSearch.getName() + " sec:"
                         + time + " MSet: " + toSearch.multiSetSize() + " Set:"
                         + toSearch.size());
                 if (time > 0) {
-                    objectsPerSecond.add((float) toSearch.size()
-                            / time);
+                    objectsPerSecond.add((float) toSearch.size() / time);
                 }
                 Iterator < ResultCandidate > it2 = result.iterator();
                 int nth = 1;
                 boolean found = false;
-              
+
                 logger.info("Total results:" + result.size());
                 while (it2.hasNext() && nth <= this.n) {
                     ResultCandidate resultCandidate = it2.next();
@@ -453,7 +455,8 @@ public class FuriaChanEngine {
 
         return new UnsafePPTreeShort < OBFragment >(folder, (short) 30,
                 (byte) 12, (short) 0,
-                (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps, OBFragment.class);
+                (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps,
+                OBFragment.class);
     }
 
     public void setR(short r) {

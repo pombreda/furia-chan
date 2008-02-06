@@ -26,7 +26,7 @@
 	<property name="sandmarkFragments" value="${fragmentsBase}/SandMark"/>
 
 	<property name="db" value="${fragmentsBase}/FuriaChanDB"/>
-	<property name="MEM" value="1200m"/>
+	<property name="MEM" value="4000m"/>
 
 </target>
 
@@ -143,7 +143,7 @@
 			</java>
 <!-- execute the searches -->
 
-<!--
+
 <antcall target="execMatch">
     <param name="inputDir" value="${jdkFragments}"/>
  </antcall>
@@ -152,7 +152,7 @@
 <antcall target="execMatch">
     <param name="inputDir" value="${zelixFragments}"/>
  </antcall>
--->
+
 <antcall target="execMatch">
     <param name="inputDir" value="${sandmarkFragments}"/>
  </antcall>
