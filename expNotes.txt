@@ -139,10 +139,16 @@ Full Mset exp
 				<arg value="0.32"/>
 				<arg value="-setT"/>
 				<arg value="0.04"/>
-
+ASM:
 [java] 03:12:07,209  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9976247 420 of 421
      [java] 03:26:42,497  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 316 of 316
      [java] 03:35:09,391  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
+
+
+It works also for Soot
+     [java] 02:35:32,649  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 440 of 440
+     [java] 03:47:39,254  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 337 of 337
+     [java] 04:54:09,534  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.95409834 291 of 305
 
 
 Full success 99.9% 1% 96% con ASM!

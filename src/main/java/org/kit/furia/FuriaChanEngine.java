@@ -138,9 +138,13 @@ public class FuriaChanEngine {
             // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified.
             // it should
             // accept a filename for the "spore" (metadata) file.
+            if(sporeFile.exists()){
             index = (UnsafePPTreeShort < OBFragment >) IndexFactory
                     .createFromXML(readString(sporeFile));
             index.relocateInitialize(null);
+            }else{ // the index is not frozen
+                index = createIndex(obFolder);
+            }
         }
         mIndex = new FIRIndexShort < OBFragment >(index, irFolder);
     }
@@ -173,11 +177,14 @@ public class FuriaChanEngine {
         while (it.hasNext()) {
             long prevTime = System.currentTimeMillis();
             Document < OBFragment > toAdd = it.next();
-            logger.debug("Loaded: " + toAdd.getName() + " size: "
-                    + toAdd.size() + " msec: "
-                    + (System.currentTimeMillis() - prevTime));
+           
             if (toAdd.size() >= FuriaChanConstants.MIN_DOC_SIZE) {
                 mIndex.insert(toAdd);
+                logger.info("Loaded: " + toAdd.getName() + " size: "
+                        + toAdd.size() + " msec: "
+                        + (System.currentTimeMillis() - prevTime));
+            }else{
+                logger.info("Document " + toAdd.getName() + " was ignored because it is too small.");
             }
         }
     }
@@ -446,7 +453,7 @@ public class FuriaChanEngine {
 
         return new UnsafePPTreeShort < OBFragment >(folder, (short) 30,
                 (byte) 12, (short) 0,
-                (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps);
+                (short) (FuriaChanConstants.MAX_NODES_PER_FRAGMENT * 2), ps, OBFragment.class);
     }
 
     public void setR(short r) {

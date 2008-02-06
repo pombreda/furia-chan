@@ -132,12 +132,12 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
     /**
      * At least the given naive mset score must be obtained to consider a term in the result.
      */
-    protected float mSetScoreThreshold = 0.50f;
+    protected float mSetScoreThreshold = 0.32f;
     
     /**
      * At least the given naive set score must be obtained to consider a term in the result.
      */
-    protected float setScoreThreshold = 0.05f;
+    protected float setScoreThreshold = 0.04f;
     
     /**
      * Tells whether or not the index is in validation mode.
@@ -469,10 +469,7 @@ public abstract class AbstractIRIndex < O extends OB > implements IRIndex < O > 
                 mSetOut.writeInt(elem.getCount());
                 i++;
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Added " + i + " fragments into OB. msec: "
-                        + (System.currentTimeMillis() - prevTime));
-            }
+           
 
             // now we just have to create the fields
             Field contentsField = new Field(FieldName.WORDS.toString(),
