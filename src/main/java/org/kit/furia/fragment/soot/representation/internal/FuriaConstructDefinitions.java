@@ -8,10 +8,8 @@ package org.kit.furia.fragment.soot.representation.internal;
 
 public class FuriaConstructDefinitions {
 									
-	// TODO: add symbols like $ ^ & to the following three
-	// slice names so that all the names are one character long
-	// this can help us a lot later
-	// just don't use ,  (  - . 
+	
+	// Don't use ,  (  - . 
 	public static final String FURIA_forbin = "$";
 	public static final String FURIA_fand = "%";
 	public static final String FURIA_fxor = "^";

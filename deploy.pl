@@ -26,7 +26,7 @@ shell("mvn assembly:assembly");
 
 
 # upload the distribution files
-@files = `ls ./target/obsearch*`;
+@files = `ls ./target/furia-chan*`;
 $fileMsg = "";
 $version = "";
 
@@ -54,13 +54,10 @@ http://code.google.com/p/obsearch/downloads/list
 $fileMsg
 
 Please send any bug reports to:
-http://code.google.com/p/obsearch/issues/list
+http://code.google.com/p/furia-chan/issues/list
 
 Homepage:
-http://code.google.com/p/obsearch/
-
-Website:
-http://obsearch.berlios.de/
+http://furiachan.org
 
 
 Arnoldo Muller

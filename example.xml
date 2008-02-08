@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!-- 
-     Utility script for developers and for running Furia examples.
+     Utility script for developers. This helps to run examples that are
+		 in sync with Maven's local repository.
+		 Please modify the properties "classFilesBase", "fragmentsBase",
+		 and "MEM" to suit you system.
 -->
 
 <project name="FuriaDevel" xmlns:artifact="urn:maven-artifact-ant">

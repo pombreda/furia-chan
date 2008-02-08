@@ -134,9 +134,6 @@ public class FuriaChanEngine {
         } else { // load OBsearch and IRIndex
             OBAsserts.chkFileExists(obFolder);
             OBAsserts.chkFileExists(irFolder);
-            // TODO: Fix "PPTreeShort". For this, OBSearch has to be modified.
-            // it should
-            // accept a filename for the "spore" (metadata) file.
             IndexFactory < OBFragment > ifac = new IndexFactory < OBFragment >();
             if (ifac.isFrozen(obFolder)) {
                 index = (UnsafePPTreeShort < OBFragment >) ifac
@@ -302,7 +299,7 @@ public class FuriaChanEngine {
                 int nth = 1;
                 boolean found = false;
 
-                logger.info("Total results:" + result.size());
+                logger.debug("Total results:" + result.size());
                 while (it2.hasNext() && nth <= this.n) {
                     ResultCandidate resultCandidate = it2.next();
                     String pre = "";
@@ -396,8 +393,7 @@ public class FuriaChanEngine {
             printStats("Not in the results! ", completelyUnableToFindSize);
             logger.info("Not found count: " + notFound);
 
-            // TODO: Add more statistics. Average n. Average naive score.
-            // Average difference between score A and B.
+          
         }
         return result;
     }

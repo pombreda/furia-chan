@@ -83,8 +83,12 @@ public class FragmentExtractorASM
 
     protected void processClass(File f,
             HashMap < String, IntegerHolder > fragments, int max) throws IOException {
+        
+        FileInputStream read = new FileInputStream(f);
+        
         ClassReader cr = new ClassReader(new BufferedInputStream(
-                new FileInputStream(f)));
+                read));
+        read.close();
         ClassNode cn = new ClassNode();
         cr.accept(cn, ClassReader.SKIP_DEBUG);
         List < MethodNode > methods = cn.methods;

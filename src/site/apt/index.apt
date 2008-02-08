@@ -1,26 +1,20 @@
  -----
- OBSearch
+ Furia-chan
  -----
- The OBSearch Team
+ The Furia-chan Team
  -----
 
 Welcome!
 ~~~~~~~~
 
-  OBSearch is a distributed similarity search index.  Examples of things you can do with OBSearch:
+ 	{{{http://en.wikipedia.org/wiki/All_your_base_are_belong_to_us}All your source are belong to us!}} (us = all the humans in this world).
+
+	Furia-chan is an Open Source/ Libre software license violation detector (a "Google" for binary programs). If given as input a binary program p, its output is a list of the top n closest programs to p. It works even if p is control-flow obfuscated! :) 
+
+	It can find embedded (stolen) components of p in a database of FLOSS programs. You can start by following the {{{tutorial.html}tutorial}}. With it you can check how good Furia-chan behaves when you use your favorite obfuscator. If you like the ideas presented here why don't you join the team? Let's protect together the most precious software development ideal, which is to share for the sake of greater good.	
+
+	{{{http://en.wikipedia.org/wiki/All_your_base_are_belong_to_us}For great justice!}} 
 
 
-  * Match programs and help to detect Open Source/Libre license violations.
 
-  * Find music that sounds like Sisters of Mercy.
-
-  * Match huge vectors of randomly generated integers just for fun.
-
-  []
-
-
-[perezosoUltimateRecortadoWeb.jpg]  
-
-
- 
- This project started as part of {{{http://code.google.com/soc/}Google Summer of Code 2007}}. The mentoring organization was Portland State University.
+	

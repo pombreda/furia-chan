@@ -241,8 +241,7 @@ public class FrimpBody extends StmtBody
                             (Unit)(oldToNew.get(oldTrap.getHandlerUnit()))));
         }
         
-        // TODO we don't add ourselves to any package... for now!
-        //PackManager.v().getPack( "fb" ).apply( this );
+
     }
     
     

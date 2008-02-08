@@ -52,7 +52,6 @@ public class FExitMonitorStmt extends JExitMonitorStmt implements Qable
     }
     
     public String toQ() throws Exception {
-		// TODO Auto-generated method stub
 		return FuriaConstructDefinitions.FURIA_fexitMonitor + "(" + Frimp.toQ(super.getOp()) +")";
 	}
     

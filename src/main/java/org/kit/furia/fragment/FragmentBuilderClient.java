@@ -281,7 +281,7 @@ public class FragmentBuilderClient {
             List < String > command = new LinkedList < String >();
             command.add("java");
             long ramToAllocate = Runtime.getRuntime().maxMemory() / 1024 / 1024
-                    / cpus;
+                   ;
             command.add("-Xmx" + (ramToAllocate) + "m");
             command.add(FragmentBuilderClientAux.class.getCanonicalName());
             command.add(dirToProcess.toString());
@@ -372,11 +372,17 @@ public class FragmentBuilderClient {
                                             + " returned code: " + res + "\n"
                                             + x.toString());
                         } else {
-                            logger.warn("Failed to process: "
+                            if(res == 7){
+                                logger.warn("No clases found for: "
+                                        + dirToProcess
+                                        );
+                            }else{
+                                logger.warn("Failed to process: "
                                     + dirToProcess
                                     + " check "
                                     + (new File(appOutputDir, "fatal.txt"))
                                             .toString());
+                            }
                         }
                     }
                     interrupted = false;

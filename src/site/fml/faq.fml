@@ -2,54 +2,23 @@
 <faqs id="General FAQ">
   <part id="General">
 		<faq id="when">
-      <question>When should I use OBSearch?</question>
+      <question>What is the meaning of Furia-chan?</question>
       <answer>
         <p>
-       	When you need to approximately match objects and you have a distance
-				function that satisfies the triangular inequality.
+       	"Furia" means fury in Spanish. In Japanese, "chan" is appended to the names of girls to add cuteness to the name.
         </p>
       </answer>			
     </faq>  
 		
     <faq id="reason">
-      <question>Why should I use OBSearch?</question>
+      <question>Why Furia-chan?</question>
       <answer>
         <p>
-        Because it is the only distributed MAM (Metric Access Methods) index available
-				in the open source market right now. Also, because it uses SMAP, a simple but effective technique for indexing any type of object, it might be faster (for heavy objects like trees or graphs) than: 
+					A number of developers are unwilling to release the source code of their programs. One of the reasons is that they feel their programs will end up being used by companies or individuals that will not comply to the terms of their copy-left license. To encourage libre/open source development, it is necessary to build tools that can help to streamline the detection of FLOSS license violations. These tools should also help us to understand better how big the license violation problem is. 
 				</p>
-				<p>
-				<a href="http://www-db.deis.unibo.it/Mtree/">M-Tree</a>
-				</p>
-				<p>
-				<a href="http://dbs.mathematik.uni-marburg.de/?search=Research_Projects_XXL">XXL</a>				
-				</p>
-				<p>
-				<a href="http://gbdi.icmc.usp.br/arboretum/">Arboretum</a>
-        </p>
+				
       </answer>			
     </faq>   
-
-		<faq id="deps">
-      <question>What do I need to compile OBSearch?</question>
-      <answer>
-        <p>
-				JDK 1.5 or greater and maven http://maven.apache.org/
-        </p>
-      </answer>			
-    </faq>   
-
-		<faq id="meaning">
-      <question>Why OB?</question>
-      <answer>
-        <p>
-        OBSearch is about choice. Some people define OB as "OBject". Others as 
-	      "OBligatory". 								
-        </p>
-				<p>
-				For others, OB = Octopus-Bear. :)
-				</p>
-      </answer>			
-    </faq> 
+	
   </part>
 </faqs>
