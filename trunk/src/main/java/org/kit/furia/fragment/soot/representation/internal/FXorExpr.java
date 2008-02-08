@@ -49,7 +49,6 @@ public class FXorExpr extends AbstractFrimpIntLongBinopExpr implements XorExpr
     {
         return new FXorExpr(Frimp.cloneIfNecessary(getOp1()), Frimp.cloneIfNecessary(getOp2()));
     }
-    // TODO: define the xor operator in Q!!!
 
     public final String getQSymbol() { return FuriaConstructDefinitions.FURIA_fxor; }
 

@@ -1,0 +1,9 @@
+--03:54:21--  ftp://jpackage.hmdc.harvard.edu/JPackage/1.7/generic/free/RPMS//apache-jdo-btree-2.0-3jpp.noarch.rpm
+           => `../../target/example/base//apache-jdo-btree-2.0-3jpp.noarch.rpm.jpackage/apache-jdo-btree-2.0-3jpp.noarch.rpm'
+Resolving jpackage.hmdc.harvard.edu... 140.247.115.176
+Connecting to jpackage.hmdc.harvard.edu|140.247.115.176|:21... failed: Connection timed out.
+Retrying.
+
+--03:57:31--  ftp://jpackage.hmdc.harvard.edu/JPackage/1.7/generic/free/RPMS//apache-jdo-btree-2.0-3jpp.noarch.rpm
+  (try: 2) => `../../target/example/base//apache-jdo-btree-2.0-3jpp.noarch.rpm.jpackage/apache-jdo-btree-2.0-3jpp.noarch.rpm'
+Connecting to jpackage.hmdc.harvard.edu|140.247.115.176|:21... 

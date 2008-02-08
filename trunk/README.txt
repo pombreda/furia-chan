@@ -13,11 +13,6 @@ Synopsis:
 
 Furia-chan is a state of the art Open Source/ Libre software license violation detector (a "google" for programs). If given as input a binary program p, its output is a list of the top n closest programs to p. It works even if p is control-flow obfuscated! :) It can find embedded (stolen) components of p in a database of FLOSS programs.
 
-********
-Details:
-********
-
-
 *********************
 Information for Users
 *********************
@@ -43,8 +38,9 @@ with Furia-chan.
 Caveats:
 
 Furia-chan will work fine if each query has at least 100 different
-fragments. Additionally, she requires that the queries retain some %
+fragments. The program automatically checks for this.
 
+If you copy the database to a computer that has different big-endianness you will break furia-chan. I am using some Java unsafe classes for performance reasons; it is much faster to re-create the database again than to wait the extra time if we don't use unsafe classes. If you want to use safe classes, you can easily change the code of furia-chan to use only safe classes.
 
 **************************
 Information for Developers
@@ -53,9 +49,16 @@ Information for Developers
  Requirements:
  -------------
 
-* You need a recent JDK 1.5,1.6.
+* You need a recent JDK 1.5, 1.6.
 * You need to have a recent version Maven and ANT installed and working
   (We have tested OBSearch with Maven 2.0.8 and 2.0.7 and ANT 1.7.0).
+
+Checkout furia-chan:
+
+svn checkout https://furia-chan.googlecode.com/svn/trunk/ furia-chan --username <you>
+or if you don't have an account:
+
+svn checkout http://furia-chan.googlecode.com/svn/trunk/ furia-chan-read-only
 
 The first time you checkout Furia-chan do a:
 ./install.sh 

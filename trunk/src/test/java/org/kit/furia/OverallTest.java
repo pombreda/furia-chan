@@ -65,7 +65,7 @@ public class OverallTest {
             e.printStackTrace();
             assertTrue(false);
         }
-        
+
         // delete the output directory before starting a new test.
         String output = FuriaProperties.getProperty("test.db.output");
         File outputDir = new File(output);

@@ -4,17 +4,14 @@
   <groupId>org.kit.furia</groupId>
   <artifactId>furia-chan</artifactId>
   <packaging>jar</packaging>
-	<!-- Since Furia is a program that we know already that will never
-       be complete, we just increment the version integer 
-			 <program version>+<test database version>+<lowest precision obtained>n<top n used>       0+0+96n10
-	-->
-  <version>0</version>
+	
+  <version>0+asm.java-0.96.10+soot.java-0.95.10</version>
   <name>furia-chan</name>
-	<inceptionYear>2007</inceptionYear>
+	<inceptionYear>2008</inceptionYear>
 	<description>  
 		
 	</description>
-  <url>http://code.google.com/p/furia-chan/</url>
+  <url>http://www.furiachan.org</url>
 
 	<properties>
 		<!-- additional unit test files to be downloaded -->
@@ -36,33 +33,34 @@
 	<distributionManagement>
     <site>
       <id>website</id>
-      <url>scp://shell.berlios.de/home/groups/furia-chan/htdocs</url>
+      <url>scp://www.furiachan.org/~/furiachan.org/</url>
     </site>
   </distributionManagement>
 	
 	<mailingLists>
-    <mailingList>
-      <name>furia-chan-users</name>
-      <subscribe/>
-      <unsubscribe/>
-      <post>http://groups.google.com/group/furia-chan-users</post>
-      <archive>http://groups.google.com/group/furia-chan-users</archive>
-    </mailingList>
-		 <mailingList>
-      <name>furia-chan-developers</name>
-      <subscribe/>
-      <unsubscribe/>
-      <post>http://groups.google.com/group/furia-chan-developers</post>
-      <archive>http://groups.google.com/group/furia-chan-developers</archive>
+				 <mailingList>
+      <name>announce</name>
+      <subscribe>http://lists.furiachan.org/listinfo.cgi/announce-furiachan.org</subscribe>
+      <unsubscribe>http://lists.furiachan.org/listinfo.cgi/announce-furiachan.org</unsubscribe>
+      <post/>
+      <archive>http://lists.furiachan.org/private.cgi/announce-furiachan.org</archive>
     </mailingList>
 
-		 <mailingList>
-      <name>furia-chan-developers</name>
-      <subscribe/>
-      <unsubscribe/>
-      <post>http://groups.google.com/group/furia-chan-announce</post>
-      <archive>http://groups.google.com/group/furia-chan-announce</archive>
+    <mailingList>
+      <name>users</name>
+      <subscribe>http://lists.furiachan.org/listinfo.cgi/users-furiachan.org</subscribe>
+      <unsubscribe>http://lists.furiachan.org/listinfo.cgi/users-furiachan.org </unsubscribe>
+      <post>users@lists.furiachan.org</post>
+      <archive>http://lists.furiachan.org/pipermail/users-furiachan.org/</archive>
     </mailingList>
+		 <mailingList>
+      <name>developers</name>
+      <subscribe>http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org</subscribe>
+      <unsubscribe>http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org</unsubscribe>
+      <post>developers@lists.furiachan.org</post>
+      <archive>http://lists.furiachan.org/pipermail/developers-furiachan.org/</archive>
+    </mailingList>
+
   </mailingLists>
 
 	<issueManagement>
@@ -277,11 +275,12 @@
         <artifactId>taglist-maven-plugin</artifactId>
       </plugin>
 
+<!--
 			 <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>jdepend-maven-plugin</artifactId>
        </plugin>
-
+-->
 <!--			  
 Would be cool to use this.
 <plugin>
@@ -310,6 +309,25 @@ Would be cool to use this.
 						<descriptor>src/assembly/src.xml</descriptor>
 						<descriptor>src/assembly/jardep.xml</descriptor>
           </descriptors>
+					
+					<archive>
+            <manifest>
+              <mainClass>org.kit.furia.FuriaChan</mainClass>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addClasspath>true</addClasspath>
+              <!-- options
+              <addClasspath>true</addClasspath>
+              <addExtensions/>
+              <classpathPrefix/>
+              -->
+            </manifest>
+            <manifestEntries>
+              <url>${pom.url}</url>
+            </manifestEntries>
+            
+          </archive>
+
 					<!--<descriptorRefs>
 						<descriptorRef>project</descriptorRef>
 					</descriptorRefs>-->
@@ -448,6 +466,7 @@ Would be cool to use this.
         </executions>
       </plugin>
 
+
 			<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -455,7 +474,7 @@ Would be cool to use this.
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
 					<argLine>-enableassertions</argLine>
-          <argLine>-Xmx1200M</argLine>
+          <argLine>-Xmx4000M</argLine>
         </configuration>
       </plugin>
 

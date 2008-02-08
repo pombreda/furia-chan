@@ -15,6 +15,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.kit.furia.FuriaChanConstants;
 import org.kit.furia.fragment.asm.FragmentExtractorASM;
 import org.kit.furia.fragment.soot.FragmentExtractorSoot;
+import org.kit.furia.fragment.soot.NoClassesFound;
 
 /*
  Furia-chan: An Open Source software license violation detector.    
@@ -109,7 +110,11 @@ public class FragmentBuilderClientAux {
              * outputFile.write(tmp.toString()); } outputFile.close();
              */
             logger.info("Completed Fragmentation for " + args[0]);
-        } catch (Exception e) {
+        } 
+        catch(NoClassesFound e1){
+            System.exit(7);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             logger.fatal("Aborting", e);
             // logger.fatal("Received Env:\n" + System.getenv().toString());

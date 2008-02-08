@@ -1,5 +1,8 @@
 package org.kit.furia;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import org.ajmm.obsearch.example.HelpException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,10 +14,15 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.PropertyConfigurator;
 
 public class AbstractFuriaChanCommandLine {
-    
-    public static void initLogger(){
+
+    public static void initLogger() {
         try {
-            PropertyConfigurator.configure("furiaLog4j.config");
+            
+            InputStream is = AbstractFuriaChanCommandLine.class
+                    .getResourceAsStream("/furiaLog4j.config");
+            Properties props = new Properties();
+            props.load(is);
+            PropertyConfigurator.configure(props);
         } catch (final Exception e) {
             System.err.print("Make sure log4j is configured properly"
                     + e.getMessage());
@@ -22,7 +30,7 @@ public class AbstractFuriaChanCommandLine {
             System.exit(48);
         }
     }
-    
+
     /**
      * Parses the array of options as received in main() and returns a
      * CommandLine object that makes it easier to analyze the commands.

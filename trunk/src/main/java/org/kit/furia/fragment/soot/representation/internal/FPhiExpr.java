@@ -219,7 +219,8 @@ public class FPhiExpr implements  PhiExpr, Qable {
   }
     
   public void apply(Switch sw)
-  {   // TODO fix this! (+ . +)
+  {   // FIXME fix this! (+ . +)
+      // maybe it is fine to have this thing commented out.
     //((ShimpleExprSwitch) sw).casePhiExpr(this);
   }
     
@@ -230,12 +231,10 @@ public class FPhiExpr implements  PhiExpr, Qable {
     
   
   public int getBlockId() {
-    // TODO Auto-generated method stub
     return 0;
   }
 
   public void setBlockId(int blockId) {
-    // TODO Auto-generated method stub
 		
   }
 
@@ -245,122 +244,98 @@ public class FPhiExpr implements  PhiExpr, Qable {
   }
 
 public ValueUnitPair getArgBox(Block arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public ValueUnitPair getArgBox(int arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public ValueUnitPair getArgBox(Unit arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public int getArgIndex(Block arg0) {
-	// TODO Auto-generated method stub
 	return 0;
 }
 
 public int getArgIndex(Unit arg0) {
-	// TODO Auto-generated method stub
 	return 0;
 }
 
 public Unit getPred(int arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public List getPreds() {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public Value getValue(Block arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public Value getValue(int arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public Value getValue(Unit arg0) {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public List getValues() {
-	// TODO Auto-generated method stub
 	return null;
 }
 
 public boolean removeArg(Block arg0) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean removeArg(int arg0) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean removeArg(Unit arg0) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean removeArg(ValueUnitPair arg0) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setArg(int arg0, Value arg1, Block arg2) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setArg(int arg0, Value arg1, Unit arg2) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setPred(int arg0, Block arg1) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setPred(int arg0, Unit arg1) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setValue(Block arg0, Value arg1) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setValue(int arg0, Value arg1) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public boolean setValue(Unit arg0, Value arg1) {
-	// TODO Auto-generated method stub
 	return false;
 }
 
 public void clearUnitBoxes() {
-	// TODO Auto-generated method stub
 	
 }
 
 public List getUnitBoxes() {
-	// TODO Auto-generated method stub
 	return null;
 }
 

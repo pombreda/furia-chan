@@ -46,7 +46,6 @@ public class FEnterMonitorStmt extends JEnterMonitorStmt implements Qable
     }
 
 	public String toQ() throws Exception {
-		// TODO Auto-generated method stub
 		return FuriaConstructDefinitions.FURIA_fenterMonitor  + "(" + Frimp.toQ(super.getOp()) +")";
 	}
     

@@ -1,0 +1,33 @@
+Versioning
+~~~~~~~~
+
+	Since Furia is a program that we know already that will never be complete (equivalence of programs is undecidable), the version number is just an integer that we increment with each new version. Furia-chan consists of a search engine and a set of  program fragment extraction engines. In order to validate Furia-chan, we have several datasets. When Furia-chan's search engine module changes, we validate all the program fragment extraction engines with the datasets and publish the results in this page. If a subset of the fragment extraction engines is modified, we only validate that subset. In any case, the version number is incremented by one. 
+
+
+Legend:
+
+ * Engine: Name of the engine.
+
+ * Dataset: Dataset used to validate the engine and the search engine.
+ 
+ * FuriaPrecision: (# of queries found within the top n returned results) / (total # of queries)
+
+	[]
+
+
++---------------------------------------------+
+*--------+---------+----------------+----+
+| Engine | Dataset | FuriaPrecision | n  |
+*--------+---------+----------------+----+
+| asm    | java-0  | 96             | 10 |
+*--------+---------+----------------+----+
+| soot   | java-0  | 95             | 10 |
+*--------+---------+----------------+----+
+Version: 0
++---------------------------------------------+
+
+
+	
+	
+
+			
