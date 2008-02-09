@@ -17,6 +17,7 @@ if (not defined $password){
 		die "You did not give me a password!";
 }
 
+shell("mvn clean");
 # generate the website
 shell("mvn site:site");
 # generate the assemblies
@@ -42,14 +43,14 @@ open OUT, ">announce.txt"	or die "Could not create announce file";
 
 print OUT <<EOF;
 
-OBSearch $version released.
+Furia-chan $version released.
 
-OBSearch $version has been released.
+Furia-chan $version has been released.
 
 Release Highlights:
 
 You can download it from:
-http://code.google.com/p/obsearch/downloads/list
+http://code.google.com/p/furia-chan/downloads/list
 
 $fileMsg
 
@@ -75,7 +76,7 @@ close OUT;
 shell("mvn site:deploy");
 
 print "\n\nPlease run the following command when you are sure everything is ok\n";
-print "svn copy https://obsearch.googlecode.com/svn/trunk/ https://obsearch.googlecode.com/svn/tags/$version -m 'LABEL: $version'  --username <you>\n";
+print "svn copy https://furia-chan.googlecode.com/svn/trunk/ https://furia-chan.googlecode.com/svn/tags/$version -m 'LABEL: $version'  --username <you>\n";
 
 sub uploadFileToGoogleCode {
 		my($file) = @_;
@@ -100,7 +101,7 @@ sub uploadFileToGoogleCode {
 		$sfile =~ s/[.]\/target\///g;
     print "$sfile $md5 $sha1\n";
 		$fileMsg =  "$fileMsg\n$md5 $sha1 $sfile";
-		my $cmd = "python googlecode_upload.py  --summary=$comment -p obsearch -l $md5,$sha1  --config-dir=./.svn -u $user -w $password $file";
+		my $cmd = "python googlecode_upload.py  --summary=$comment -p furia-chan -l $md5,$sha1  --config-dir=./.svn -u $user -w $password $file";
 		shell($cmd);
     
 }
