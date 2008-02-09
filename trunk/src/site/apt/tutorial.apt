@@ -14,10 +14,10 @@ mkdir <dir>
 cd <dir>	
 ---
 
-	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-0.jar}} and copy it into <<<<dir>>>>. 
+	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar}} and copy it into <<<<dir>>>>. 
 
 ---
-wget http://furia-chan.googlecode.com/files/furia-chan-0.jar
+wget http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar
 
 // rename it to furia.jar so that the explanations are less cluttered.
 mv furia-chan-0.jar furia.jar

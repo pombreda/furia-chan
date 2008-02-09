@@ -3,7 +3,7 @@
 # run this script when after an update install.sh has changed
 
 
-OBVERSION=0.9.1a
+OBVERSION=0.9.1b
 
 mkdir target
 cd target
@@ -26,7 +26,7 @@ wget http://obsearch.googlecode.com/files/obsearch-$OBVERSION.jar
 
 
 # TODO: re-enable this!
-#mvn install:install-file -Dfile=obsearch-$OBVERSION.jar -DgroupId=gsoc -DartifactId=obsearch -Dversion=$OBVERSION -Dpackaging=jar -DpomFile=pom.xml
+mvn install:install-file -Dfile=obsearch-$OBVERSION.jar -DgroupId=gsoc -DartifactId=obsearch -Dversion=$OBVERSION -Dpackaging=jar -DpomFile=pom.xml
 
 cd ..
 cd ..

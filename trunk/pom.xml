@@ -5,7 +5,7 @@
   <artifactId>furia-chan</artifactId>
   <packaging>jar</packaging>
 	
-  <version>0+asm.java-0.96.10+soot.java-0.95.10</version>
+  <version>0</version>
   <name>furia-chan</name>
 	<inceptionYear>2008</inceptionYear>
 	<description>  
@@ -33,7 +33,7 @@
 	<distributionManagement>
     <site>
       <id>website</id>
-      <url>scp://www.furiachan.org/~/furiachan.org/</url>
+      <url>scp://www.furiachan.org/home/amuller/furiachan.org/</url>
     </site>
   </distributionManagement>
 	
@@ -474,7 +474,7 @@ Would be cool to use this.
 					<useSystemClassLoader>true</useSystemClassLoader>
 					<forkMode>once</forkMode>
 					<argLine>-enableassertions</argLine>
-          <argLine>-Xmx4000M</argLine>
+          <argLine>-Xmx1200M</argLine>
         </configuration>
       </plugin>
 
