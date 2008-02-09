@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<faqs id="General FAQ">
+  <part id="General">
+		<faq id="when">
+      <question>What is the meaning of Furia-chan?</question>
+      <answer>
+        <p>
+       	"Furia" means fury in Spanish. In Japanese, "chan" is appended to the names of girls to add cuteness to the name.
+        </p>
+      </answer>			
+    </faq>  
+		
+    <faq id="reason">
+      <question>Why Furia-chan?</question>
+      <answer>
+        <p>
+					A number of developers are unwilling to release the source code of their programs. One of the reasons is that they feel their programs will end up being used by companies or individuals that will not comply to the terms of their copy-left license. To encourage libre/open source development, it is necessary to build tools that can help to streamline the detection of FLOSS license violations. These tools should also help us to understand better how big the license violation problem is. 
+				</p>
+				
+      </answer>			
+    </faq>   
+	
+  </part>
+</faqs>

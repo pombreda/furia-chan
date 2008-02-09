@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Furia-chan">
+<!--
+  <bannerLeft>
+    <name>Maven</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+-->
+<!--  <bannerRight>
+		<name>BerliOS Developer Logo</name>
+		<src>http://developer.berlios.de/bslogo.php?group_id=8796</src>
+		<href>http://developer.berlios.de</href>
+  </bannerRight>-->
+
+  <body>
+<!--    <links>     
+      <item name="GSOC" href="http://code.google.com/soc/"/>
+    </links>-->
+
+		<menu name="Main">
+			<item name="Welcome" href="index.html"/>
+		</menu>
+
+    <menu name="About">
+			<item name="Overview" href="overview.html"/>
+			<item name="Features" href="features.html"/>			
+      <item name="FAQ" href="faq.html"/>
+			<item name="TODO" href="todo.html"/>
+			
+    </menu>
+
+		<menu name="Information">
+			<item name="Tutorial" href="tutorial.html"/>
+			<item name="Javadoc" href="apidocs/index.html"/>
+			<item name="Community" href="mail-lists.html"/>
+			<item name="Links" href="links.html"/>
+			<item name="Versioning" href="versioning.html"/>
+    </menu>
+		
+		<menu name="Get Furia-chan">
+			<item name="Download" href="download.html"/>
+		</menu>
+
+		<menu ref="reports"/>
+		
+		<menu name="Powered By">
+			<item name="OBSearch" href="http://code.google.com/p/obsearch/"/>
+			<item name="Lucene" href="http://lucene.apache.org/java/docs/index.html"/>
+			<item name="Soot" href="http://www.sable.mcgill.ca/soot/"/>
+			<item name="ASM" href="http://asm.objectweb.org/"/>
+		</menu>
+  </body>
+</project>

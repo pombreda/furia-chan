@@ -1,0 +1,157 @@
+IDEAS:
+
+
+Exp 1 marta Jan 31 600am
+Range 3. Min size 100. 
+Default performance was 84% 
+
+Exp2 amanda Jan 31 400pm
+Range 3 Min size 100 (same as above)
+I want to find the min size that is necessary to increase
+the precision.
+
+     [java] 20:16:33,355  INFO  FuriaChanEngine  - OBs per sec: Infinity Std. Dev NaN
+     [java] 20:16:33,355  INFO  FuriaChanEngine  - OBs not found (size). Mean: 433.62295081967216 Std. Dev 1309.1672564895903 variance 1713918.9054644809 max: 10079
+     [java] 22:55:02,471  INFO  FuriaChanEngine  - OBs per sec: 0.06942177446478087 Std. Dev 0.028977753748912417
+     [java] 22:55:02,471  INFO  FuriaChanEngine  - OBs not found (size). Mean: 536.8888888888889 Std. Dev 1330.1336103503465 variance 1769255.4213836477 max: 6341
+
+
+Exp3 marta Jan 31 500pm 
+Range 10 Min size 100 
+I want to find the effects of a range 10 and compare it against exp 1
+Result:
+No cambia. De hecho empeora en 1 app menos revisada.
+
+
+Exp4 Boost Amanda
+Boost did not work :(
+
+[java] 14:34:21,297  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.56060606 222 of 396
+
+Exp5 Marta 300pm
+Use range 1 and see if it returns the same.
+Probably it will be faster.
+
+Se pone mucho mas rapido. Efectos son los mismos.
+-------------------------- Not yet done
+
+Exp6 Amanda 1636
+Get more data about the guys that don't get matched
+Avg returned
+Position in N
+
+With this, find a minimum threshold and filter the data from
+Lucene so that the results have a min threshold.
+
+OK so the data goes like this for
+
+*** Queries not found:
+OBs not found (size). Mean: 433.62295081967216 Std. Dev 1309.167256 4895903 max: 10079
+
+*** Not matched for the guys within N
+ZKM
+Not matched (within N) MSet. Mean: 0.5312347366792124 Std. Dev 0.23229
+Not matched (within N) Set. Mean: 0.22376122962096207 Std. Dev 0.14286
+SM
+Not matched (within N) MSet. Mean: 0.5535734510522329 Std. Dev 0.194253
+Not matched (within N) Set. Mean: 0.18632521759652487 Std. Dev 0.1406693
+
+*** Not matched after N
+Not matched (after N) MSet. Mean: 0.25324302814148203 Std. Dev 0.1826229
+Not matched (after N) Set. Mean: 0.11209678271257073 Std. Dev 0.068080923
+SM
+Not matched (after N) MSet. Mean: 0.37959386537516954 Std. Dev 0.15176822
+Not matched (after N) Set. Mean: 0.09833053719334284 Std. Dev 0.059579893
+
+*** 
+
+*** Results found after N
+
+:(:(:(MSet. Mean: 0.9138953685760498 Std. Dev0.0979560194350794
+:(:(:(Set. Mean: 0.7392836809158325 Std. Dev0.024128565
+SM
+:(:(:(MSet. Mean: 0.6394775184718046 Std. Dev0.1563560188521453
+:(:(:(Set. Mean: 0.2646263824267821 Std. Dev0.1311903624806
+
+*** Avg N  found for the inputs
+:(:(:(Nth. Mean: 15.0 Std. De
+SM
+:(:(:(Nth. Mean: 31.727272727272727 Std. Dev31.4359377435
+
+
+
+*****
+Ideas:
+Another thing that could be achieved is to compare the returned docs between
+them and count similar documents as one line.
+
+
+
+Efects of range:
+For range 3, it appears in the 10th place, with range 7 it appears at the beginning!
+Max words 5
+ecs-1.4.2-2jpp.noarch.rpm.jpackage
+
+
+*** Found the Problem!!! ***
+
+Exp 7. Amanda Revised the query code. Using hitcollector so that I can get
+the raw score. Final sort by using msets. Not including guys smaller than 100
+in the validation.
+r=3 k=1 Filter:0.70
+
+[java] 07:09:15,184  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 440 of 440
+[java] 10:45:46,877  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 337 of 337
+[java] 13:33:13,195  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.72786885 222 of 305
+
+
+By changing the filter to 0.50: things improved for sandmark:
+
+
+Exp 8. Marta Same as #7 but:
+k=3 r=7
+
+Exp 9 only sandmark
+same as #7 but with threshold 0.5. Result: 95%. 
+
+maybe the difference is that we were matching only the first 100 queries???
+
+
+Exp 10 base zelix sandmark. Final confirmation
+same as #7 but with threshold 0.5. Result: 92 sandmark.everything else 100.
+
+Exp 11 confirming the results again. 92
+
+Exp 12 amanda setting range to 1
+cromming :( I don't know what was the different thing.
+
+Exp 56 Marta 
+			  <arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
+
+A ver que pasa!
+
+Exp 58 Amanda:
+Full Mset exp
+<arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
+ASM:
+[java] 03:12:07,209  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9976247 420 of 421
+     [java] 03:26:42,497  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 316 of 316
+     [java] 03:35:09,391  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
+
+
+It works also for Soot
+     [java] 02:35:32,649  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 440 of 440
+     [java] 03:47:39,254  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 1.0 337 of 337
+     [java] 04:54:09,534  INFO  FuriaChanEngine  - *** FuriaPrecision: (% of programs found in the first n documents) 0.95409834 291 of 305
+
+
+Full success 99.9% 1% 96% con ASM!
+
+There was an error with the code... I need to try again.
+But maybe it is ok. I think it is ok.

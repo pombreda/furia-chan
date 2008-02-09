@@ -1,0 +1,149 @@
+Tutorial
+~~~~~~~~~~~~~~~~~~~~
+
+	This tutorial will show how to use Furia-chan. It is mainly designed for users with a unix terminal. If you are a windows user you could use {{{http://www.cygwin.com/}cygwin}}, or use additional windows programs to perform some of the steps. 
+
+Preliminaries:
+
+	You need Java 1.5 or greater. Furia-chan has been tested with sun's Java 1.6.0.
+
+	Make a directory <<<<dir>>>> where you perform all the experiments and go to that directory.
+
+---
+mkdir <dir>
+cd <dir>	
+---
+
+	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar}} and copy it into <<<<dir>>>>. 
+
+---
+wget http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar
+
+// rename it to furia.jar so that the explanations are less cluttered.
+mv furia-chan-0.jar furia.jar
+---
+
+	Download the test data set from {{http://www.furiachan.org/datasets/java-0.tar.bz2}} and copy it into <<<<dir>>>>.
+	
+---
+wget http://www.furiachan.org/datasets/java-0.tar.bz2
+
+// the sha1 sum should be: 8a40349cbd6583301fcd084f42711c2c164a2828
+sha1sum java-0.tar.bz2 
+---
+
+	Decompress the dataset. (Windows users: you can use {{{www.7-zip.org/}7-zip}} to decompress the file)
+
+
+---
+tar -xjf java-0.tar.bz2
+---
+
+Let's start!
+
+	We now are ready to fragment and match programs.
+
+* Fragment Programs
+
+	In the previous steps we downloaded Furia-chan and got some experiment data. Furia-chan works on top of fragmented programs. She does not understand directly bytecode files so we will first fragment all the programs.
+
+---
+  // fragment the "base" data set.
+java -cp furia.jar org.kit.furia.BytecodeFrag  -dm -input ./java-0/base -output \
+    ./fragments/base/ -engine asm
+
+java -cp furia.jar org.kit.furia.BytecodeFrag -dm -input ./java-0/querySetSandMark \
+   -output ./fragments/querySetSandMark -engine asm
+---
+	
+	The flag "-dm" tells the Bytecode fragment application to operate in "directory mode". This means that the given folder is assummed to have folders which contain class files. Each folder name is the program name of the set of class files. The switch -engine asm asks furia-chan to fragment the files with the ASM bytecode library. 
+
+* Load Fragments into the DB
+
+	Now that we have created the fragments, let's index the Open Source apps we want to protect! 
+
+---
+// The -load switch tells Furiachan the input folder from where the fragment files
+// will be copied.
+java -jar furia.jar  -load -input ./fragments/base/ -db ./db/
+
+// To optimize matching speed OBSearch requires us to "freeze" or "learn" the DB. 
+// This process will take a while.
+// It is highly recommended to give java the switch -Xmx4000M where 4000 is
+// the number of megabytes of memory your system has. If you don't do this, 
+// the process will take a loooong time :).
+java -jar furia.jar  -freeze  -db ./db/
+
+---
+
+	After these command are executed we can search the DB. After freeze we can load additional data if we want to. Now we have a Furia-chan database under ./db/
+
+* Searching for Violations
+
+	Now that we have our database, we can start finding potential license violations. Under 
+ ./fragments/querySetSandMark, we have the fragments of applications  obfuscated with the Sandmark obfuscator. Furia-chan has a special validation mode that assumes that the query's application name exists in the database. With this information, we can calculate some basic precision measures. To perform the match we do: 
+
+---
+
+java -jar furia.jar  -search -input ./fragments/querySetSandMark \
+     -db ./db/ -validate
+
+---
+
+	This will throw a bunch of lines of data, but what you really want to find is something like: 
+
+---
+FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
+---
+
+ What this says is that for each query in ./fragments/querySetSandMark, Furia-chan found the query in the first n documents 96% of the time. The default value for n is 10.
+
+
+
+
+What's next?
+
+	Now that we have validated that Furia-chan is matching appropiately, it is time to use our favourite obfuscator and test how good it is. A non-exhaustive list of free and non-free obfuscators:
+
+	Commercial:
+
+ * {{{http://www.zelix.com/klassmaster/}Zelix Klass Master}}
+
+ * {{{http://www.codingart.com/codeshield.html}Code Shield}}
+
+ * {{{http://www.thinkmap.com/}DashO}}
+	
+ * {{{http://www.duckware.com/jobfuscate/index.html}JObfuscate}}
+	
+ * {{{http://www.e-t.com/jshrink.html}JShrink}}
+	
+ * {{{http://www.leesw.com/smokescreen/index.html}Smokescreen}}
+
+[] 
+
+	Free:
+
+ * {{{http://sandmark.cs.arizona.edu/}Sandmark}}
+	
+ * {{{http://proguard.sourceforge.net/}Pro-guard}}
+	
+ * {{{http://www.retrologic.com/retroguard-main.html}Regro-guard}}
+	
+ * {{{http://www.yworks.com/en/products_yguard_about.htm}YGuard}}
+	
+ * {{{http://www.e-t.com/jshrink.html}Marvin}}
+
+ * {{{http://donquixote.cafebabe.jp/}Don Quixote}} (Japanese only)
+
+[]
+
+	We have to copy any of the folders found under ./java-0/base/ to a new place <O>, obfuscate it with your obfuscator and then call Furia:
+
+---
+// fragment the program
+java -cp furia.jar org.kit.furia.BytecodeFrag  -input <O> -output <O> -engine asm
+
+// match the program
+java -jar furia.jar  -search -input <O>  -db ./db/
+--- 
+ 

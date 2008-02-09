@@ -1,0 +1,13 @@
+Features
+~~~~~~~~
+
+ * Two fragment generation engines for Java based on {{{http://www.sable.mcgill.ca/soot/}Soot}} and {{{http://asm.objectweb.org/}ASM}}.
+
+ * It can be extended to support any computer architecture if a fragment generation engine is provided.
+
+ * It can be easily modified to match other types of program fragments (graphs)  with different similarity functions.
+
+ * The API is compact and easy to understand.
+
+ 
+

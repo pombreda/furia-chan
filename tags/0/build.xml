@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<project name="Furia">
+	<!-- download test data files-->
+	<target name="install">
+
+	</target>
+
+	<target name="testDataPrepareInit">
+		<property name="my.test.data.url" value="http://furia-chan.googlecode.com/files/"/>		
+		<property name="tagsFile" value="TAGS"/>
+		<condition property="testDataReady">
+    <and>
+      <available file="${out}/${my.test.data.db}"/>
+    </and>
+  </condition>
+
+	<!-- generate etags file -->
+		<echo>Generating tags here: ${tagsFile}</echo>
+      <apply executable="etags"  parallel="true">
+				<arg value="-o"/> 
+				<arg value="${tagsFile}"/>  
+				<srcfile/>
+				<fileset dir="src" includes="**/*.java"/>
+      </apply>
+	</target>
+	
+	<target name="testDataPrepare" depends="testDataPrepareInit" unless="testDataReady">
+		
+		<!-- remove -small to get a bigger dataset -->
+		<mkdir dir="${out}"/>
+		<get src="${my.test.data.url}${my.test.data.db}_00" dest="${out}/${my.test.data.db}_00" usetimestamp="true" />
+    <get src="${my.test.data.url}${my.test.data.db}_01" dest="${out}/${my.test.data.db}_01" usetimestamp="true" />
+    <get src="${my.test.data.url}${my.test.data.db}_02" dest="${out}/${my.test.data.db}_02" usetimestamp="true" />
+
+    <concat destfile="${out}/${my.test.data.db}.tar.bz2" binary="yes">
+     <fileset file="${out}/${my.test.data.db}_00" />
+     <fileset file="${out}/${my.test.data.db}_01" />
+		 <fileset file="${out}/${my.test.data.db}_02" />
+   </concat>
+
+		<untar src="${out}/${my.test.data.db}.tar.bz2" dest="${out}" compression="bzip2"/>
+	</target>
+
+	
+	<!-- generate texen files -->
+	<target name="generateSources">
+		  <taskdef name="fmpp" classname="fmpp.tools.AntTask" /> 
+			<!-- now we generate code using texen -->							
+			<echo>In: ${in}</echo>
+			<echo>Out: ${out}</echo>
+			<property name="finalOut" value="${out}/generated-sources/texen/org/ajmm/obsearch/"/>
+
+			<fmpp
+              sourceRoot="${in}" outputRoot="${out}"
+              data="types: csv(${in}/Types.csv)"
+				      excludes="Types.csv">
+     </fmpp>
+	</target>
+
+</project>
