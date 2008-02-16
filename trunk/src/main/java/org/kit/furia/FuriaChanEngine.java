@@ -254,9 +254,9 @@ public class FuriaChanEngine {
         // query is not
         // in n
         // ********************************************************
-        logger.info("# of docs" + this.mIndex.getSize());
+        logger.info("# of docs in the DB: " + this.mIndex.getSize());
         try {
-            logger.info("# of words" + this.mIndex.getWordsSize());
+            logger.info("# of words in the DB:" + this.mIndex.getWordsSize());
         } catch (DatabaseException d) {
             // :)
         }
@@ -369,9 +369,7 @@ public class FuriaChanEngine {
         float result = ((float) foundResults / (float) totalDocs);
         // validationMode's summary
         if (validationMode) {
-            logger
-                    .info("*** FuriaPrecision: (% of programs found in the first n documents) "
-                            + result + " " + foundResults + " of " + totalDocs);
+            
 
             printStats("MSet. Mean: ", mSetScoreStats);
             printStats("Set. Mean: ", setScoreStats);
@@ -390,8 +388,11 @@ public class FuriaChanEngine {
             printStats(":(:(:(MSet. Mean: ", notMatchedMSet);
             printStats(":(:(:(Set. Mean: ", notMatchedSet);
             printStats(":(:(:(Nth. Mean: ", notMatchedN);
-            printStats("Not in the results! ", completelyUnableToFindSize);
+            printStats("Not in the results", completelyUnableToFindSize);
             logger.info("Not found count: " + notFound);
+            logger
+            .info("*** FuriaPrecision: (% of programs found in the first n documents) "
+                    + result + " " + foundResults + " of " + totalDocs);
 
           
         }

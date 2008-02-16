@@ -50,12 +50,8 @@ public class FuriaProperties {
             InputStream is = FuriaProperties.class
                     .getResourceAsStream( "/furia.properties");
             props = new Properties();
-            props.load(is);
-            // configure log4j only once too
-            PropertyConfigurator.configure(props
-                    .getProperty("log4j.file"));
-        }
-
+            props.load(is);           
+        }        
         return props;
     }
     
