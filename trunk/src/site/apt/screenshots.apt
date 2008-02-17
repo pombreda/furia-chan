@@ -1,4 +1,4 @@
-	Here we present some screenshots of Furia-chan. In the {{{tutorial.html}tutorial}}, we explain the meaning of all the numbers that follow each result. We also show there more examples.
+	Here we present some screen-shots of Furia-chan. In the {{{tutorial.html}tutorial}}, we explain the meaning of all the numbers that follow each result. We also show there more examples.
 
 Different Versions of Programs
 
@@ -40,7 +40,7 @@ jzlib-1.0.7-1jpp.noarch.rpm.jpackage 0.224 0.537 0.192 7437 1190
 
 ---
 
-	Xerces is an XML parser. In the result, other xml related tools are returned:
+	Xerces is an XML parser. In the result, other XML related tools are returned:
 
 ---
 
@@ -57,3 +57,6 @@ xmlbeans-1.0.4-2jpp.noarch.rpm.jpackage 0.231 0.537 0.214 43065 2687
 xml-security-1.2.97-1jpp.noarch.rpm.jpackage 0.224 0.798 0.317 6177 789
 
 ---
+
+
+[img099.jpg]
