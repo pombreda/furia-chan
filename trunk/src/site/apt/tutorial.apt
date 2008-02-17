@@ -67,7 +67,7 @@ java -cp furia.jar org.kit.furia.BytecodeFrag -dm -input ./java-0/querySetSandMa
 
 ---
 // The -load switch tells Furia-chan the input folder from where the fragment files
-// will be copied.
+// will be read.
 // The -db switch tells Furia-chan where the database will be created.
 java -jar furia.jar  -load -input ./fragments/base/ -db ./db/
 
@@ -100,7 +100,7 @@ java -jar furia.jar  -search -input ./fragments/querySetSandMark \
 FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
 ---
 
- What this says is that for each query (program) in ./fragments/querySetSandMark, Furia-chan found the query in the first n returned documents 96% of the time. The default value for n is 10.
+ What this says is that for each query (program) in ./fragments/querySetSandMark, Furia-chan found the query in the first n returned documents 96% of the time.
 
 	Additionally, there are some numbers that will be handy when you are detecting violations:
 
