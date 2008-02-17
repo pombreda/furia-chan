@@ -16,16 +16,16 @@ mkdir <dir>
 cd <dir>	
 ---
 
-	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar}} and copy it into <<<<dir>>>>. 
+	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-1-jar-with-dependencies.jar}} and copy it into <<<<dir>>>>. 
 
 ---
-wget http://furia-chan.googlecode.com/files/furia-chan-0-jar-with-dependencies.jar
+wget http://furia-chan.googlecode.com/files/furia-chan-1-jar-with-dependencies.jar
 
 // rename it to furia.jar so that the explanations are less cluttered.
-mv furia-chan-0-jar-with-dependencies.jar furia.jar
+mv furia-chan-1-jar-with-dependencies.jar furia.jar
 ---
 
-	Download the test data set from {{http://www.furiachan.org/datasets/java-0.tar.bz2}} and copy it into <<<<dir>>>>.
+	Download the test data set from {{http://www.furiachan.org/datasets/java-0.tar.bz2}} and copy it into <<<<dir>>>>. If you want mirror this file please let us {{{http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org}know}}.
 	
 ---
 wget http://www.furiachan.org/datasets/java-0.tar.bz2
@@ -47,7 +47,7 @@ Let's start!
 
 * Fragment Programs
 
-	In the previous steps we downloaded Furia-chan and got some experiment data. Furia-chan works on top of fragmented programs. She does not understand directly bytecode files so we will first fragment all the programs.
+	In the previous steps we downloaded Furia-chan and got some experiment data. Furia-chan works on top of fragmented programs. She does not understand directly byte-code files so we will first fragment all the programs.
 
 ---
 // Fragment the "base" data set.
@@ -59,7 +59,7 @@ java -cp furia.jar org.kit.furia.BytecodeFrag -dm -input ./java-0/querySetSandMa
    -output ./fragments/querySetSandMark -engine asm
 ---
 	
-	The flag "-dm" tells the Bytecode fragment application to operate in "directory mode". This means that the given folder is assummed to have folders which contain class files. Each folder name is the program name of the set of class files. The switch -engine asm asks furia-chan to fragment the files with the ASM bytecode library. With the first command, we have generated fragments for our "base" set of class files that contain the programs compiled with Sun's compiler. The second command extracts fragments of classes obfuscated with the Sandmark obfuscator.
+	The flag "-dm" tells the Byte-code fragment application to operate in "directory mode". This means that the given folder is assumed to have folders which contain class files. Each folder name becomes the program name of the set of class files. The switch -engine asm asks furia-chan to fragment the files with the ASM byte-code library. With the first command, we have generated fragments for our "base" set of class files that contain the programs compiled with Sun's compiler. The second command extracts fragments of classes obfuscated with the Sandmark obfuscator.
 
 * Load Fragments into the DB
 
@@ -73,14 +73,14 @@ java -jar furia.jar  -load -input ./fragments/base/ -db ./db/
 
 // To optimize matching speed OBSearch requires us to "freeze" or "learn" the DB. 
 // This process will take a while.
-// It is highly recommended to give java the switch -XmxKM where K is
+// It is highly recommended to give Java the switch -XmxKM where K is
 // the number of megabytes of memory your system has. If you don't do this, 
 // the process will take a loooong time :). When I run furia-chan I use: -Xmx4000M
 java -Xmx4000M -jar furia.jar  -freeze  -db ./db/
 
 ---
 
-	After these command are executed we can search the DB. After freeze we can load additional data if we want to. Now we have a Furia-chan database under ./db/
+	After these commands are executed we can search the DB. After freeze we can load additional data if we want to. Now we have a Furia-chan database under ./db/
 
 * Searching for Programs
 
@@ -167,13 +167,13 @@ spring11-dao-1.1.5-2jpp.noarch.rpm.jpackage 0.363 0.852 0.468 2815 370
 
 	We can see that the first returned result is in effect the application we are looking for. The MSet score is 81% and the Set score is 37%. Is this a good match? 
 
-	In the previous section, we found that in the scoring boundaries for the MSet score is 0.6523830739630235 with an standard deviation of 0.16253904550225942. The Set score boundary is 0.29925904061796293 with an std. deviation of 0.2538806029016859. This means that our score is within the expected score  boundary for this version of furia-chan. You can always find the scoring boundaries for the version of furia-chan that you are using {{{versioning.html}here}}. It is also evident that spring is the match, because all the other results are subcomponents or different spring versions.
+	In the previous section, we found that the scoring boundaries for the MSet score is 0.6523830739630235 with an standard deviation of 0.16253904550225942. The Set score boundary is 0.29925904061796293 with an std. deviation of 0.2538806029016859. This means that our score is within the expected score  boundary for this version of furia-chan. You can always find the scoring boundaries for the version of furia-chan that you are using {{{versioning.html}here}}. It is also evident that spring is the match, because all the other results are subcomponents or different spring versions.
 
-	The second match is an older version of spring. It's MSet score is a bit higher because  spring 1.1.4 has less fragments than spring 1.1.5. So far, the range we used was 1. This range means that fragments are considered equal if they are 1 distance units away from each other. If you increase this value, you gain some flexibility at the expense of accepting false positives. Please see the {{{overview.html}papers}} for more information on what this unit means. We will also increase the parameter {{{http://en.wikipedia.org/wiki/Nearest_neighbor_(pattern_recognition)}k}}. Let's see how this changes the result for spring. 
+	The second match is an older version of spring. Its MSet score is a bit higher because  spring 1.1.4 has less fragments than spring 1.1.5. So far, the range we used was 1. This range means that fragments are considered equal if they are at most 1 distance units away from each other. If you increase this value, you gain some flexibility at the expense of accepting false positives. Please see the {{{overview.html}papers}} for more information on what this unit means. We will also increase the parameter {{{http://en.wikipedia.org/wiki/Nearest_neighbor_(pattern_recognition)}k}}. Let's see how this changes the result for spring. 
 
 ---
-// we have added the parameter -r 3. It means that we are willing to accept
-// fragments that are at most 3 distance units away from each other.
+// we have added the parameter -r 7. It means that we are willing to accept
+// fragments that are at most 7 distance units away from each other.
 // the parameter -k means that we are accepting the two closest fragments of the
 // database for each fragment of the query. This parameter sometimes confuses Lucene
 // so use it with care.
@@ -199,7 +199,7 @@ spring-context-1.1.4-2jpp.noarch.rpm.jpackage 0.231 0.892 0.585 2555 282
 
 ---
 
-	Both MSet and Set scores have been increased several points. You can tweak these two variables to improve the scoring of a match. If you ran this example in a "normal" computer, you probably noted that Furia-chan takes longer to answer this query. This is because OBSearch has to work harder when r and k are increased. As a side note, the first search we ran for spring had r=1 and k=1.
+	Both MSet and Set scores have been increased. You can tweak these two variables to improve the scoring of a match. If you ran this example in a "normal" computer, you probably noted that Furia-chan takes longer to answer this query. This is because OBSearch has to work harder when r and k are increased. As a side note, the first search we ran for spring had r=1 and k=1.
 
 
 * Detecting a Licence Violation
@@ -215,7 +215,7 @@ java -jar furia.jar -search  -db ./db/ -input \
 
 ---	
 
-Furia-chan returns:
+	Furia-chan returns:
 
 ---
 
@@ -233,14 +233,14 @@ portals-pluto-1.0.1-0.rc4.1jpp.noarch.rpm.jpackage 0.122 0.416 0.108 5935 809
 
 --- 
 
-	We found two struts results!  Spring also uses dom4j in its dependencies so we detected two possible "violations". The scores are low because Sandmark has very nasty obfuscations. Other obfuscators should be easier to handle.  You could also create fragments from soot by using -engine soot for even cleaner results. Soot returns better results at the expense of longer fragment extraction time. Also, soot fails for some programs and fragments cannot be extracted from every program. Finally, we have tried with two commercial obfuscators that perform control flow obfuscation and the results are cleaner.
+	We found two struts results!  Spring also uses dom4j in its dependencies so we detected two possible "violations". The scores are low because Sandmark has very strong obfuscations. Other obfuscators should be easier to handle.  You could also create fragments from soot by using -engine soot for even cleaner results. Soot returns better results at the expense of longer fragment extraction time. Also, soot fails for some programs and fragments cannot be extracted from every program. Finally, we have tried with two commercial obfuscators that perform control flow obfuscation and the results are cleaner.
 
-	The result you just got is just telling you: <<in these n results, there might be a violation>>. It is up to you to read the scores and determine if they are relevant. Just because an score is X% you should not go and sue company or individual X. You need to analyze the pirate program, what is doing and judge the results accordingly. People at {{{www.gpl-violations.org }www.gpl-violations.org}} are experts in this type of things. 
+	<<Warning:>> The result you just got is just telling you: <<in these n results, there might be a violation>>. It is up to you to read the scores and determine if they are relevant. Just because an score is X% you should not go and sue company or individual X. You need to analyze the pirate program, what is doing and judge the results accordingly. People at {{{www.gpl-violations.org }www.gpl-violations.org}} are experts at doing this. 
  
  
 What's next?
 
-	Now that we have validated that Furia-chan is matching appropiately, it is time to use our favourite obfuscator and test how good it is. If you find an obfuscator that breaks furia-chan please let us {{{http://lists.furiachan.org/listinfo.cgi/users-furiachan.org}know}}. If you find an interesting result, feel free to drop us a mail also. A non-exhaustive list of free and non-free obfuscators:
+	Now that we have validated that Furia-chan is matching appropriately, it is time to use our favorite obfuscator and test how good it is. If you find an obfuscator that breaks furia-chan please let us {{{http://lists.furiachan.org/listinfo.cgi/users-furiachan.org}know}}. If you find an interesting result, feel free to drop us a mail also. A non-exhaustive list of free and non-free obfuscators:
 
 	Commercial:
 
