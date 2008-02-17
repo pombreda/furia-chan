@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!-- 
+     Utility script for developers. This helps to run examples that are
+		 in sync with Maven's local repository.
+		 Please modify the properties "classFilesBase", "fragmentsBase",
+		 and "MEM" to suit you system.
+-->
+
+<project name="FuriaDevel" xmlns:artifact="urn:maven-artifact-ant">
+
+<target name="init">
+	<!-- ant maven tasks related properties -->
+	<property name="anttask" value="maven-ant-tasks-2.0.6.jar"/>
+	<property name="jardownloadlocation" value="http://ftp.kddilabs.jp/infosystems/apache/maven/binaries/"/>
+	<property name="destlocation" value="${ant.home}/lib/"/>
+	
+
+
+
+	<!-- paths used through all the example -->
+	<property name="classFilesBase" value="${user.home}/ALMACEN/SCAM/"/>
+	<property name="fragmentsBase" value="${user.home}/ALMACEN/BigDBASM/"/>
+	<property name="jdk" value="${classFilesBase}/JPackageClass/"/>
+	<property name="zelix" value="${classFilesBase}/JPackageClassObfuscatedZelix/"/>
+	<property name="sandMark" value="${classFilesBase}/JPackageClassObfuscatedSandMarkNoClassEnc/"/>
+
+	<property name="jdkFragments" value="${fragmentsBase}/Base"/>
+	<property name="zelixFragments" value="${fragmentsBase}/Zelix"/>
+	<property name="sandmarkFragments" value="${fragmentsBase}/SandMark"/>
+
+	<property name="db" value="${fragmentsBase}/FuriaChanDB"/>
+	<property name="MEM" value="4000m"/>
+
+</target>
+
+<!-- check if maven tasks have been downloaded -->
+<target name="checkprerequisites">
+<condition property="mavenanttaskavailable">
+      <available file="${destlocation}/${anttask}"/>
+</condition>
+</target>
+
+<!-- download maven tasks -->
+<target name="downloadprerequisites" unless="mavenanttaskavailable" depends="checkprerequisites, init">
+
+	<get src="${jardownloadlocation}/${anttask}" dest="${destlocation}/${anttask}"/>
+	
+	
+	
+</target>
+
+<!-- initialize maven tasks-->
+<target name="maven" depends="init, downloadprerequisites">
+	
+	<path id="maven-ant-tasks.classpath" path="${destlocation}/${anttask}" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant"
+           classpathref="maven-ant-tasks.classpath" />
+	<!-- access maven project -->
+	<artifact:pom id="project" file="pom.xml" />
+	<!-- define the classpath -->
+
+	
+	<!-- generate the classpath -->
+	<artifact:dependencies pathId="dependency.classpath">
+      <pom refid="project"/>
+  </artifact:dependencies>
+	
+	<!-- DB and QUERY datafiles -->
+
+	<property name="dbdata" value="${user.home}/temp/slices"/>
+	<property name="querydata" value="${user.home}/temp/slices-query"/>
+</target>
+
+
+ 
+<target name="fragment" depends="maven">
+	<delete dir="${jdkFragments}"/>
+
+	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
+				<!--<jvmarg value="-ea" />-->
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-dm"/>
+				<arg value="-input"/>
+				<arg value="${jdk}"/>
+				<arg value="-output"/>
+				<arg value="${jdkFragments}"/>
+				<arg value="-engine"/>
+				<arg value="asm"/>
+
+			</java>
+
+	    <java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
+				<!--<jvmarg value="-ea" />-->
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-dm"/>
+				<arg value="-input"/>
+				<arg value="${zelix}"/>
+				<arg value="-output"/>
+				<arg value="${zelixFragments}"/>
+								<arg value="-engine"/>
+				<arg value="asm"/>
+
+			</java>
+
+
+			<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.BytecodeFrag"  failonerror="true">
+				<!--<jvmarg value="-ea" />-->
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-dm"/>
+				<arg value="-input"/>
+				<arg value="${sandMark}"/>
+				<arg value="-output"/>
+				<arg value="${sandmarkFragments}"/>
+								<arg value="-engine"/>
+				<arg value="asm"/>
+
+			</java>
+</target>
+
+<target name="go" depends="maven">
+
+<delete dir="${db}"/>
+<echo>Loading data... </echo>
+<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
+
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-load"/>
+				<arg value="-input"/>
+				<arg value="${jdkFragments}"/>	
+				<arg value="-db"/>
+				<arg value="${db}"/>
+			</java>
+
+
+<echo>Freeze! </echo>
+<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">				
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-freeze"/>			
+				<arg value="-db"/>
+				<arg value="${db}"/>
+			</java>
+<!-- execute the searches -->
+
+
+<antcall target="execMatch">
+    <param name="inputDir" value="${jdkFragments}"/>
+ </antcall>
+
+
+<antcall target="execMatch">
+    <param name="inputDir" value="${zelixFragments}"/>
+ </antcall>
+
+<antcall target="execMatch">
+    <param name="inputDir" value="${sandmarkFragments}"/>
+ </antcall>
+
+</target>
+
+<target name="small" depends="maven">
+<antcall target="execMatch">
+  <param name="inputDir" value="${sandmarkFragments}/jsch-0.1.20-1jpp.noarch.rpm.jpackage"/>
+</antcall>
+
+<antcall target="execMatch">
+		<param name="inputDir" value="${sandmarkFragments}/cryptix-pgp-3.2.0-4jpp.noarch.rpm.jpackage"/>
+ </antcall>
+</target>
+
+<target name="execMatch" depends="maven">
+<echo>Executing query set: ${inputDir}</echo>
+<java dir="${project.build.outputDirectory}" fork="yes" classpath="${project.build.outputDirectory}:${project.build.testOutputDirectory}" classpathref="dependency.classpath" classname="org.kit.furia.FuriaChan"  failonerror="true">
+				<!--<jvmarg value="-ea" />-->
+				<jvmarg value="-server" />
+				<jvmarg value="-Xmx${MEM}" />
+				<arg value="-search"/>
+				<arg value="-input"/>
+				<arg value="${inputDir}"/>	
+				<arg value="-db"/>
+				<arg value="${db}"/>
+				<arg value="-k"/>
+				<arg value="1"/>
+				<arg value="-r"/>
+				<arg value="1"/>
+				<arg value="-n"/>
+				<arg value="10"/>
+				<arg value="-msetT"/>
+				<arg value="0.32"/>
+				<arg value="-setT"/>
+				<arg value="0.04"/>
+				<arg value="-validate"/>
+			</java>
+
+
+</target>
+
+<!-- this task prints the classpath as it is being used in this machine.
+		 useful if you are using Emacs or JDE, or hacking Furia
+     -->
+<target name="printClassPathForJDE" depends="maven">
+	<property name="text" refid="dependency.classpath"/>
+	<echo>${text}:${project.build.outputDirectory}:${project.build.testOutputDirectory}:/usr/share/java/jde.jar</echo>
+</target>
+
+
+</project>

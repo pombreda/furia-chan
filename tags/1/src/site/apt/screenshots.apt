@@ -1,0 +1,62 @@
+	Here we present some screen-shots of Furia-chan. The program we want to match in a database of 500~ applications is shown after the "||". The lines that follow show what furia-chan returns when she receives the given query. In the {{{tutorial.html}tutorial}}, we explain the meaning of all the numbers that follow each result. We also show there more examples.
+
+Different Versions of Programs
+
+	The top matches for jetty5-5.1.2-2jpp.noarch.rpm.jpackage are jetty5-5.1.2-2jpp.noarch.rpm.jpackage and two older versions of the package:
+
+---
+
+|| Match for jetty5-5.1.2-2jpp.noarch.rpm.jpackage sec:1 MSet: 14348 Set:664
+<<jetty5-5.1.2-2jpp.noarch.rpm.jpackage 0.483 0.650 0.120 17094 2072
+jetty50-5.0.0-4jpp.noarch.rpm.jpackage 0.461 0.653 0.120 16281 1996
+jetty4-4.2.24-1jpp.noarch.rpm.jpackage 0.400 0.645 0.118 14401 1883
+netbeans-web-3.6-3jpp.noarch.rpm.jpackage 0.231 0.509 0.064 25801 2373
+jakarta-slide-server-2.1-2jpp.noarch.rpm.jpackage 0.213 0.473 0.049 27810 2861
+batik-squiggle-1.6-1jpp.noarch.rpm.jpackage 0.198 0.690 0.177 1474 305
+c-jdbc-2.0.2-1jpp.noarch.rpm.jpackage 0.198 0.429 0.063 30603 2240
+tomcat3-webapps-3.3.2-1jpp.noarch.rpm.jpackage 0.195 0.501 0.058 26259 2549
+limewire-3.5.6-3jpp.noarch.rpm.jpackage 0.192 0.510 0.050 25816 3029
+castor-xml-0.9.6-1jpp.noarch.rpm.jpackage 0.188 0.467 0.061 27915 2302
+
+---
+
+Similar Functionality Revealed
+
+	A match for gnu-crypto returns other cryptographic related packages:
+
+---
+
+|| Match for gnu-crypto-2.0.1-1jpp.noarch.rpm.jpackage sec:295 MSet: 45470 Set:10618
+blowfish-j-2.12-1jpp.noarch.rpm.jpackage 1.913 0.777 0.796 2954 1526
+oldlogi.crypto-1.0.7-2jpp.noarch.rpm.jpackage 1.728 0.682 0.538 9351 2549
+logi.crypto-1.1.2-2jpp.noarch.rpm.jpackage 1.728 0.682 0.538 9351 2549
+<<gnu-crypto-2.0.1-1jpp.noarch.rpm.jpackage 1.000 1.000 1.000 45470 10618
+oscore-2.2.4-1jpp.noarch.rpm.jpackage 0.799 0.802 0.457 4577 1118
+cryptix-pgp-3.2.0-4jpp.noarch.rpm.jpackage 0.403 0.607 0.183 12293 2521
+blowfish-j-demo-2.12-1jpp.noarch.rpm.jpackage 0.395 0.638 0.509 922 379
+jrms-1.1-1jpp.noarch.rpm.jpackage 0.349 0.670 0.496 805 413
+qdox-1.5-1jpp.noarch.rpm.jpackage 0.250 0.746 0.410 5290 656
+jzlib-1.0.7-1jpp.noarch.rpm.jpackage 0.224 0.537 0.192 7437 1190
+
+---
+
+	Xerces is an XML parser. In the result, other XML related tools are returned:
+
+---
+
+|| Match for xerces-j2-dom3-2.6.2-7jpp.noarch.rpm.jpackage sec:6 MSet: 30508 Set:3476
+<<xerces-j2-dom3-2.6.2-7jpp.noarch.rpm.jpackage 2.212 1.000 1.000 30508 3476
+xerces-j2-2.7.1-1jpp.noarch.rpm.jpackage 2.023 0.806 0.820 36979 3834
+xsdlib-2.2-0.20030225.2jpp.noarch.rpm.jpackage 0.474 0.871 0.570 4087 577
+tomcat55-jasper-5.5.17-4jpp.noarch.rpm.jpackage 0.294 0.798 0.280 12443 1436
+xalan-j2-xsltc-2.7.0-1jpp.noarch.rpm.jpackage 0.285 0.767 0.191 22036 2136
+tomcat5-jasper-5.0.30-11jpp.noarch.rpm.jpackage 0.281 0.822 0.291 10788 1302
+c-jdbc-2.0.2-1jpp.noarch.rpm.jpackage 0.256 0.682 0.177 30603 2240
+gnu-crypto-2.0.1-1jpp.noarch.rpm.jpackage 0.237 0.600 0.126 10086 2067
+xmlbeans-1.0.4-2jpp.noarch.rpm.jpackage 0.231 0.537 0.214 43065 2687
+xml-security-1.2.97-1jpp.noarch.rpm.jpackage 0.224 0.798 0.317 6177 789
+
+---
+
+
+[img099.jpg]

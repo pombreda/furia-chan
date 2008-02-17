@@ -1,0 +1,290 @@
+Tutorial
+~~~~~~~~~~~~~~~~~~~~
+
+[img104b.jpg]
+
+	This tutorial will show how to use Furia-chan. It is mainly designed for users with a unix terminal. If you are a windows user you could use {{{http://www.cygwin.com/}cygwin}}, or use additional windows programs to perform some of the preliminary steps. 
+
+Preliminaries:
+
+	You need Java 1.5 or greater. Furia-chan has been tested with sun's Java 1.6.0.
+
+	Make a directory <<<<dir>>>> where you perform all the experiments and go to that directory.
+
+---
+mkdir <dir>
+cd <dir>	
+---
+
+	Download the file {{http://furia-chan.googlecode.com/files/furia-chan-1-jar-with-dependencies.jar}} and copy it into <<<<dir>>>>. 
+
+---
+wget http://furia-chan.googlecode.com/files/furia-chan-1-jar-with-dependencies.jar
+
+// rename it to furia.jar so that the explanations are less cluttered.
+mv furia-chan-1-jar-with-dependencies.jar furia.jar
+---
+
+	Download the test data set from {{http://www.furiachan.org/datasets/java-0.tar.bz2}} and copy it into <<<<dir>>>>. If you want mirror this file please let us {{{http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org}know}}.
+	
+---
+wget http://www.furiachan.org/datasets/java-0.tar.bz2
+
+// the sha1 sum should be: 8a40349cbd6583301fcd084f42711c2c164a2828
+sha1sum java-0.tar.bz2 
+---
+
+	Decompress the dataset. (Windows users: you can use {{{www.7-zip.org/}7-zip}} to decompress the file)
+
+
+---
+tar -xjf java-0.tar.bz2
+---
+
+Let's start!
+
+	We now are ready to fragment and match programs.
+
+* Fragment Programs
+
+	In the previous steps we downloaded Furia-chan and got some experiment data. Furia-chan works on top of fragmented programs. She does not understand directly byte-code files so we will first fragment all the programs.
+
+---
+// Fragment the "base" data set.
+java -cp furia.jar org.kit.furia.BytecodeFrag  -dm -input ./java-0/base -output \
+    ./fragments/base/ -engine asm
+
+// Fragment the obfuscated data set.
+java -cp furia.jar org.kit.furia.BytecodeFrag -dm -input ./java-0/querySetSandMark \
+   -output ./fragments/querySetSandMark -engine asm
+---
+	
+	The flag "-dm" tells the Byte-code fragment application to operate in "directory mode". This means that the given folder is assumed to have folders which contain class files. Each folder name becomes the program name of the set of class files. The switch -engine asm asks furia-chan to fragment the files with the ASM byte-code library. With the first command, we have generated fragments for our "base" set of class files that contain the programs compiled with Sun's compiler. The second command extracts fragments of classes obfuscated with the Sandmark obfuscator.
+
+* Load Fragments into the DB
+
+	Now that we have created the fragments, let's index the Open Source apps we want to protect (our base set of class files). 
+
+---
+// The -load switch tells Furia-chan the input folder from where the fragment files
+// will be read.
+// The -db switch tells Furia-chan where the database will be created.
+java -jar furia.jar  -load -input ./fragments/base/ -db ./db/
+
+// To optimize matching speed OBSearch requires us to "freeze" or "learn" the DB. 
+// This process will take a while.
+// It is highly recommended to give Java the switch -XmxKM where K is
+// the number of megabytes of memory your system has. If you don't do this, 
+// the process will take a loooong time :). When I run furia-chan I use: -Xmx4000M
+java -Xmx4000M -jar furia.jar  -freeze  -db ./db/
+
+---
+
+	After these commands are executed we can search the DB. After freeze we can load additional data if we want to. Now we have a Furia-chan database under ./db/
+
+* Searching for Programs
+
+	Now that we have our database, we can start finding potential license violations. Under 
+ ./fragments/querySetSandMark, we have the fragments of applications  obfuscated with the Sandmark obfuscator. Furia-chan has a special validation mode that assumes that the query's application name exists in the database. With this information, we can calculate some basic precision measures. We will query the database with 307 applications and see if Furia-chan identifies them in the first top n results (n = 10). To perform the match we do: 
+
+---
+
+java -jar furia.jar  -search -input ./fragments/querySetSandMark \
+     -db ./db/ -validate
+
+---
+
+	When the process finishes running you will see something like: 
+
+---
+FuriaPrecision: (% of programs found in the first n documents) 0.9641694 296 of 307
+---
+
+ What this says is that for each query (program) in ./fragments/querySetSandMark, Furia-chan found the query in the first n returned documents 96% of the time.
+
+	Additionally, there are some numbers that will be handy when you are detecting violations:
+
+---
+MSet. Mean:  0.6523830739630235 StdDev: 0.16253904550225942 min: 0.3228130340576172 max: 1.0
+Set. Mean:  0.29925904061796293 StdDev: 0.2538806029016859 min: 0.04516129195690155 max: 1.0
+---
+
+  For each Furia-chan version, we will provide these numbers {{{versioning.html}here}}. We call these numbers <scoring boundaries>. You use them to get an idea on how the MSet and Set scores range in average for the strongest obfuscator our automated test used. Of course, higher scores than the boundaries are always better.
+
+** If you want to know more about these numbers...
+
+	The MSet ({{{http://en.wikipedia.org/wiki/Multiset}multi-set}}) score is the # of fragments in the <app> we want to protect that are also found in the <query> (pirate program). It is calculated by the formula:
+
+---
+|app ^ query| / |app| 
+---
+
+	where ^ is the multi-set intersection operation and |x| the cardinality of multi-set x.
+
+	The Set score is the # of fragments in the app we want to protect that are also found in the query (pirate program) when we see a program as a set. It is calculated by the formula:
+
+---
+|v(app) ^ v(query)| / |v(app)| 
+---
+
+	where ^ is the set intersection operation and v() is the set view of the given multi-set. In addition to these two scorings, Lucene performs some detailed analysis of the fragments of each program to decide which fragments are relevant and which are not. We are using Lucene's raw scoring. This score sorts the results in terms of relevance. Combined with the MSet and Set scores, we can decide if a match is relevant or not.
+
+	Lucene's {{{http://lucene.apache.org/java/2_3_0/api/org/apache/lucene/search/Similarity.html}javadoc}} explains more about this similarity if you are interested.
+
+
+* Matching Whole Programs
+
+	We will analyze here the effects of changing some parameters on one application so you can get an idea of what things can be tweaked in order to detect a license violation.
+
+	Let's match spring 1.1.5!
+
+---
+// note that we removed the "-validate" flag.
+java -jar furia.jar -search  -db ./db/ -input \
+     ./fragments/querySetSandMark/spring11-1.1.5-2jpp.noarch.rpm.jpackage/  
+
+---
+
+	This command will return something like:
+
+---
+(name, luceneScore, scoreMSet, scoreSet, size)
+|| Match for spring11-1.1.5-2jpp.noarch.rpm.jpackage sec:6.197 MSet: 19018 Set:1082
+Total results:406
+spring11-1.1.5-2jpp.noarch.rpm.jpackage 1.043 0.810 0.377 16348 1840
+spring-1.1.4-2jpp.noarch.rpm.jpackage 0.979 0.811 0.367 15770 1783
+spring-all-1.1.4-2jpp.noarch.rpm.jpackage 0.953 0.813 0.368 15533 1745
+spring11-webmvc-1.1.5-2jpp.noarch.rpm.jpackage 0.530 0.827 0.538 2252 390
+spring-webmvc-1.1.4-2jpp.noarch.rpm.jpackage 0.492 0.827 0.536 2077 366
+spring11-core-1.1.5-2jpp.noarch.rpm.jpackage 0.488 0.767 0.335 4421 776
+spring-core-1.1.4-2jpp.noarch.rpm.jpackage 0.465 0.765 0.330 4328 770
+spring-context-1.1.4-2jpp.noarch.rpm.jpackage 0.380 0.887 0.557 2555 282
+spring-orm-1.1.4-2jpp.noarch.rpm.jpackage 0.366 0.868 0.557 1722 203
+spring11-dao-1.1.5-2jpp.noarch.rpm.jpackage 0.363 0.852 0.468 2815 370
+---
+
+	The returned columns are the name of the matching application, Lucene's raw score, the MSet score and the Set score. Finally the cardinality of the set view of the application is given as a reference. We will ignore Lucene's score and focus on MSet and Set scores.
+
+	We can see that the first returned result is in effect the application we are looking for. The MSet score is 81% and the Set score is 37%. Is this a good match? 
+
+	In the previous section, we found that the scoring boundaries for the MSet score is 0.6523830739630235 with an standard deviation of 0.16253904550225942. The Set score boundary is 0.29925904061796293 with an std. deviation of 0.2538806029016859. This means that our score is within the expected score  boundary for this version of furia-chan. You can always find the scoring boundaries for the version of furia-chan that you are using {{{versioning.html}here}}. It is also evident that spring is the match, because all the other results are subcomponents or different spring versions.
+
+	The second match is an older version of spring. Its MSet score is a bit higher because  spring 1.1.4 has less fragments than spring 1.1.5. So far, the range we used was 1. This range means that fragments are considered equal if they are at most 1 distance units away from each other. If you increase this value, you gain some flexibility at the expense of accepting false positives. Please see the {{{overview.html}papers}} for more information on what this unit means. We will also increase the parameter {{{http://en.wikipedia.org/wiki/Nearest_neighbor_(pattern_recognition)}k}}. Let's see how this changes the result for spring. 
+
+---
+// we have added the parameter -r 7. It means that we are willing to accept
+// fragments that are at most 7 distance units away from each other.
+// the parameter -k means that we are accepting the two closest fragments of the
+// database for each fragment of the query. This parameter sometimes confuses Lucene
+// so use it with care.
+java -jar furia.jar -search  -db ./db/ -input \
+     ./fragments/querySetSandMark/spring11-1.1.5-2jpp.noarch.rpm.jpackage/ -r 7 -k 2
+
+---
+
+	The answer is:
+
+---
+
+spring11-1.1.5-2jpp.noarch.rpm.jpackage 0.671 0.831 0.415 16348 1840
+spring-1.1.4-2jpp.noarch.rpm.jpackage 0.625 0.832 0.405 15770 1783
+spring-all-1.1.4-2jpp.noarch.rpm.jpackage 0.609 0.833 0.406 15533 1745
+spring11-webmvc-1.1.5-2jpp.noarch.rpm.jpackage 0.327 0.840 0.556 2252 390
+spring11-core-1.1.5-2jpp.noarch.rpm.jpackage 0.315 0.775 0.365 4421 776
+spring-core-1.1.4-2jpp.noarch.rpm.jpackage 0.297 0.774 0.357 4328 770
+spring-webmvc-1.1.4-2jpp.noarch.rpm.jpackage 0.295 0.838 0.552 2077 366
+spring11-dao-1.1.5-2jpp.noarch.rpm.jpackage 0.239 0.861 0.511 2815 370
+spring-orm-1.1.4-2jpp.noarch.rpm.jpackage 0.239 0.883 0.616 1722 203
+spring-context-1.1.4-2jpp.noarch.rpm.jpackage 0.231 0.892 0.585 2555 282
+
+---
+
+	Both MSet and Set scores have been increased. You can tweak these two variables to improve the scoring of a match. If you ran this example in a "normal" computer, you probably noted that Furia-chan takes longer to answer this query. This is because OBSearch has to work harder when r and k are increased. As a side note, the first search we ran for spring had r=1 and k=1.
+
+
+* Detecting a Licence Violation
+
+	The previous example showed how similarity of complete programs can be calculated. Usually OSS violations are embedded in bigger pieces of software. Let's see how furia-chan can detect these sub-components.
+
+	Let's match spring-web-1.1.4-2jpp.noarch.rpm.jpackage . This package contains embedded some struts class files. 
+
+---
+
+java -jar furia.jar -search  -db ./db/ -input \
+     ./fragments/querySetSandMark/spring-web-1.1.4-2jpp.noarch.rpm.jpackage -r 7 -k 3
+
+---	
+
+	Furia-chan returns:
+
+---
+
+spring-web-1.1.4-2jpp.noarch.rpm.jpackage 0.285 0.866 0.476 983 145
+spring11-web-1.1.5-2jpp.noarch.rpm.jpackage 0.242 0.834 0.382 1073 173
+spring-orm-1.1.4-2jpp.noarch.rpm.jpackage 0.159 0.686 0.261 1722 203
+struts-faces-1.2.7-2jpp.noarch.rpm.jpackage 0.142 0.657 0.199 1680 201
+struts11-1.1-1jpp.noarch.rpm.jpackage 0.136 0.378 0.120 6402 785
+spring11-orm-1.1.5-2jpp.noarch.rpm.jpackage 0.134 0.680 0.255 1823 204
+dom4j-1.6.1-1jpp.noarch.rpm.jpackage 0.133 0.484 0.107 5175 758
+xpp3-1.1.3.4-1.o.1jpp.noarch.rpm.jpackage 0.130 0.524 0.110 4446 665
+jakarta-commons-jelly-1.0-1jpp.noarch.rpm.jpackage 0.124 0.642 0.195 2480 334
+portals-pluto-1.0.1-0.rc4.1jpp.noarch.rpm.jpackage 0.122 0.416 0.108 5935 809
+
+
+--- 
+
+	We found two struts results!  Spring also uses dom4j in its dependencies so we detected two possible "violations". The scores are low because Sandmark has very strong obfuscations. Other obfuscators should be easier to handle.  You could also create fragments from soot by using -engine soot for even cleaner results. Soot returns better results at the expense of longer fragment extraction time. Also, soot fails for some programs and fragments cannot be extracted from every program. Finally, we have tried with two commercial obfuscators that perform control flow obfuscation and the results are cleaner.
+
+	<<Warning:>> The result you just got is just telling you: <<in these n results, there might be a violation>>. It is up to you to read the scores and determine if they are relevant. Just because an score is X% you should not go and sue company or individual X. You need to analyze the pirate program, what is doing and judge the results accordingly. People at {{{www.gpl-violations.org }www.gpl-violations.org}} are experts at doing this. 
+ 
+ 
+What's next?
+
+	Now that we have validated that Furia-chan is matching appropriately, it is time to use our favorite obfuscator and test how good it is. If you find an obfuscator that breaks furia-chan please let us {{{http://lists.furiachan.org/listinfo.cgi/users-furiachan.org}know}}. If you find an interesting result, feel free to drop us a mail also. A non-exhaustive list of free and non-free obfuscators:
+
+	Commercial:
+
+ * {{{http://www.zelix.com/klassmaster/}Zelix Klass Master}}
+
+ * {{{http://www.codingart.com/codeshield.html}Code Shield}}
+
+ * {{{http://www.thinkmap.com/}DashO}}
+	
+ * {{{http://www.duckware.com/jobfuscate/index.html}JObfuscate}}
+	
+ * {{{http://www.e-t.com/jshrink.html}JShrink}}
+	
+ * {{{http://www.leesw.com/smokescreen/index.html}Smokescreen}}
+
+[] 
+
+	Free:
+
+ * {{{http://sandmark.cs.arizona.edu/}Sandmark}}
+	
+ * {{{http://proguard.sourceforge.net/}Pro-guard}}
+	
+ * {{{http://www.retrologic.com/retroguard-main.html}Regro-guard}}
+	
+ * {{{http://www.yworks.com/en/products_yguard_about.htm}YGuard}}
+	
+ * {{{http://www.e-t.com/jshrink.html}Marvin}}
+
+ * {{{http://donquixote.cafebabe.jp/}Don Quixote}} (Japanese only)
+
+[]
+
+	We have to copy any of the folders found under ./java-0/base/ to a new place <O>, obfuscate it with your obfuscator and then call Furia:
+
+---
+// fragment the program, leave the fragments in the root folder of the class files
+java -cp furia.jar org.kit.furia.BytecodeFrag  -input <O> -output <O> -engine asm
+
+// match the program
+java -jar furia.jar  -search -input <O>  -db ./db/
+--- 
+ 
+
+	Thank you for reading this tutorial.
+
+[img104a.jpg]
