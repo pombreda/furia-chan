@@ -43,7 +43,7 @@
       <subscribe>http://lists.furiachan.org/listinfo.cgi/announce-furiachan.org</subscribe>
       <unsubscribe>http://lists.furiachan.org/listinfo.cgi/announce-furiachan.org</unsubscribe>
       <post/>
-      <archive>http://lists.furiachan.org/private.cgi/announce-furiachan.org</archive>
+      <archive>http://lists.furiachan.org/pipermail/announce-furiachan.org/</archive>
     </mailingList>
 
     <mailingList>
