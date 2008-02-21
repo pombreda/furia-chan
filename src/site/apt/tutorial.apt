@@ -25,10 +25,25 @@ wget http://furia-chan.googlecode.com/files/furia-chan-1-jar-with-dependencies.j
 mv furia-chan-1-jar-with-dependencies.jar furia.jar
 ---
 
-	Download the test data set from {{http://www.furiachan.org/datasets/java-0.tar.bz2}} and copy it into <<<<dir>>>>. If you want mirror this file please let us {{{http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org}know}}.
+	Download the test data set from any of the following mirrors:	
+
+	* {{http://download.berlios.de/obsearch/java-0.tar.bz2}}
+
+	* {{http://download2.berlios.de/obsearch/java-0.tar.bz2}}
+
+[]
+	
+	Please use this mirror if all the others fail:
+
+  * {{http://www.furiachan.org/datasets/java-0.tar.bz2}} 
+
+[]
+
+  and copy it into <<<<dir>>>>. If you want mirror this file please let us {{{http://lists.furiachan.org/listinfo.cgi/developers-furiachan.org}know}}.
 	
 ---
-wget http://www.furiachan.org/datasets/java-0.tar.bz2
+// Download the file:
+wget http://download2.berlios.de/obsearch/java-0.tar.bz2
 
 // the sha1 sum should be: 8a40349cbd6583301fcd084f42711c2c164a2828
 sha1sum java-0.tar.bz2 

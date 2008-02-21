@@ -17,30 +17,24 @@ Furia-chan is a state of the art Open Source/ Libre software license violation d
 Information for Users
 *********************
 
-Furia-chan is a program matcher. The matching process consist of two steps. At first, you generate fragments of a program. Think of each fragment as the words of a web document.  The next step uses OBSearch and Lucene to calculate the similarity of the program.
+Furia-chan is a program matcher. The matching process consist of two steps. At first, you generate fragments of a program. Think of each fragment as a word of a web document.  The next step uses OBSearch and Lucene to calculate the similarity of binary programs.
 
-Currently, fragments can only be generated from Java Byte-code. There are plans to implement a program fragmentation engine for x86. Stay tuned!
+Check the tutorial of the program here: http://www.furiachan.org/tutorial.html
 
-* To fragment a folder of class files:
+If you have any questions drop us a line here: 
 
-* To fragment a folder of folders of class files: 
-(folder name used as app name)
+http://lists.furiachan.org/listinfo.cgi/users-furiachan.org
 
-Now that you have fragmented a program, we can load them and search them
-with Furia-chan.
-
-* To add a fragmented program:
-
-* To add many fragmented programs at once:
-
-* To find the similarity of programs:
+Thank you for your interest in Furia-chan!  
 
 Caveats:
 
 Furia-chan will work fine if each query has at least 100 different
 fragments. The program automatically checks for this.
 
-If you copy the database to a computer that has different big-endianness you will break furia-chan. I am using some Java unsafe classes for performance reasons; it is much faster to re-create the database again than to wait the extra time if we don't use unsafe classes. If you want to use safe classes, you can easily change the code of furia-chan to use only safe classes.
+If you copy the database to a computer that has different big-endianness you will break furia-chan. I am using some Java unsafe classes for performance reasons; it is much faster to re-create the database again than to wait the extra time if we don't use unsafe classes. If you want to use safe classes, the code can be easily changed.
+
+Currently, fragments can only be generated from Java Byte-code. There are plans to implement a program fragmentation engine for x86. Stay tuned!
 
 **************************
 Information for Developers
@@ -131,28 +125,16 @@ svn copy https://obsearch.googlecode.com/svn/trunk/ \
  
  mvn assembly:assembly
 
-
-
-
  Deployment:
  -----------
-Before deploying, change the line in pom.xml from
-<my.test.data.db>slices-small</my.test.data.db>
-to:
-<my.test.data.db>slices</my.test.data.db>
 
-And run: mvn test
-The test will run for 40 hours, if everything is fine, then you can release:
-but first restore the line <my.test.data.db>slices-small</my.test.data.db>
-in pom.xml
+Run: mvn test
+If everything is fine, then you can make a release.
 
 perl deploy.pl
 
 This script will generate the binary files, upload the website to
-berlios.de and will also generate an announce.txt file ready to 
+and will also generate an announce.txt file ready to 
 be sent to the mailing lists. The label creation is a manual process
  and it must be done after this script has been completed:
  
-svn copy https://obsearch.googlecode.com/svn/trunk/ \
-             https://obsearch.googlecode.com/svn/tags/0.7-GSOC \
-             -m "initial release"  --username <you>
