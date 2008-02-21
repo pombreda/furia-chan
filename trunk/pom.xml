@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>gsoc</groupId>
 			<artifactId>obsearch</artifactId>
-			<version>0.9.1a</version>
+			<version>0.9.1b</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -114,12 +114,12 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
+<!--		<dependency>
       <groupId>berkeleydb</groupId>
       <artifactId>je</artifactId>
       <version>3.2.23</version>
       <scope>compile</scope>
-    </dependency>
+    </dependency>-->
 
 		<dependency>
       <groupId>apache</groupId>

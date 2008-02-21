@@ -25,7 +25,7 @@ chmod 755 install.sh
 wget http://obsearch.googlecode.com/files/obsearch-$OBVERSION.jar
 
 
-# TODO: re-enable this!
+
 mvn install:install-file -Dfile=obsearch-$OBVERSION.jar -DgroupId=gsoc -DartifactId=obsearch -Dversion=$OBVERSION -Dpackaging=jar -DpomFile=pom.xml
 
 cd ..

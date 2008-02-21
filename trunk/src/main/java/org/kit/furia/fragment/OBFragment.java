@@ -177,7 +177,11 @@ public final class OBFragment implements OBShort {
         } else {
             return b.mtd( this);
         }
-
+        /*if (this.tree.getSize() < b.tree.getSize()) {
+            return (short)this.ds( b);
+        } else {
+            return (short)b.ds( this);
+        }*/
     }
 
     public final short mtd(OBFragment other) {

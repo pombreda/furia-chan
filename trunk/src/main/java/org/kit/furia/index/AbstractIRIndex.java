@@ -69,8 +69,8 @@ import com.sleepycat.je.DatabaseException;
  */
 
 /**
- * FuriousIRIndex holds the basic functionality for an Information Retrieval
- * system that works on OB objects (please see obsearch.berlios.de). By using a
+ * AbstractIRIndex holds the basic functionality for an Information Retrieval
+ * system that works on OB objects (please see www.obsearch.net). By using a
  * distance function d, we transform the queries in terms of the closest
  * elements that are in the database, and once this transformation is performed,
  * we utilize an information retrieval system (Apache's Lucene) to perform the
