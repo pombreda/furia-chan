@@ -24,7 +24,7 @@ package org.kit.furia.misc;
  * @author Arnoldo Jose Muller Molina
  * @since 0
  */
-public class IntegerHolder implements Comparable<IntegerHolder> {
+public final class IntegerHolder implements Comparable<IntegerHolder> {
 
     /**
      * Integer value to be stored.
