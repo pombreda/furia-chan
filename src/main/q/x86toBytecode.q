@@ -10,7 +10,8 @@ type Mem = const memInt, memShort, memByte, memLong, memDouble, memFloat;
 
 
 mov A B = addr(A) ++ value(B) ++  [store(A)];
-add A B = value(A) ++ value(B) ++ [iadd];
+add A B = value(A) ++ value(B) ++ [iadd]; // should define routines for add
+sub A B = value(A) ++ value(B) ++ [isub]; // to handle different types.
 
 
 // obtain an address
