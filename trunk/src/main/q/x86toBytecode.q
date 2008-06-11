@@ -1,5 +1,4 @@
 // rules used to transform assembly code instructions to java bytecode 
-
 // this is added here so that parameters respect this :)
 // mem is the memory array
 //type Reg64 = const rax, rbx, rcx, rdx, rsp, rbp, rsi, rdi;
@@ -22,17 +21,17 @@ type Mem = const memInt, memShort, memByte, memLong, memDouble, memFloat;
 
 // primitive arithmetic operations used for pointers or
 // arithmetic operations on bytecode
-xaddAux A B = addr([A]) ++ addr([B]) ++ t_add(A);
-xsubAux  A B = addr([A]) ++ addr([B]) ++ t_sub(A);
-xmulAux A B = addr([A]) ++ addr([B]) ++ t_mul(A);
-xdivAux A B = addr([A]) ++ addr([B]) ++ t_div(A);
+xaddAux A B = xaddr([A]) ++ xaddr([B]) ++ t_add(A);
+xsubAux  A B = xaddr([A]) ++ xaddr([B]) ++ t_sub(A);
+xmulAux A B = xaddr([A]) ++ xaddr([B]) ++ t_mul(A);
+xdivAux A B = xaddr([A]) ++ xaddr([B]) ++ t_div(A);
 
 // to avoid clashes we prepend "x" to all the instructions.
 xmov A B = addr(A) ++ value(B) ++  store(A);
 // A = A + B
-xadd A B = value(A) ++ value(B) ++ store(A); 
+xadd A B = addr(A) ++ value(A) ++ value(B) ++ t_add(A) ++  store(A); 
 // A = A - B
-xsub A B = value(A) ++ value(B)  ++ store(A); // to handle different types.
+xsub A B = addr(A) ++ value(A) ++ value(B) ++ t_sub(A) ++ store(A); // to handle different types.
 // add with carry
 xadc A B = xadd A B;
 // sub with borrow
@@ -63,7 +62,26 @@ xrcr A B = xsar A B;
 xrol A B = xsal A B;
 // rotate right
 xror A B = xsar A B;
+// Logical left
+xshl A B = xsal A B;
+// Logical left
+xshr A B = xsar A B;
 
+xlea A B = addr(A) ++ addr(B) ++ store(A);
+
+xint A = invokestatic A;
+
+xcall A = invokestatic A;
+
+
+// Logical operators
+// negate
+xneg A = addr(A) ++  value(0) ++ value(A) ++ t_sub(A) ++ store(A);
+// And
+xand A B = addr(A) ++ value(A) ++ value(B) ++ t_and(A) ++ store(A);
+// Or
+xor A B = addr(A) ++ value(A) ++ value(B) ++ t_or(A) ++ store(A);
+xxor A B = addr(A) ++ value(A) ++ value(B) ++ t_xor(A) ++ store(A);
 
 // leaving swap to give emphasis of the instruction change
 xxchg A B = value(A) ++ value(B) ++ [swap] ++  c_store(B) ++ c_store(A);
@@ -107,13 +125,22 @@ xpopf = xpop f_interrupt ++ xpop f_direction ++ xpop f_carry;
 
 // addr([A minus C:Int]) = [aload(e( memInt )) , xload(A),  iconst C, isub]
 // 														if isRegInt(A);
-addr(A:Int) = value(A);
-addr([A:Int]) = value(A);
+
+xaddr(A:Int) = value(A);
+xaddr([A:Int]) = value(A);
+
+xaddr([A]) = [ xload(A) ]
+							               if isRegInt(A);
+xaddr([A]) =  A  if  islist A;
+xaddr(A) =  A  if  islist A;
+// any address is empty
+xaddr(_) = [];
+
+
 addr([A]) = [aload(e( memInt )) , xload(A) ]
 							               if isRegInt(A);
-addr([A]) =  A  if  islist A;
-addr(A) =  A  if  islist A;
-
+addr([A]) = [aload(e( memInt ))] ++  A  if  islist A;
+addr(A) = [aload(e( memInt ))] ++  A  if  islist A;
 // any address is empty
 addr(_) = [];
 
@@ -132,9 +159,8 @@ value(A:Int) = [iconst A];
 value(A) = addr(A) ++ [ xload(A) ] if isRegInt(A);
 value([A]) = addr([A]) ++ [iaload] if isRegInt(A);
 
-// This is for addresses, so we don't need iaload
-value([A]) = A ++ [iaload] if islist(A);
-value(A) = A ++ [iaload] if islist(A);
+value([A]) = addr(A) ++ [iaload] if islist(A);
+value(A) = addr(A) ++ [iaload] if islist(A);
 
 
 // load a value.
@@ -177,6 +203,12 @@ t_mul(A:RegFloat) = [fmul];
 t_mul(A:RegDouble) = [dmul];
 t_mul(A) = [imul]; // if isRegInt(A);
 
+// Logical And
+t_and(A) = [iand];
+// Logical Or
+t_or(A) = [ior]; 
+// Logical xor
+t_xor(A) = [xor];
 
 t_cmp(A:RegFloat) = [fcmp];
 t_cmp(A:RegDouble) = [dcmp];
@@ -202,4 +234,24 @@ selectRegister(B:Reg8) = ah;
 
 
 
+test STR A B = puts (STR ++ "...OK\n") if A == B;
+             = puts (STR ++ "...FAILED\n") || fail otherwise;
 
+
+tests 
+= test "mov 1"
+  (xmov eax ebx)
+  [iload (e ebx), istore (e eax)]
+||
+  test "mov 2"
+  (xmov [eax suma 2 multi 3 resta 1 divi 5] [ebx suma 3])
+  [aload (e memInt),iload (e eax),iconst 2,iadd,iconst 3,imul,iconst 1,isub,iconst 5,idiv,aload (e memInt),iload (e ebx),iconst 3,iadd,iaload,iastore]
+||
+  test "add 1"
+(xadd [eax suma 3] 4)
+[aload (e memInt),iload (e eax),iconst 3,iadd,aload (e memInt),iload (e eax),iconst 3,iadd,iaload,iconst 4,iadd,iastore]
+||
+  test "lea 1"
+(xlea [eax] [edx suma eax resta 0x30])
+[aload (e memInt),iload (e eax),aload (e memInt),iload (e edx),iload (e eax),iadd,iconst 48,isub,iastore];
+// xlea eax [edx suma eax resta 0x30];
