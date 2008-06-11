@@ -49,7 +49,7 @@ xinc A = xadd A 1;
 // decrement
 xdec A = xadd A (-1) ;
 // comparison
-xcmp A B = value(A) ++ value(B) ++ t_cmp(A);
+xcmp A B = xsub A B;
 // shift arithmetic left
 xsal A B = value(A) ++ value(B) ++ t_shl(A);
 // shift arithmetic right
@@ -69,10 +69,45 @@ xshr A B = xsar A B;
 
 xlea A B = addr(A) ++ addr(B) ++ store(A);
 
-xint A = invokestatic A;
+xint A = [invokestatic A];
 
-xcall A = invokestatic A;
+xcall A = [invokestatic A];
 
+// control flow
+jmp A = [goto A];
+// jump if equal
+xje ADDR = [ifeq ADDR];
+// jump if zero
+xjz ADDR = [ifeq ADDR];
+// jump if cx zero
+xjcxz ADDR = [xload(cx)] ++ xje ADDR;
+// jump if ecx zero
+xjecxz ADDR = [xload(ecx)] ++ xje ADDR;
+// jump if not equal
+xjne ADDR = [ifne ADDR];
+// jump if not zero
+xjnz ADDR = [ifne ADDR];
+// jump if greater
+xjg ADDR = [ifgt ADDR];
+// jump if greater or equal
+xge ADDR = [ifge ADDR];
+// jump if less
+xjl ADDR = [iflt ADDR];
+// jump if less or equal
+xjle ADDR = [ifle ADDR];
+// jump if not greater
+xjng ADDR = xjle ADDR;
+// jump if not greater or equal
+xjnge ADDR = xjl ADDR;
+// jump if not less
+xjnl ADDR = xjge ADDR;
+// jump if not less or equal
+xjnle ADDR = xjg ADDR;
+
+
+
+// return
+xret = ret;
 
 // Logical operators
 // negate
@@ -112,6 +147,7 @@ xpusha = xpush eax ++  xpush ebx ++ xpush ecx ++ xpush edx ++ xpush esi ++ xpush
 xpopa = xpop f_interrupt ++ xpop f_direction ++ xpop f_complement_carry ++  xpop f_carry ++  xpop esp ++  xpop ebp ++  xpop edi ++  xpop esi ++  xpop edx ++  xpop ecx ++  xpop ebx ++  xpop eax;
 // pop all flags
 xpopf = xpop f_interrupt ++ xpop f_direction ++ xpop f_carry;
+
 
 
 
@@ -219,6 +255,8 @@ t_shl(A) = [ishl] if isRegInt(A);
 
 // shift right
 t_shr(A) = [ishl] if isRegInt(A);
+
+
 
 
 
