@@ -22,13 +22,13 @@
 open OK, ">OK.txt" or die "Could not open OK.txt";
 open BAD, ">BAD.txt" or die "Could not open BAD.txt";
 
-#foreach my $app (@packages) {
-#		processApp($app);
-#} 
+foreach my $app (@packages) {
+		processApp($app);
+} 
 
 
-emergeApp("mplayer");
-emergeApp("emacs");
+#emergeApp("mplayer");
+#emergeApp("emacs");
 
 
 close OK;
@@ -52,8 +52,9 @@ sub processApp {
 sub emergeApp{
 		my($a) = @_;
 		
-		$cmd = "emerge $a";
-		open(CMD, "$cmd |") or die "Can't run '$cmd'\n$!\n";
+		$cmd = "emerge $a > $a.txt";
+    system($cmd);
+				open(CMD, "$a.txt");
 		$i=0;
 		my $bad = 0;
 		my $process =0;
@@ -78,8 +79,10 @@ sub emergeApp{
 		}
 		if($bad){
 				print BAD "$a\n";
-		}else{
+		}elsif($process) {
 				print OK "$a\n";
+		}else{
+				print BAD "$a\n";
 		}
 		close(CMD);
 }
